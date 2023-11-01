@@ -1,4 +1,7 @@
 {
+  "author": "Gatien De Bast",
+  "name": "cv",
+  "version": "1.0.0",
   "devDependencies": {
     "parcel": "^2.10.1"
   },
