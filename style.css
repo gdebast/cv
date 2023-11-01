@@ -142,4 +142,5 @@ main color #228be6
   /*grid properties*/
   grid-column: 2;
   grid-row: 4/6;
+  display: none;
 }
