@@ -1,0 +1,9 @@
+{
+  "devDependencies": {
+    "parcel": "^2.10.1"
+  },
+  "scripts": {
+    "start": "parcel index.html",
+    "build": "parcel build index.html --dist-dir ./dist"
+  }
+}
