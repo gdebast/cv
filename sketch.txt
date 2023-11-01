@@ -1,0 +1,17 @@
+*Step 1 Defining the CV web-site
+Who:
+   HR, developer leads of other companies, OMP developers
+What:
+   The goal is to get hired by other companies by showing my achievements.
+
+*Step 2
+   Personality : Startup/Upbeat
+
+*Step 3 layout
+   the landing page starts with a big friendly picture of me in a block.
+   Each block is a functionality:
+      About the author -> cv
+      DPL movie -> able to upload and analyse the logs of DPL
+      OMP architect -> able to analyze pak cyclic dependencies and OPAL style guide aderence.
+      OPAL++ -> able to generate setting and expression based on a pseudo language.
+      Hire! -> reveal number/mail and able to download a CV
