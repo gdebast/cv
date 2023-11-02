@@ -32,6 +32,7 @@ main color #228be6
   text-align: center;
 
   /*shape*/
+  border: none;
   border-radius: 2.4rem;
   background-color: #a7d1f5;
   padding: 0 3.2rem;
@@ -51,11 +52,15 @@ main color #228be6
   transform: scale(1.05);
 }
 
-/*************/
-/*MAIN LAYOUT*/
-/*************/
+.hidden {
+  display: none;
+}
 
-.main {
+/***************/
+/*PORTAL LAYOUT*/
+/***************/
+
+.portal {
   padding: 9.6rem 22rem;
   background-color: #e9f3fd;
 }

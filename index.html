@@ -14,7 +14,10 @@
     <script type="module" src="src/main.js"></script>
   </head>
   <body>
-    <main class="main">
+    <!-- ------------- -->
+    <!-- main portal   -->
+    <!-- ------------- -->
+    <nav class="portal">
       <div class="app-grid">
         <section class="description-section">
           <div></div>
@@ -29,18 +32,25 @@
           <img class="gdb-photo" src="gdb.jpg" alt="Gatien De Bast" />
         </section>
 
-        <section class="about-section app-container">
+        <button class="about-section app-container">
           <div>About the Author</div>
-        </section>
+        </button>
 
-        <section class="dplmovie-section app-container">
+        <button class="dplmovie-section app-container" id="dplmovie-button">
           <div>DPL Movie</div>
-        </section>
+        </button>
 
-        <section class="opalgraph-section app-container">
+        <button class="opalgraph-section app-container">
           <div>OPAL Dependancy Graph</div>
-        </section>
+        </button>
       </div>
-    </main>
+    </nav>
+
+    <!-- ------------- -->
+    <!-- DPL Movie app -->
+    <!-- ------------- -->
+    <section class="app hidden dplmovie" for="dplmovie-button">
+      <input id="fileItem" type="file" />
+    </section>
   </body>
 </html>
