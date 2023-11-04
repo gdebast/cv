@@ -1,14 +1,11 @@
-import { RuntimeTracker } from "./runtimetracker";
 import { PortalAppLinker } from "./ui/portal/portalapplinker";
-
-const t = new RuntimeTracker();
+import { canvasTest } from "./ui/dplmovie/canvasTest";
 
 const linker = new PortalAppLinker();
 linker.linkAll();
 
-console.log(t.add(1, 1));
-
-const fileInput = document.getElementById("fileItem");
+// file input test
+const fileInput = document.getElementById("dpl-movie-fileItem");
 
 fileInput.addEventListener("change", function () {
   const file = fileInput.files[0];
@@ -22,3 +19,6 @@ fileInput.addEventListener("change", function () {
   );
   if (file) reader.readAsText(file);
 });
+
+// canvas test
+canvasTest();

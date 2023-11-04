@@ -1,0 +1,12 @@
+#dpl-movie-fileItem {
+  display: none;
+}
+.dpl-movie-fileItem-label {
+  cursor: pointer;
+}
+
+.dplmovie-canvas {
+  border: 0.1rem solid black;
+  display: block;
+  margin: 1.2rem auto 1.2rem auto;
+}

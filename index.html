@@ -4,7 +4,8 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="css/common.css" />
+    <link rel="stylesheet" href="css/dplmovie.css" />
     <title>Gatien De Bast</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
@@ -45,12 +46,65 @@
         </button>
       </div>
     </nav>
+    <!-- -------------- -->
+    <!-- app navigation -->
+    <!-- -------------- -->
+    <nav class="app-menu hidden">
+      <button class="portal-app-btn app-btn">
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="app-btn-icon"
+          viewBox="0 0 512 512"
+        >
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="32"
+            d="M368 368L144 144M368 144L144 368"
+          />
+        </svg>
+      </button>
+
+      <!-- DPL Movie navigation -->
+      <button
+        class="dplmovie-upload-btn app-btn app-specific-btn hidden"
+        for="dplmovie-button"
+      >
+        <label class="dpl-movie-fileItem-label" for="dpl-movie-fileItem">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="app-btn-icon"
+            viewBox="0 0 512 512"
+          >
+            <path
+              d="M320 367.79h76c55 0 100-29.21 100-83.6s-53-81.47-96-83.6c-8.89-85.06-71-136.8-144-136.8-69 0-113.44 45.79-128 91.2-60 5.7-112 43.88-112 106.4s54 106.4 120 106.4h56"
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="32"
+            />
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="32"
+              d="M320 255.79l-64-64-64 64M256 448.21V207.79"
+            />
+          </svg>
+        </label>
+        <input id="dpl-movie-fileItem" type="file" />
+      </button>
+    </nav>
 
     <!-- ------------- -->
     <!-- DPL Movie app -->
     <!-- ------------- -->
     <section class="app hidden dplmovie" for="dplmovie-button">
-      <input id="fileItem" type="file" />
+      <canvas class="dplmovie-canvas"></canvas>
     </section>
   </body>
 </html>

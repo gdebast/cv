@@ -19,7 +19,12 @@ body {
 }
 
 /*
-main color #228be6
+- Font sizes (px)
+10 / 12 / 14 / 16 / 18 / 20 / 24 / 30 / 36 / 44 / 52 / 62 / 74 / 86 / 98
+
+-Color
+ main color #228be6
+ tint: #a7d1f5, #e9f3fd
 */
 
 /*********/
@@ -50,10 +55,6 @@ main color #228be6
 .app-container:hover {
   cursor: pointer;
   transform: scale(1.05);
-}
-
-.hidden {
-  display: none;
 }
 
 /***************/
@@ -125,7 +126,7 @@ main color #228be6
 }
 
 /***************/
-/* APP SECTIONS*/
+/* APP BUTTONS*/
 /***************/
 
 /*about the author*/
@@ -147,5 +148,42 @@ main color #228be6
   /*grid properties*/
   grid-column: 2;
   grid-row: 4/6;
+  display: none;
+}
+
+/***************/
+/*   APP NAV   */
+/***************/
+.portal-app-btn {
+  margin-right: 4.8rem; /*make sure that the app-to-portal button stand out of the others*/
+}
+
+.app-menu {
+  padding: 2rem 4.4rem;
+  background-color: #e9f3fd;
+  display: flex;
+  gap: 2.4rem;
+}
+
+.app-btn {
+  border-radius: 1.2rem;
+  border: none;
+  cursor: pointer;
+  background-color: #a7d1f5;
+  transition: transform 0.3s;
+}
+.app-btn:hover {
+  cursor: pointer;
+  transform: scale(1.1);
+}
+
+.app-btn-icon {
+  height: 4.8rem;
+  border: none;
+  padding: 0.6rem;
+}
+
+/*hidding class*/
+.hidden {
   display: none;
 }
