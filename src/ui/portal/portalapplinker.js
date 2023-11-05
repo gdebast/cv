@@ -13,16 +13,19 @@ const appMenuElt = document.querySelector(CLASS_APPMENU);
 const appPortalBtn = document.querySelector(CLASS_APPMENUBTN);
 
 /**
- * class responsible for linking the portal to the apps
+ * class responsible for linking the portal to the apps.
+ * It will dictate which app section and which navigation button to open based on the main button of the portal.
  */
 export class PortalAppLinker {
-  constructor() {}
+  constructor() {
+    this.__linkAll();
+  }
 
   /**
    * link app button to the app such that it appears when the use click on it.
    * It also connect the app menu.
    */
-  linkAll() {
+  __linkAll() {
     let self = this;
     // connect each app section to its button
     apps.forEach(function (appElt) {
