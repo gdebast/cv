@@ -15,12 +15,22 @@
 /*************************/
 /* runtime selection view*/
 /*************************/
+
+/* view*/
 .dplmovie-runtime-view {
   margin: 1.2rem 1.2rem 1.2rem 1.2rem;
   display: flex;
   flex-direction: column;
   gap: 1rem;
 }
+.dplmovie-runtime-view-elt:first-child {
+  margin-top: 1.6rem;
+}
+.dplmovie-runtime-view-elt:hover {
+  box-shadow: 0 0 0.8rem 0rem #141010;
+}
+
+/*elements in the view*/
 .dplmovie-runtime-view-elt {
   margin: 0rem 1.2rem;
   padding: 1rem 0.6rem;
@@ -31,13 +41,10 @@
   box-shadow: 0 0 0.3rem 0rem #141010;
   background-color: #e9f3fd;
   transition: box-shadow 0.3s;
-}
-.dplmovie-runtime-view-elt:first-child {
-  margin-top: 1.6rem;
-}
 
-.dplmovie-runtime-view-elt:hover {
-  box-shadow: 0 0 0.8rem 0rem #141010;
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
 }
 
 .dplmovie-runtime-view-elt-title {

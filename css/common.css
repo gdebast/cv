@@ -27,9 +27,38 @@ body {
  tint: #a7d1f5, #d3e8fa #e9f3fd
 */
 
-/*********/
-/*GENERIC*/
-/*********/
+/*****************/
+/*GENERIC BUTTONS*/
+/*****************/
+
+/*buttons with icon*/
+/*-----------------*/
+.app-btn {
+  border-radius: 1.2rem;
+  border: none;
+  cursor: pointer;
+  background-color: #a7d1f5;
+  transition: transform 0.2s;
+}
+.app-btn:hover {
+  transform: scale(1.1);
+}
+
+.app-btn-icon-medium {
+  height: 4.8rem;
+  border: none;
+  padding: 0.6rem;
+}
+
+.app-btn-icon-small {
+  height: 2.8rem;
+  border: none;
+  padding: 0.6rem;
+}
+
+/*app buttons*/
+/*-----------*/
+
 .app-container {
   /*text properties*/
   font-size: 3.6rem;
@@ -163,24 +192,6 @@ body {
   background-color: #d3e8fa;
   display: flex;
   gap: 2.4rem;
-}
-
-.app-btn {
-  border-radius: 1.2rem;
-  border: none;
-  cursor: pointer;
-  background-color: #a7d1f5;
-  transition: transform 0.3s;
-}
-.app-btn:hover {
-  cursor: pointer;
-  transform: scale(1.1);
-}
-
-.app-btn-icon {
-  height: 4.8rem;
-  border: none;
-  padding: 0.6rem;
 }
 
 /*hidding class*/
