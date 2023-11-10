@@ -24,7 +24,7 @@ body {
 
 -Color
  main color #228be6
- tint: #a7d1f5, #e9f3fd
+ tint: #a7d1f5, #d3e8fa #e9f3fd
 */
 
 /*********/
@@ -63,7 +63,7 @@ body {
 
 .portal {
   padding: 9.6rem 22rem;
-  background-color: #e9f3fd;
+  background-color: #d3e8fa;
 }
 
 .app-grid {
@@ -160,7 +160,7 @@ body {
 
 .app-menu {
   padding: 2rem 4.4rem;
-  background-color: #e9f3fd;
+  background-color: #d3e8fa;
   display: flex;
   gap: 2.4rem;
 }
