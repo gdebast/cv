@@ -25,6 +25,7 @@ body {
 -Color
  main color #228be6
  tint: #a7d1f5, #d3e8fa #e9f3fd
+ error:  #C92A2A, #fff4e6, #e67700
 */
 
 /*****************/
@@ -39,9 +40,12 @@ body {
   cursor: pointer;
   background-color: #a7d1f5;
   transition: transform 0.2s;
+
+  position: relative; /*usefull for adding message box*/
 }
 .app-btn:hover {
   transform: scale(1.1);
+  z-index: 9;
 }
 
 .app-btn-icon-medium {
@@ -56,8 +60,45 @@ body {
   padding: 0.6rem;
 }
 
-/*app buttons*/
-/*-----------*/
+/*button with message in case of error*/
+.app-btn-error {
+  background-color: #c92a2a;
+  color: #fff4e6;
+}
+.app-btn-error-message-box {
+  position: absolute;
+  border-radius: 0rem 0.8rem 0.8rem 0.8rem;
+  border: #0a2a45 solid 0.1rem;
+  background-color: #e67700;
+  color: #fff4e6;
+  padding: 0.8rem 1.2rem;
+  z-index: 10;
+  text-align: left;
+  top: 50%;
+  left: 50%;
+  width: 25rem; /* force to have a small box*/
+  cursor: default;
+
+  /*flex*/
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  gap: 1.2rem;
+}
+.app-btn-error-message-box button {
+  align-self: start;
+  border-radius: 0.6rem;
+  border: none;
+  cursor: pointer;
+  background-color: transparent;
+  padding: 0.2rem;
+}
+.app-btn-error-message-box button svg {
+  height: 2.4rem;
+}
+
+/*big buttons to get to the apps*/
+/*------------------------------*/
 
 .app-container {
   /*text properties*/
