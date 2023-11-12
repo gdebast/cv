@@ -1,5 +1,5 @@
 import { PortalAppLinker } from "./ui/portal/portalapplinker";
-import { canvasTest } from "./ui/dplmovie/canvasTest";
+import { createBouncingCircles } from "./ui/dplmovie/canvastest";
 import { DPLMovieJsonInputView } from "./ui/dplmovie/dplmoviejsoninputview";
 import { DPLMovieRuntimeView } from "./ui/dplmovie/dplmovieruntimeview";
 import { DPLMovieRuntimePool } from "./model/dplmovie/dplmovieruntimepool";
@@ -20,4 +20,4 @@ dplMovieRuntimePool.addRuntime(
 );
 
 // canvas test
-canvasTest();
+createBouncingCircles(10, 1, 5);
