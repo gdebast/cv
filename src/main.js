@@ -20,4 +20,4 @@ dplMovieRuntimePool.addRuntime(
 );
 
 // canvas test
-createBouncingCircles(10, 1, 5);
+createBouncingCircles(15, 1, 5);
