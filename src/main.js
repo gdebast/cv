@@ -3,6 +3,7 @@ import { createBouncingCircles } from "./ui/dplmovie/canvasTest";
 import { DPLMovieJsonInputView } from "./ui/dplmovie/dplmoviejsoninputview";
 import { DPLMovieRuntimeView } from "./ui/dplmovie/dplmovieruntimeview";
 import { DPLMovieRuntimePool } from "./model/dplmovie/dplmovieruntimepool";
+import { DirectedGraph } from "./model/utility/graph";
 
 const linker = new PortalAppLinker();
 const dplMovieRuntimePool = new DPLMovieRuntimePool();
