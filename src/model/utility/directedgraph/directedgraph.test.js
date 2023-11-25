@@ -46,10 +46,11 @@ test("1.1 the graph should correctly represents the desired structure", () => {
     "n5->a9->n1",
   ]);
 });
+
 // LEVELS
+// ------
 test("1.2 the graph levels should be correct", () => {
   const graphlevels = g1.levels;
-  console.log(graphlevels.length);
   graphlevels.sort((level1, level2) => {
     return level1.number < level2.number ? -1 : 1;
   });
