@@ -93,6 +93,14 @@ export class DirectedGraph {
     return levelsArray;
   }
 
+  /** returns all clusters of this graph.
+   * @returns {Array<DirectedGraphCluster>} all levels of this graph
+   */
+  get clusters() {
+    this.computeLevelsClustersAndCycles();
+    return this._clusters;
+  }
+
   /** create a Node in this graph.
    * @param {Object} obj the object contained in this node (optional)
    * @returns the created node.
