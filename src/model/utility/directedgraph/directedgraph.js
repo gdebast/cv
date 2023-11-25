@@ -77,6 +77,18 @@ export class DirectedGraph {
     this._initializeMetaStructures();
   }
 
+  /** returns all levels of this graph.
+   * @returns {Array<DirectedGraphLevel>} all levels of this graph
+   */
+  get levels() {
+    this.computeLevelsClustersAndCycles();
+    const levelsArray = [];
+    this._levels.forEach((level) => {
+      levelsArray.push(level);
+    });
+    return levelsArray;
+  }
+
   /** create a Node in this graph.
    * @param {Object} obj the object contained in this node (optional)
    * @returns the created node.
