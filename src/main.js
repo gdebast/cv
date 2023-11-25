@@ -45,3 +45,5 @@ g.createArc(n2, n7, "a5");
 g.createArc(n6, n7, "a7");
 //g.createArc(n7, n6, "a6");
 g.computeLevelsClustersAndCycles();
+
+console.log(process.env.NODE_ENV);
