@@ -77,6 +77,10 @@ export class DirectedGraph {
     this._initializeMetaStructures();
   }
 
+  get arcs() {
+    return this._arcs;
+  }
+
   /** returns all levels of this graph.
    * @returns {Array<DirectedGraphLevel>} all levels of this graph
    */
@@ -120,7 +124,7 @@ export class DirectedGraph {
 
   computeLevelsClustersAndCycles() {
     // the levels are up to date
-    if (this._levels.length > 0) return;
+    if (this._levels.size > 0) return;
     this._initializeMetaStructures();
 
     const computer = new DirectedGraphLevelClusterCycleComputer(this._nodes);
