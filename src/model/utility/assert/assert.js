@@ -1,4 +1,4 @@
-const ACTIVATE_ASSERT = false;
+const ACTIVATE_ASSERT = process.env.NODE_ENV === "development";
 
 export const ASSERT_TYPE = function (obj, cls) {
   if (!ACTIVATE_ASSERT) return;
