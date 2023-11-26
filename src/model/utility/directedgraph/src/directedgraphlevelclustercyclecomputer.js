@@ -47,6 +47,8 @@ export class DirectedGraphLevelClusterCycleComputer {
 
   /** compute the levels, clusters and cycles. */
   compute() {
+    this._processIsolatedNodes();
+
     this._logStatus();
 
     // exploration
@@ -80,12 +82,22 @@ export class DirectedGraphLevelClusterCycleComputer {
     };
   }
 
-  _getLevelArray() {
-    const discoveredLevels = [];
-    this._levels.forEach((node) => {
-      discoveredLevels.push(node);
-    });
-    return discoveredLevels;
+  /** this method will simply find the isolated nodes (no arc connected to it)
+   *  and assign them a cluster.
+   */
+  _processIsolatedNodes() {
+    const nodesLength = this._possibleStartNodes.length;
+    for (let index = nodesLength - 1; index >= 0; index--) {
+      const node = this._possibleStartNodes[index];
+      if (node.outgoingArcs.length === 0 && node.ingoingArcs.length === 0) {
+        this._possibleStartNodes.splice(index, 1);
+        const isolatedCluster = new DirectedGraphCluster();
+        isolatedCluster.addNode(node);
+        this._clusters.push(isolatedCluster);
+        const isolatedLevel = this._findOrCreateLevel(1);
+        isolatedLevel.addNode(node);
+      }
+    }
   }
 
   /** create or return find the level of this graph with that number.
@@ -354,6 +366,14 @@ export class DirectedGraphLevelClusterCycleComputer {
       })
       .join();
     console.log(`${indentation}${arrayName} = [${psStrs}]`);
+  }
+
+  _getLevelArray() {
+    const discoveredLevels = [];
+    this._levels.forEach((node) => {
+      discoveredLevels.push(node);
+    });
+    return discoveredLevels;
   }
 
   /** log the clusters, levels and cycles */

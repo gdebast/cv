@@ -22,3 +22,15 @@ dplMovieRuntimePool.addRuntime(
 
 // canvas test
 createBouncingCircles(15, 1, 5);
+
+const g3 = new DirectedGraph();
+const g3n1 = g3.createNode("n1");
+const g3n2 = g3.createNode("n2");
+const g3n3 = g3.createNode("n3");
+const g3n4 = g3.createNode("n4");
+g3.createNode("n5");
+g3.createArc(g3n1, g3n2, "a1");
+g3.createArc(g3n1, g3n3, "a2");
+g3.createArc(g3n2, g3n4, "a3");
+g3.createArc(g3n3, g3n4, "a4");
+g3.computeLevelsClustersAndCycles(true);

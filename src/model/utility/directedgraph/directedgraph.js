@@ -130,12 +130,15 @@ export class DirectedGraph {
     return arc;
   }
 
-  computeLevelsClustersAndCycles() {
+  computeLevelsClustersAndCycles(debug = false) {
     // the levels are up to date
     if (this._levels.size > 0) return;
     this._initializeMetaStructures();
 
-    const computer = new DirectedGraphLevelClusterCycleComputer(this._nodes);
+    const computer = new DirectedGraphLevelClusterCycleComputer(
+      this._nodes,
+      debug
+    );
     const result = computer.compute();
 
     let { levels: levels, clusters: clusters, cycles: cycles } = result;

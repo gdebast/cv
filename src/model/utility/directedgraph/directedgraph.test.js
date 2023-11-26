@@ -1,5 +1,9 @@
 import { DirectedGraph } from "./directedgraph";
 
+const sortNode = function (n1, n2) {
+  return n1.object < n2.object ? -1 : 1;
+};
+
 const getGraphDescription = function (graph) {
   const graphArcs = graph.arcs;
   graphArcs.sort((arc1, arc2) => {
@@ -18,7 +22,9 @@ const getLevelsDescription = function (graph) {
   });
 
   const levelDescriptionArray = graphlevels.map((level) => {
-    return `${level.number}->[${level.nodes
+    const levelNodes = level.nodes;
+    levelNodes.sort(sortNode);
+    return `${level.number}->[${levelNodes
       .map((node) => {
         return node.object;
       })
@@ -30,9 +36,7 @@ const getLevelsDescription = function (graph) {
 const getClustersDescription = function (graph) {
   const getClusterId = function (cluster) {
     const clusterNodes = cluster.nodes;
-    clusterNodes.sort((n1, n2) => {
-      return n1.object < n2.object ? -1 : 1;
-    });
+    clusterNodes.sort(sortNode);
     return clusterNodes.join("-");
   };
   // sort the clusters
@@ -42,9 +46,7 @@ const getClustersDescription = function (graph) {
   });
   return graphClusters.map((cluster) => {
     const clusterNodes = cluster.nodes;
-    clusterNodes.sort((n1, n2) => {
-      return n1.object < n2.object ? -1 : 1;
-    });
+    clusterNodes.sort(sortNode);
     return `[${clusterNodes
       .map((n) => {
         return n.object;
@@ -100,7 +102,7 @@ test("1.2 the graph levels should be correct", () => {
     "1->[n5]",
     "2->[n4]",
     "3->[n1]",
-    "4->[n8,n2,n3]",
+    "4->[n2,n3,n8]",
     "5->[n6]",
     "6->[n7]",
   ]);
@@ -151,8 +153,8 @@ test("2.2 the graph levels should be correct", () => {
   const levelDescriptionArray = getLevelsDescription(g2);
   expect(levelDescriptionArray).toEqual([
     "1->[n1]",
-    "2->[n3,n2]",
-    "3->[n7,n6,n5,n4]",
+    "2->[n2,n3]",
+    "3->[n4,n5,n6,n7]",
   ]);
 });
 
@@ -161,4 +163,48 @@ test("2.2 the graph levels should be correct", () => {
 test("2.3 the graph clusters should be correct", () => {
   const clustersDescription = getClustersDescription(g2);
   expect(clustersDescription).toEqual(["[n1,n2,n3,n4,n5,n6,n7]"]);
+});
+
+// =============================================
+// 3. test a diamond graph without isolate node.
+// =============================================
+const g3 = new DirectedGraph();
+const g3n1 = g3.createNode("n1");
+const g3n2 = g3.createNode("n2");
+const g3n3 = g3.createNode("n3");
+const g3n4 = g3.createNode("n4");
+g3.createNode("n5");
+g3.createArc(g3n1, g3n2, "a1");
+g3.createArc(g3n1, g3n3, "a2");
+g3.createArc(g3n2, g3n4, "a3");
+g3.createArc(g3n3, g3n4, "a4");
+
+// REPRESENTATION
+// --------------
+test("3.1 the graph should correctly represents the desired structure", () => {
+  const graphDescriptionArray = getGraphDescription(g3);
+  expect(graphDescriptionArray).toEqual([
+    "n1->a1->n2",
+    "n1->a2->n3",
+    "n2->a3->n4",
+    "n3->a4->n4",
+  ]);
+});
+
+// LEVELS
+// ------
+test("3.2 the graph levels should be correct", () => {
+  const levelDescriptionArray = getLevelsDescription(g3);
+  expect(levelDescriptionArray).toEqual([
+    "1->[n1,n5]",
+    "2->[n2,n3]",
+    "3->[n4]",
+  ]);
+});
+
+// CLUSTER
+// -------
+test("3.3 the graph clusters should be correct", () => {
+  const clustersDescription = getClustersDescription(g3);
+  expect(clustersDescription).toEqual(["[n5]", "[n1,n2,n3,n4]"]);
 });
