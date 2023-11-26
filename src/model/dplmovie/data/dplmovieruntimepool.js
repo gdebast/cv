@@ -1,3 +1,5 @@
+import { ASSERT_TYPE } from "../../utility/assert/assert";
+
 class DPLMovieRuntime {
   constructor(id, solverType, solverName, runtimeDate) {
     this._id = id;
@@ -52,6 +54,7 @@ export class DPLMovieRuntimePool {
    *  @param {Object} runtime  DPLMovieRuntime to delete
    */
   deleteRuntime(runtime) {
+    ASSERT_TYPE(runtime, DPLMovieRuntime);
     this._onAddDeleteObservers.forEach(function (obs) {
       obs.notifyRuntimeDeletion(runtime);
     });
@@ -60,10 +63,14 @@ export class DPLMovieRuntimePool {
 
   // returns all the runtime
   get runtimes() {
+    const sortRuntimes = function (r1, r2) {
+      return r1.date < r2.date ? -1 : 1;
+    };
     const runtimes = [];
     this._dplMovieRuntimes.forEach(function (runtime) {
       runtimes.push(runtime);
     });
+    runtimes.sort(sortRuntimes);
     return runtimes;
   }
 
