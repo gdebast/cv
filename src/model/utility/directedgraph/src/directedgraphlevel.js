@@ -1,3 +1,5 @@
+import { setToArray } from "../../toarray/toarray";
+
 export class DirectedGraphLevel {
   /** object representing a level in a directed graph.
    * @param {integer} levelNr level number
@@ -25,10 +27,6 @@ export class DirectedGraphLevel {
    * @returns {Array<DirectedGraphNode>} nodes in the level.
    */
   get nodes() {
-    const nodes = [];
-    this._nodes.forEach((node) => {
-      nodes.push(node);
-    });
-    return nodes;
+    return setToArray(this._nodes);
   }
 }

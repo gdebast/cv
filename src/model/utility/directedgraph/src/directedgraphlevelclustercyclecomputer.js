@@ -59,6 +59,8 @@ export class DirectedGraphLevelClusterCycleComputer {
 
       if (pathToExplore) this._discoverCluster(pathToExplore);
 
+      if (pathToExplore) this._discoverCycles();
+
       if (!pathToExplore || !this._isExplorationContinuing())
         this._addPathToTopology(this._currentPath);
 
@@ -382,6 +384,7 @@ export class DirectedGraphLevelClusterCycleComputer {
     console.log(`Result:`);
     this._logNodeContainer(this._getLevelArray(), "Levels", "  ", true);
     this._logNodeContainer(this._clusters, "Clusters", "  ", false);
+    this._logNodeContainer(this._cycles, "Cycles", "  ", false);
   }
 
   /** log an object containing a list of nodes.
@@ -453,9 +456,18 @@ export class DirectedGraphLevelClusterCycleComputer {
   _discoverLevels() {
     const self = this;
     this._topology.forEach(function (node) {
-      const allLowerLevelNode = node.ingoingArcs.map((arc) => {
-        return arc.fromNode;
+      const nodeInSameCycle = node.cycle ? node.cycle.nodes : [];
+
+      // find all nodes below this one
+      const allLowerLevelNode = [];
+      node.ingoingArcs.forEach((arc) => {
+        const potentielNode = arc.fromNode;
+        if (potentielNode === node) return;
+        if (nodeInSameCycle.includes(potentielNode)) return;
+        allLowerLevelNode.push(arc.fromNode);
       });
+
+      // find the maximum level of all node below and set the node this level+1
       let maxLowerLevel = null;
       for (const lowerNode of allLowerLevelNode) {
         if (
@@ -467,6 +479,67 @@ export class DirectedGraphLevelClusterCycleComputer {
       if (maxLowerLevel)
         self._findOrCreateLevel(maxLowerLevel.number + 1).addNode(node);
       else self._findOrCreateLevel(1).addNode(node);
+
+      // propagate to the cycle, if needed
+      if (nodeInSameCycle.length > 0) {
+        nodeInSameCycle.forEach((n) => {
+          node.level.addNode(n);
+        });
+      }
+    });
+  }
+
+  /** this method aims to detect cycle with the current path:
+   *  1. if the current path hit itself (last to-node is one of the from-node), a cycle is detected. if a cycle is not detected, we stop.
+   *  2. all nodes involves will get a new cycle. If the involved nodes are in a cycle, those cycles merge with the new.
+   *  3. the last segment of the current path is removed. The next loop should back-track it.
+   */
+  _discoverCycles() {
+    const currentPathLength = this._currentPath.length;
+    if (currentPathLength === 0) return;
+
+    // 1. cycle detection
+    const lastToNode = this._currentPath[currentPathLength - 1].arc.toNode;
+    let cycleDetectionIndex = currentPathLength - 1;
+    let cycleDetected = false;
+    while (!cycleDetected && cycleDetectionIndex >= 0) {
+      cycleDetected =
+        this._currentPath[cycleDetectionIndex].arc.fromNode === lastToNode;
+      if (!cycleDetected) cycleDetectionIndex--;
+    }
+
+    if (!cycleDetected) return;
+
+    // 2. assign a cycle
+    ASSERT(
+      cycleDetectionIndex >= 0 && currentPathLength > cycleDetectionIndex,
+      `cycle detection index is wrong : currentPathLength=${currentPathLength} and cycleDetectionIndex=${cycleDetectionIndex}`
+    );
+    const oldCycles = [];
+    const involvedNodes = [];
+    for (let index = cycleDetectionIndex; index < currentPathLength; index++) {
+      const involvedNode = this._currentPath[index].arc.fromNode;
+      involvedNodes.push(involvedNode);
+      const oldCycle = involvedNode.cycle;
+      if (oldCycle) {
+        oldCycles.push(oldCycle);
+        const oldCycleNodes = oldCycle.nodes;
+        involvedNodes.push(...oldCycleNodes);
+      }
+    }
+    const newCycle = new DirectedGraphCycle();
+    involvedNodes.forEach((n) => {
+      newCycle.addNode(n);
+    });
+    this._cycles.push(newCycle);
+
+    //3. remove the last segment
+    this._currentPath.pop();
+
+    //4. remove the old cycles
+    oldCycles.forEach(function (cycle) {
+      ASSERT(cycle.nodes.length === 0, "an old cycle has not been emptied.");
+      this._cycles.splice(this._cycles.indexOf(cycle), 1);
     });
   }
 }

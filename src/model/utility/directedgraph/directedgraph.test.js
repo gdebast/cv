@@ -4,6 +4,12 @@ const sortNode = function (n1, n2) {
   return n1.object < n2.object ? -1 : 1;
 };
 
+const getNodeContainerId = function (container) {
+  const nodes = container.nodes;
+  nodes.sort(sortNode);
+  return nodes.join("-");
+};
+
 const getGraphDescription = function (graph) {
   const graphArcs = graph.arcs;
   graphArcs.sort((arc1, arc2) => {
@@ -33,21 +39,15 @@ const getLevelsDescription = function (graph) {
   return levelDescriptionArray;
 };
 
-const getClustersDescription = function (graph) {
-  const getClusterId = function (cluster) {
-    const clusterNodes = cluster.nodes;
-    clusterNodes.sort(sortNode);
-    return clusterNodes.join("-");
-  };
-  // sort the clusters
-  const graphClusters = graph.clusters;
-  graphClusters.sort((c1, c2) => {
-    return getClusterId(c1) < getClusterId(c2) ? -1 : 1;
+const getNodeContainersDescription = function (containers) {
+  // sort
+  containers.sort((c1, c2) => {
+    return getNodeContainerId(c1) < getNodeContainerId(c2) ? -1 : 1;
   });
-  return graphClusters.map((cluster) => {
-    const clusterNodes = cluster.nodes;
-    clusterNodes.sort(sortNode);
-    return `[${clusterNodes
+  return containers.map((cluster) => {
+    const nodes = cluster.nodes;
+    nodes.sort(sortNode);
+    return `[${nodes
       .map((n) => {
         return n.object;
       })
@@ -111,8 +111,15 @@ test("1.2 the graph levels should be correct", () => {
 // CLUSTER
 // -------
 test("1.3 the graph clusters should be correct", () => {
-  const clustersDescription = getClustersDescription(g1);
+  const clustersDescription = getNodeContainersDescription(g1.clusters);
   expect(clustersDescription).toEqual(["[n1,n2,n3,n4,n5,n6,n7,n8]"]);
+});
+
+// CYCLES
+// -------
+test("1.4 the graph cycles should be correct", () => {
+  const cyclesDescription = getNodeContainersDescription(g1.cycles);
+  expect(cyclesDescription).toEqual([]);
 });
 
 // =============================================
@@ -161,8 +168,15 @@ test("2.2 the graph levels should be correct", () => {
 // CLUSTER
 // -------
 test("2.3 the graph clusters should be correct", () => {
-  const clustersDescription = getClustersDescription(g2);
+  const clustersDescription = getNodeContainersDescription(g2.clusters);
   expect(clustersDescription).toEqual(["[n1,n2,n3,n4,n5,n6,n7]"]);
+});
+
+// CYCLES
+// -------
+test("2.4 the graph cycles should be correct", () => {
+  const cyclesDescription = getNodeContainersDescription(g2.cycles);
+  expect(cyclesDescription).toEqual([]);
 });
 
 // =============================================
@@ -205,6 +219,110 @@ test("3.2 the graph levels should be correct", () => {
 // CLUSTER
 // -------
 test("3.3 the graph clusters should be correct", () => {
-  const clustersDescription = getClustersDescription(g3);
+  const clustersDescription = getNodeContainersDescription(g3.clusters);
   expect(clustersDescription).toEqual(["[n5]", "[n1,n2,n3,n4]"]);
+});
+
+// CYCLES
+// -------
+test("3.4 the graph cycles should be correct", () => {
+  const cyclesDescription = getNodeContainersDescription(g3.cycles);
+  expect(cyclesDescription).toEqual([]);
+});
+
+// =================================
+// 4. test a graph with a big cycle.
+// =================================
+const g4 = new DirectedGraph();
+const g4n1 = g4.createNode("n1");
+const g4n2 = g4.createNode("n2");
+const g4n3 = g4.createNode("n3");
+const g4n4 = g4.createNode("n4");
+g4.createArc(g4n1, g4n2, "a1");
+g4.createArc(g4n2, g4n3, "a2");
+g4.createArc(g4n3, g4n4, "a3");
+g4.createArc(g4n4, g4n1, "a4");
+
+// REPRESENTATION
+// --------------
+test("4.1 the graph should correctly represents the desired structure", () => {
+  const graphDescriptionArray = getGraphDescription(g4);
+  expect(graphDescriptionArray).toEqual([
+    "n1->a1->n2",
+    "n2->a2->n3",
+    "n3->a3->n4",
+    "n4->a4->n1",
+  ]);
+});
+
+// LEVELS
+// ------
+test("4.2 the graph levels should be correct", () => {
+  const levelDescriptionArray = getLevelsDescription(g4);
+  expect(levelDescriptionArray).toEqual(["1->[n1,n2,n3,n4]"]);
+});
+
+// CLUSTER
+// -------
+test("4.3 the graph clusters should be correct", () => {
+  const clustersDescription = getNodeContainersDescription(g4.clusters);
+  expect(clustersDescription).toEqual(["[n1,n2,n3,n4]"]);
+});
+
+// CYCLES
+// -------
+test("4.4 the graph cycles should be correct", () => {
+  const cyclesDescription = getNodeContainersDescription(g4.cycles);
+  expect(cyclesDescription).toEqual(["[n1,n2,n3,n4]"]);
+});
+
+// ======================================
+// 5. test a graph with two small cycles.
+// ======================================
+const g5 = new DirectedGraph();
+const g5n1 = g5.createNode("n1");
+const g5n2 = g5.createNode("n2");
+const g5n3 = g5.createNode("n3");
+const g5n4 = g5.createNode("n4");
+g5.createArc(g5n1, g5n2, "a1");
+g5.createArc(g5n2, g5n1, "a2");
+g5.createArc(g5n2, g5n3, "a3");
+g5.createArc(g5n2, g5n4, "a4");
+g5.createArc(g5n3, g5n4, "a5");
+g5.createArc(g5n4, g5n3, "a6");
+
+// REPRESENTATION
+// --------------
+test("5.1 the graph should correctly represents the desired structure", () => {
+  const graphDescriptionArray = getGraphDescription(g5);
+  expect(graphDescriptionArray).toEqual([
+    "n1->a1->n2",
+    "n2->a2->n1",
+    "n2->a3->n3",
+    "n2->a4->n4",
+    "n3->a5->n4",
+    "n4->a6->n3",
+  ]);
+});
+
+// LEVELS
+// ------
+test("5.2 the graph levels should be correct", () => {
+  const levelDescriptionArray = getLevelsDescription(g5);
+  console.log(levelDescriptionArray);
+  expect(levelDescriptionArray).toEqual(["1->[n1,n2]", "2->[n3,n4]"]);
+});
+
+// CLUSTER
+// -------
+test("5.3 the graph clusters should be correct", () => {
+  const clustersDescription = getNodeContainersDescription(g5.clusters);
+  expect(clustersDescription).toEqual(["[n1,n2,n3,n4]"]);
+});
+
+// CYCLES
+// -------
+test("5.4 the graph cycles should be correct", () => {
+  const cyclesDescription = getNodeContainersDescription(g5.cycles);
+  expect(cyclesDescription).toEqual(["[n1,n2]", "[n3,n4]"]);
 });

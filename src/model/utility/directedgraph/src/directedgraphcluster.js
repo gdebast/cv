@@ -1,3 +1,5 @@
+import { setToArray } from "../../toarray/toarray";
+
 export class DirectedGraphCluster {
   /** object representing a cluster or independent component of a directed graph.
    */
@@ -19,10 +21,6 @@ export class DirectedGraphCluster {
    * @returns {Array<DirectedGraphNode>} nodes in the cluster.
    */
   get nodes() {
-    const nodes = [];
-    this._nodes.forEach((node) => {
-      nodes.push(node);
-    });
-    return nodes;
+    return setToArray(this._nodes);
   }
 }

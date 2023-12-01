@@ -101,6 +101,14 @@ export class DirectedGraph {
     return this._clusters;
   }
 
+  /** returns all cycles of this graph.
+   * @returns {Array<DirectedGraphCycle>} all levels of this graph
+   */
+  get cycles() {
+    this.computeLevelsClustersAndCycles();
+    return this._cycles;
+  }
+
   /** create a Node in this graph.
    * @param {Object} obj the object contained in this node (optional)
    * @returns the created node.
