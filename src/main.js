@@ -3,9 +3,12 @@ import { createBouncingCircles } from "./ui/dplmovie/canvasTest";
 import { DPLMovieJsonInputView } from "./ui/dplmovie/dplmoviejsoninputview";
 import { DPLMovieRuntimeView } from "./ui/dplmovie/dplmovieruntimeview";
 import { DPLMovieRuntimePool } from "./model/dplmovie/data/dplmovieruntimepool";
-import { DirectedGraph } from "./model/utility/directedgraph/directedgraph";
+import { GraphPool } from "./model/graphplayer/data/graphpool";
+import { GraphCreationView } from "./ui/graphplayer/graphcreationview";
 
 const linker = new PortalAppLinker();
+
+// DPL movie
 const dplMovieRuntimePool = new DPLMovieRuntimePool();
 const dplMovieJsonInputView = new DPLMovieJsonInputView(dplMovieRuntimePool);
 const dplMovieRuntimeView = new DPLMovieRuntimeView(dplMovieRuntimePool);
@@ -20,5 +23,9 @@ dplMovieRuntimePool.addRuntime(
   new Date(1991, 11, 23)
 );
 
+//Graph player
+const graphPool = new GraphPool();
+const graphCreationView = new GraphCreationView(graphPool);
+
 // canvas test
-createBouncingCircles(15, 1, 5);
+createBouncingCircles(0, 1, 5);

@@ -1,19 +1,15 @@
 class Circle {
-  constructor(
-    canvasContext,
-    xBorder,
-    yBorder,
-    xCenter,
-    yCenter,
-    radius,
-    xSpeed,
-    ySpeed
-  ) {
+  constructor(canvasContext, canvas, xCenter, yCenter, radius, xSpeed, ySpeed) {
     this._canvasContext = canvasContext;
-    this._xBorder = xBorder;
-    this._yBorder = yBorder;
-    this._xCenter = Math.max(Math.min(xCenter, xBorder - radius), radius);
-    this._yCenter = Math.max(Math.min(yCenter, yBorder - radius), radius);
+    this._canvas = canvas;
+    this._xCenter = Math.max(
+      Math.min(xCenter, this._canvas.width - radius),
+      radius
+    );
+    this._yCenter = Math.max(
+      Math.min(yCenter, this._canvas.height - radius),
+      radius
+    );
     this._radius = radius;
     this._xSpeed = xSpeed;
     this._ySpeed = ySpeed;
@@ -37,18 +33,38 @@ class Circle {
     this._xCenter += this._xSpeed;
     this._yCenter += this._ySpeed;
     if (
-      this._xCenter + this._radius > this._xBorder ||
+      this._xCenter + this._radius > this._canvas.width ||
       this._xCenter - this._radius < 0
     )
       this._xSpeed = -this._xSpeed;
 
     if (
-      this._yCenter + this._radius > this._yBorder ||
+      this._yCenter + this._radius > this._canvas.height ||
       this._yCenter - this._radius < 0
     )
       this._ySpeed = -this._ySpeed;
   }
 }
+
+const makecircle = function (
+  canvasContext,
+  canvas,
+  maxSpeed,
+  minSpeed,
+  xStart,
+  yStart
+) {
+  const newCircle = new Circle(
+    canvasContext,
+    canvas,
+    xStart,
+    yStart,
+    30,
+    Math.max(maxSpeed * 2 * Math.random() - maxSpeed, minSpeed),
+    Math.max(maxSpeed * 2 * Math.random() - maxSpeed, minSpeed)
+  );
+  return newCircle;
+};
 
 export const createBouncingCircles = function (
   numberOfCircles,
@@ -57,22 +73,46 @@ export const createBouncingCircles = function (
 ) {
   const canvas = document.querySelector(".dplmovie-canvas");
   canvas.width = window.innerWidth;
-  canvas.height = 0.9 * window.innerHeight;
+  canvas.height = window.innerHeight;
   const canvasContext = canvas.getContext("2d");
 
+  window.addEventListener("resize", function () {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  });
+
   const circles = [];
-  for (let i = 0; i < numberOfCircles; i++) {
-    const newCircle = new Circle(
-      canvasContext,
-      canvas.width,
-      canvas.height,
-      canvas.width * Math.random() + 1,
-      canvas.height * Math.random() + 1,
-      30,
-      Math.max(maxSpeed * 2 * Math.random() - maxSpeed, minSpeed),
-      Math.max(maxSpeed * 2 * Math.random() - maxSpeed, minSpeed)
+  canvas.addEventListener("mousedown", function (event) {
+    const rect = canvas.getBoundingClientRect();
+    /*conversion to get to the scale in the canvas. 
+    It looks like the number of pixels in the canvas, is higher than in the document.
+    therefore, the transformation involves a zoom */
+    const correctionFactorX = canvas.width / rect.width;
+    const correctionFactorY = canvas.height / rect.height;
+
+    circles.push(
+      makecircle(
+        canvasContext,
+        canvas,
+        maxSpeed,
+        minSpeed,
+        (event.clientX - rect.left) * correctionFactorX,
+        (event.clientY - rect.top) * correctionFactorY
+      )
     );
-    circles.push(newCircle);
+  });
+
+  for (let i = 0; i < numberOfCircles; i++) {
+    circles.push(
+      makecircle(
+        canvasContext,
+        canvas,
+        maxSpeed,
+        minSpeed,
+        canvas.width * Math.random() + 1,
+        canvas.height * Math.random() + 1
+      )
+    );
   }
 
   const animate = function () {

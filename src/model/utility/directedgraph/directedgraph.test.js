@@ -309,7 +309,6 @@ test("5.1 the graph should correctly represents the desired structure", () => {
 // ------
 test("5.2 the graph levels should be correct", () => {
   const levelDescriptionArray = getLevelsDescription(g5);
-  console.log(levelDescriptionArray);
   expect(levelDescriptionArray).toEqual(["1->[n1,n2]", "2->[n3,n4]"]);
 });
 

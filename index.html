@@ -6,6 +6,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/dplmovie.css" />
+    <link rel="stylesheet" href="css/graphplayer.css" />
     <title>Gatien De Bast</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
@@ -41,12 +42,8 @@
           <div>the XAI Expert ...</div>
         </button>
 
-        <button class="opalarch-section app-container">
-          <div>... the Architect</div>
-        </button>
-
-        <button class="graph-section app-container">
-          <div>the graph Lover ...</div>
+        <button class="graph-section app-container" id="graphplayer-button">
+          <div>... the graph Lover</div>
         </button>
       </div>
     </nav>
@@ -102,6 +99,27 @@
         </label>
         <input id="dpl-movie-fileItem" type="file" />
       </button>
+
+      <!-- Graph Player navigation -->
+      <div class="app-specific-btn hidden" for="graphplayer-button">
+        <div class="graphplayer-creategraph-btn app-btn">
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            class="app-btn-icon-medium"
+            viewBox="0 0 512 512"
+          >
+            <path
+              fill="none"
+              stroke="currentColor"
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="32"
+              d="M256 112v288M400 256H112"
+            />
+          </svg>
+          <input class="graphplayer-graphnameinput" type="text" />
+        </div>
+      </div>
     </nav>
 
     <!-- ------------- -->
@@ -113,5 +131,9 @@
         <canvas class="dplmovie-canvas dplmovie-box"></canvas>
       </div>
     </section>
+    <!-- ------------------->
+    <!-- Graph Player app -->
+    <!-- ------------------->
+    <section class="app hidden graphplayer" for="graphplayer-button"></section>
   </body>
 </html>

@@ -213,18 +213,11 @@ body {
   grid-row: 3/5;
 }
 
-/*opal architect*/
-.opalarch-section {
-  /*grid properties*/
-  grid-column: 2;
-  grid-row: 4/6;
-}
-
 /*graph expert*/
 .graph-section {
   /*grid properties*/
-  grid-column: 1;
-  grid-row: 5/7;
+  grid-column: 2;
+  grid-row: 4/6;
 }
 
 /***************/

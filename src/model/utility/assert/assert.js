@@ -1,11 +1,15 @@
 const ACTIVATE_ASSERT =
   process.env.NODE_ENV ===
   "development"; /*if true, inline all asserts, otherwise remove all asserts */
-
 export const ASSERT_TYPE = function (obj, cls) {
   if (!ACTIVATE_ASSERT) return;
   ASSERT_EXIST(obj);
-  ASSERT(obj instanceof cls, `the value is not an instance of ${cls.name}`);
+  ASSERT(
+    obj instanceof cls,
+    `the value is not an instance of '${
+      cls.name
+    }' but of '${typeof obj}' (value: ${obj})`
+  );
 };
 
 export const ASSERT_EXIST = function (obj) {

@@ -1,4 +1,5 @@
 import { ASSERT_TYPE } from "../../utility/assert/assert";
+import { mapToArray } from "../../utility/toarray/toarray";
 
 class DPLMovieRuntime {
   constructor(id, solverType, solverName, runtimeDate) {
@@ -27,7 +28,6 @@ export class DPLMovieRuntimePool {
   constructor() {
     this._dplMovieRuntimes = new Map();
     this._onAddDeleteObservers = [];
-    this._totalNumberOfRuntime = 0;
   }
 
   /** add a runtime to the pool.
@@ -36,7 +36,8 @@ export class DPLMovieRuntimePool {
    *  @param {Date}   runtimeDate date when the solver was run
    */
   addRuntime(solverType, solverName, runtimeDate) {
-    const newRuntimeId = this._totalNumberOfRuntime;
+    ASSERT_TYPE(runtimeDate, Date);
+    const newRuntimeId = this._dplMovieRuntimes.size;
     const newRuntime = new DPLMovieRuntime(
       newRuntimeId,
       solverType,
@@ -47,11 +48,10 @@ export class DPLMovieRuntimePool {
     this._onAddDeleteObservers.forEach(function (obs) {
       obs.notifyRuntimeCreation(newRuntime);
     });
-    this._totalNumberOfRuntime++;
   }
 
   /** delete the given DPLMovieRuntime from the pool.
-   *  @param {Object} runtime  DPLMovieRuntime to delete
+   *  @param {DPLMovieRuntime} runtime  DPLMovieRuntime to delete
    */
   deleteRuntime(runtime) {
     ASSERT_TYPE(runtime, DPLMovieRuntime);
@@ -66,12 +66,7 @@ export class DPLMovieRuntimePool {
     const sortRuntimes = function (r1, r2) {
       return r1.date < r2.date ? -1 : 1;
     };
-    const runtimes = [];
-    this._dplMovieRuntimes.forEach(function (runtime) {
-      runtimes.push(runtime);
-    });
-    runtimes.sort(sortRuntimes);
-    return runtimes;
+    return mapToArray(this._dplMovieRuntimes, sortRuntimes);
   }
 
   /** return a runtime from an Id

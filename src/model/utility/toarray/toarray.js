@@ -8,3 +8,13 @@ export const setToArray = function (set) {
   });
   return result;
 };
+
+export const mapToArray = function (map, sortingFnc = null) {
+  ASSERT_TYPE(map, Map);
+  const array = [];
+  map.forEach(function (elt) {
+    array.push(elt);
+  });
+  if (sortingFnc) array.sort(sortingFnc);
+  return array;
+};
