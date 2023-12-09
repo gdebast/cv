@@ -25,6 +25,17 @@ export class PoolBase {
     this._onAddDeleteObservers.push(observer);
   }
 
+  /** delete the given object.
+   * @param {Object} object object to delete.
+   */
+  delete(object) {
+    ASSERT_EXIST(object);
+    this._onAddDeleteObservers.forEach(function (obs) {
+      obs.notifyRuntimeDeletion(object);
+    });
+    this._storedObjects.delete(object.id);
+  }
+
   // ---------
   // PROTECTED
   // ---------
@@ -32,6 +43,7 @@ export class PoolBase {
   constructor() {
     this._storedObjects = new Map();
     this._onAddDeleteObservers = [];
+    this._idCount = 0;
   }
 
   /** return the stored object, sorted according to the predicate.
@@ -46,7 +58,7 @@ export class PoolBase {
    * @returns {integer} new id.
    */
   protected_makeNewId() {
-    return this._storedObjects.size;
+    return this._idCount++;
   }
 
   /** add a new object.
@@ -60,13 +72,5 @@ export class PoolBase {
     this._onAddDeleteObservers.forEach(function (obs) {
       obs.notifyRuntimeCreation(object);
     });
-  }
-
-  protected_deleteStoredObject(object) {
-    ASSERT_EXIST(object);
-    this._onAddDeleteObservers.forEach(function (obs) {
-      obs.notifyRuntimeDeletion(object);
-    });
-    this._storedObjects.delete(object.id);
   }
 }

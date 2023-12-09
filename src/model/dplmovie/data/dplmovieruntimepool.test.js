@@ -59,7 +59,7 @@ test("2. the pool should be able to locate runtimes", () => {
 // =========================================
 test("3. the pool should be able to delete runtimes", () => {
   const firstRuntime = runtimes[0];
-  dplmovieRuntimePool.deleteRuntime(firstRuntime);
+  dplmovieRuntimePool.delete(firstRuntime);
   const runtimeDesc = describeRuntimes(dplmovieRuntimePool.runtimes);
   expect(runtimeDesc).toEqual([
     {
@@ -73,7 +73,7 @@ test("3. the pool should be able to delete runtimes", () => {
 // =======================================
 // 4. test the observability.
 // =======================================
-test("3. the pool should be oberservable", () => {
+test("4. the pool should be oberservable", () => {
   expect(observer.observedCreateCount).toEqual(2);
   expect(observer.observedDeleteCount).toEqual(1);
 });

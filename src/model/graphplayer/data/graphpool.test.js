@@ -40,7 +40,7 @@ test("2. the pool should be able to locate graphs", () => {
 // =======================================
 test("3. the pool should be able to delete graphs", () => {
   const firstgraph = graphs[0];
-  graphPool.deleteGraph(firstgraph);
+  graphPool.delete(firstgraph);
   const desc = describeGraphWrappers(graphPool.graphs);
   expect(desc).toEqual(["1-my second"]);
 });
@@ -48,7 +48,7 @@ test("3. the pool should be able to delete graphs", () => {
 // =======================================
 // 4. test the observability.
 // =======================================
-test("3. the pool should be oberservable", () => {
+test("4. the pool should be oberservable", () => {
   expect(observer.observedCreateCount).toEqual(2);
   expect(observer.observedDeleteCount).toEqual(1);
 });

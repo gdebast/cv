@@ -49,12 +49,4 @@ export class DPLMovieRuntimePool extends PoolBase {
     );
     this.protected_addStoredObject(newRuntime, newRuntimeId);
   }
-
-  /** delete the given DPLMovieRuntime from the pool.
-   *  @param {DPLMovieRuntime} runtime  DPLMovieRuntime to delete
-   */
-  deleteRuntime(runtime) {
-    ASSERT_TYPE(runtime, DPLMovieRuntime);
-    this.protected_deleteStoredObject(runtime);
-  }
 }

@@ -38,12 +38,4 @@ export class DirectedGraphWrapperPool extends PoolBase {
     const newGraph = new DirectedGraphWrapper(name, newId);
     this.protected_addStoredObject(newGraph, newId);
   }
-
-  /** delete a graph from the pool
-   * @param {DirectedGraphWrapper} graph to delete
-   */
-  deleteGraph(graph) {
-    ASSERT_TYPE(graph, DirectedGraphWrapper);
-    this.protected_deleteStoredObject(graph);
-  }
 }
