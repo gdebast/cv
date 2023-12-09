@@ -35,3 +35,7 @@ Generic css class to view pool elements in a list.
   flex-direction: row;
   justify-content: space-between;
 }
+
+.selected-pool-selection-view-elt {
+  background-color: #75b1e6;
+}

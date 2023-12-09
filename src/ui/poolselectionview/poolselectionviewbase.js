@@ -2,6 +2,7 @@ import { ASSERT, ASSERT_EXIST } from "../../model/utility/assert/assert";
 
 const CLASS_VIEW = "pool-selection-view";
 const CLASS_VIEWELT = "pool-selection-view-elt";
+const CLASS_SELECTEDVIEWELT = "selected-pool-selection-view-elt";
 
 const HTML_DELLETEICON =
   '<svg xmlns="http://www.w3.org/2000/svg" class="app-btn-icon-small" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352"/><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>';
@@ -17,6 +18,7 @@ export class PoolSelectionViewBase {
     this._pool = pool;
     /*contain the DOM element rendering the pool objects */
     this._view = mainSectionDOMElt.querySelector(`.${CLASS_VIEW}`);
+    ASSERT_EXIST(this._view);
     this._pool.registerObserver(this);
   }
 
@@ -57,10 +59,17 @@ export class PoolSelectionViewBase {
     newDeleteBtnElt.classList.add("app-btn");
     newDeleteBtnElt.innerHTML = HTML_DELLETEICON;
     const pool = this._pool;
-    newDeleteBtnElt.addEventListener("click", function () {
+    newDeleteBtnElt.addEventListener("click", function (event) {
       const idToDelete = +newDeleteBtnElt.parentElement.attributes.id.value;
       const objectPool = pool.getById(idToDelete);
       pool.delete(objectPool);
+      event.stopPropagation();
+    });
+
+    // define the click event
+    const self = this;
+    poolObjectElt.addEventListener("click", function () {
+      self._unselectAllElementsBut(poolObjectElt);
     });
 
     // DOM tree creation
@@ -79,5 +88,15 @@ export class PoolSelectionViewBase {
       `Impossible to find a unique DOM element with "${selectorStr}"`
     );
     this._view.removeChild(eltsToRemove[0]);
+  }
+
+  /** unselect all element in the view but the given one
+   * @param {Object} selectedDOMElt element to show selected.
+   */
+  _unselectAllElementsBut(selectedDOMElt) {
+    this._view.childNodes.forEach((elt) => {
+      elt.classList.remove(CLASS_SELECTEDVIEWELT);
+    });
+    selectedDOMElt.classList.add(CLASS_SELECTEDVIEWELT);
   }
 }
