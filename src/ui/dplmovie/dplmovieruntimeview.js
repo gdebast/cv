@@ -1,8 +1,10 @@
-const CLASS_DPLMOVIERUNTIMEVIEW = "dplmovie-runtime-view";
-const CLASS_DPLMOVIERUNTIMEVIEWELT = "dplmovie-runtime-view-elt";
-const dplMovieRuntimeViewElt = document.querySelector(
-  `.${CLASS_DPLMOVIERUNTIMEVIEW}`
-);
+import { ASSERT } from "../../model/utility/assert/assert";
+
+const CLASS_VIEW = "pool-selection-view";
+const CLASS_VIEWELT = "pool-selection-view-elt";
+const CLASS_DPLMOVIESECTION = "dplmovie";
+const dplMovieSection = document.querySelector(`.${CLASS_DPLMOVIESECTION}`);
+const dplMovieRuntimeViewElt = dplMovieSection.querySelector(`.${CLASS_VIEW}`);
 
 const HTML_DELLETEICON =
   '<svg xmlns="http://www.w3.org/2000/svg" class="app-btn-icon-small" viewBox="0 0 512 512"><path d="M112 112l20 320c.95 18.49 14.4 32 32 32h184c17.67 0 30.87-13.51 32-32l20-320" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/><path stroke="currentColor" stroke-linecap="round" stroke-miterlimit="10" stroke-width="32" d="M80 112h352"/><path d="M192 112V72h0a23.93 23.93 0 0124-24h80a23.93 23.93 0 0124 24h0v40M256 176v224M184 176l8 224M328 176l-8 224" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32"/></svg>';
@@ -24,14 +26,6 @@ export class DPLMovieRuntimeView {
     this._deleteRuntimeViewElement(runtime);
   }
 
-  /** remove all elements in the view
-   */
-  _clear() {
-    while (dplMovieRuntimeViewElt.firstChild) {
-      dplMovieRuntimeViewElt.removeChild(dplMovieRuntimeViewElt.firstChild);
-    }
-  }
-
   /** add an html elemnent in the view.
    *  @param {Object} runtime the DPLMovieRuntime to be rendered in the view.
    */
@@ -39,17 +33,17 @@ export class DPLMovieRuntimeView {
     // create the main box
     const runtimeId = runtime.id;
     const newRuntimeElt = document.createElement("div");
+    newRuntimeElt.classList.add(CLASS_VIEWELT);
     newRuntimeElt.id = runtimeId;
+
+    // create the elements with the text
     const newRuntimeTitleElt = document.createElement("p");
     const newRuntimeDateElt = document.createElement("p");
-
-    // create the element with the text
     const type = runtime.solverType;
     const name = runtime.solverName;
     const dateStr = this._dateFormatter.format(runtime.date);
     const runtimeTxt = `${type} : ${name}`;
     const newRuntimeTitleDateElt = document.createElement("div");
-    newRuntimeElt.classList.add(CLASS_DPLMOVIERUNTIMEVIEWELT);
     newRuntimeTitleElt.classList.add("dplmovie-runtime-view-elt-title");
     newRuntimeDateElt.classList.add("dplmovie-runtime-view-elt-date");
     newRuntimeTitleElt.innerText = runtimeTxt;
@@ -79,12 +73,12 @@ export class DPLMovieRuntimeView {
    *  @param {Object} runtime the DPLMovieRuntime to remove from the view.
    */
   _deleteRuntimeViewElement(runtime) {
-    const selectorStr = `.${CLASS_DPLMOVIERUNTIMEVIEWELT}[id="${runtime.id}"]`;
-    const eltsToRemove = document.querySelectorAll(selectorStr);
-    if (eltsToRemove.length !== 1)
-      console.error(
-        `Impossible to find a unique element with "${selectorStr}"`
-      );
+    const selectorStr = `.${CLASS_VIEWELT}[id="${runtime.id}"]`;
+    const eltsToRemove = dplMovieSection.querySelectorAll(selectorStr);
+    ASSERT(
+      eltsToRemove.length === 1,
+      `Impossible to find a unique element "${typeof runtime}" with "${selectorStr}"`
+    );
     dplMovieRuntimeViewElt.removeChild(eltsToRemove[0]);
   }
 }

@@ -7,6 +7,10 @@
     <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="css/dplmovie.css" />
     <link rel="stylesheet" href="css/graphplayer.css" />
+    <link
+      rel="stylesheet"
+      href="src/ui/poolselectionview/poolselectionview.css"
+    />
     <title>Gatien De Bast</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
@@ -127,13 +131,18 @@
     <!-- ------------- -->
     <section class="app hidden dplmovie" for="dplmovie-button">
       <div class="dplmovie-runtime-canvas">
-        <nav class="dplmovie-runtime-view dplmovie-box"></nav>
+        <nav class="pool-selection-view dplmovie-box"></nav>
         <canvas class="dplmovie-canvas dplmovie-box"></canvas>
       </div>
     </section>
     <!-- ------------------->
     <!-- Graph Player app -->
     <!-- ------------------->
-    <section class="app hidden graphplayer" for="graphplayer-button"></section>
+    <section class="app hidden graphplayer" for="graphplayer-button">
+      <div class="graphplayer-graphview-canvas">
+        <nav class="pool-selection-view graphplayer-box"></nav>
+        <canvas class="graphplayer-canvas graphplayer-box"></canvas>
+      </div>
+    </section>
   </body>
 </html>

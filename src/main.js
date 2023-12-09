@@ -5,6 +5,7 @@ import { DPLMovieRuntimeView } from "./ui/dplmovie/dplmovieruntimeview";
 import { DPLMovieRuntimePool } from "./model/dplmovie/data/dplmovieruntimepool";
 import { DirectedGraphWrapperPool } from "./model/graphplayer/data/directedgraphwrapperpool";
 import { GraphCreationView } from "./ui/graphplayer/graphcreationview";
+import { GraphSelectionView } from "./ui/graphplayer/graphselectionview";
 
 const linker = new PortalAppLinker();
 
@@ -26,6 +27,7 @@ dplMovieRuntimePool.addRuntime(
 //Graph player
 const graphPool = new DirectedGraphWrapperPool();
 const graphCreationView = new GraphCreationView(graphPool);
+const graphSelectionView = new GraphSelectionView(graphPool);
 
 // canvas test
 createBouncingCircles(0, 1, 5);

@@ -1,0 +1,37 @@
+/*
+Generic css class to view pool elements in a list.
+*/
+
+/* view*/
+.pool-selection-view {
+  margin: 1.2rem 1.2rem 1.2rem 1.2rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+/*elements in the view*/
+.pool-selection-view-elt:first-child {
+  margin-top: 1.6rem;
+}
+.pool-selection-view-elt:last-child {
+  margin-bottom: 1.6rem;
+}
+.pool-selection-view-elt:hover {
+  box-shadow: 0 0 0.8rem 0rem #141010;
+}
+.pool-selection-view-elt {
+  margin: 0rem 1.2rem;
+  padding: 1rem 0.6rem;
+
+  border: 0.1rem solid #141010;
+  cursor: pointer;
+  border-radius: 1.2rem;
+  box-shadow: 0 0 0.3rem 0rem #141010;
+  background-color: #e9f3fd;
+  transition: box-shadow 0.3s;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+}
