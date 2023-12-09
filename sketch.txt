@@ -15,3 +15,12 @@ What:
       OMP architect -> able to analyze pak cyclic dependencies and OPAL style guide aderence.
       OPAL++ -> able to generate setting and expression based on a pseudo language.
       Hire! -> reveal number/mail and able to download a CV
+
+Unfair advantage:
+- resourceful = get the things done
+- testing guru
+- precise communication
+Goat:
+- git
+- data structure
+- asynchronous code

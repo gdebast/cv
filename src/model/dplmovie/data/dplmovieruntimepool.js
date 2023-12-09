@@ -1,5 +1,5 @@
 import { ASSERT_TYPE } from "../../utility/assert/assert";
-import { mapToArray } from "../../utility/toarray/toarray";
+import { PoolBase } from "../../utility/poolbase/poolbase";
 
 class DPLMovieRuntime {
   constructor(id, solverType, solverName, runtimeDate) {
@@ -24,10 +24,13 @@ class DPLMovieRuntime {
   }
 }
 
-export class DPLMovieRuntimePool {
-  constructor() {
-    this._dplMovieRuntimes = new Map();
-    this._onAddDeleteObservers = [];
+export class DPLMovieRuntimePool extends PoolBase {
+  // returns all the runtime
+  get runtimes() {
+    const sortRuntimes = function (r1, r2) {
+      return r1.date < r2.date ? -1 : 1;
+    };
+    return this.protected_getSortedObjectsAsArray(sortRuntimes);
   }
 
   /** add a runtime to the pool.
@@ -37,17 +40,14 @@ export class DPLMovieRuntimePool {
    */
   addRuntime(solverType, solverName, runtimeDate) {
     ASSERT_TYPE(runtimeDate, Date);
-    const newRuntimeId = this._dplMovieRuntimes.size;
+    const newRuntimeId = this.protected_makeNewId();
     const newRuntime = new DPLMovieRuntime(
       newRuntimeId,
       solverType,
       solverName,
       runtimeDate
     );
-    this._dplMovieRuntimes.set(newRuntimeId, newRuntime);
-    this._onAddDeleteObservers.forEach(function (obs) {
-      obs.notifyRuntimeCreation(newRuntime);
-    });
+    this.protected_addStoredObject(newRuntime, newRuntimeId);
   }
 
   /** delete the given DPLMovieRuntime from the pool.
@@ -55,33 +55,6 @@ export class DPLMovieRuntimePool {
    */
   deleteRuntime(runtime) {
     ASSERT_TYPE(runtime, DPLMovieRuntime);
-    this._onAddDeleteObservers.forEach(function (obs) {
-      obs.notifyRuntimeDeletion(runtime);
-    });
-    this._dplMovieRuntimes.delete(runtime.id);
-  }
-
-  // returns all the runtime
-  get runtimes() {
-    const sortRuntimes = function (r1, r2) {
-      return r1.date < r2.date ? -1 : 1;
-    };
-    return mapToArray(this._dplMovieRuntimes, sortRuntimes);
-  }
-
-  /** return a runtime from an Id
-   *  @param {integer} id id of the runtime
-   */
-  getById(id) {
-    const returnedRuntime = this._dplMovieRuntimes.get(id);
-    return returnedRuntime;
-  }
-
-  /** register a pool observer which will be notified on creation and deletion of Runtime..
-   *  This observer must implement the notifyRuntimeDeletion(DPLMovieRuntime) and notifyRuntimeCreation(DPLMovieRuntime).
-   *  @param {Object} observer  observer to be notified later
-   */
-  registerObserver(observer) {
-    this._onAddDeleteObservers.push(observer);
+    this.protected_deleteStoredObject(runtime);
   }
 }

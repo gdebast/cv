@@ -1,4 +1,4 @@
-import { GraphPool } from "./graphpool";
+import { DirectedGraphWrapperPool } from "./directedgraphwrapperpool";
 
 const describeGraphWrappers = function (graphWrappers) {
   return graphWrappers.map((g) => {
@@ -6,7 +6,7 @@ const describeGraphWrappers = function (graphWrappers) {
   });
 };
 
-const graphPool = new GraphPool();
+const graphPool = new DirectedGraphWrapperPool();
 
 graphPool.addGraph("my first");
 graphPool.addGraph("my second");

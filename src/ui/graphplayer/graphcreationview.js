@@ -22,7 +22,6 @@ export class GraphCreationView {
       if (event.target === graphNameInput) return;
       self._graphPool.addGraph(graphNameInput.value);
       graphNameInput.value = "";
-      console.log(self._graphPool);
     });
   }
 }

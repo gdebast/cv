@@ -3,7 +3,7 @@ import { createBouncingCircles } from "./ui/dplmovie/canvasTest";
 import { DPLMovieJsonInputView } from "./ui/dplmovie/dplmoviejsoninputview";
 import { DPLMovieRuntimeView } from "./ui/dplmovie/dplmovieruntimeview";
 import { DPLMovieRuntimePool } from "./model/dplmovie/data/dplmovieruntimepool";
-import { GraphPool } from "./model/graphplayer/data/graphpool";
+import { DirectedGraphWrapperPool } from "./model/graphplayer/data/directedgraphwrapperpool";
 import { GraphCreationView } from "./ui/graphplayer/graphcreationview";
 
 const linker = new PortalAppLinker();
@@ -24,7 +24,7 @@ dplMovieRuntimePool.addRuntime(
 );
 
 //Graph player
-const graphPool = new GraphPool();
+const graphPool = new DirectedGraphWrapperPool();
 const graphCreationView = new GraphCreationView(graphPool);
 
 // canvas test
