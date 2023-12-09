@@ -1,4 +1,5 @@
 import { DPLMovieRuntimePool } from "./dplmovieruntimepool";
+import { PoolObserverMock } from "../../utility/poolbase/poolobservermock";
 
 // utility functions
 const describeRuntimes = function (runtimes) {
@@ -9,6 +10,7 @@ const describeRuntimes = function (runtimes) {
 
 // test
 const dplmovieRuntimePool = new DPLMovieRuntimePool();
+const observer = new PoolObserverMock(dplmovieRuntimePool);
 dplmovieRuntimePool.addRuntime(
   "Deployment Solver",
   "FIFO",
@@ -66,4 +68,12 @@ test("3. the pool should be able to delete runtimes", () => {
       date: new Date(1991, 11, 23),
     },
   ]);
+});
+
+// =======================================
+// 4. test the observability.
+// =======================================
+test("3. the pool should be oberservable", () => {
+  expect(observer.observedCreateCount).toEqual(2);
+  expect(observer.observedDeleteCount).toEqual(1);
 });

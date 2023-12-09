@@ -1,4 +1,5 @@
 import { DirectedGraphWrapperPool } from "./directedgraphwrapperpool";
+import { PoolObserverMock } from "../../utility/poolbase/poolobservermock";
 
 const describeGraphWrappers = function (graphWrappers) {
   return graphWrappers.map((g) => {
@@ -7,6 +8,7 @@ const describeGraphWrappers = function (graphWrappers) {
 };
 
 const graphPool = new DirectedGraphWrapperPool();
+const observer = new PoolObserverMock(graphPool);
 
 graphPool.addGraph("my first");
 graphPool.addGraph("my second");
@@ -41,4 +43,12 @@ test("3. the pool should be able to delete graphs", () => {
   graphPool.deleteGraph(firstgraph);
   const desc = describeGraphWrappers(graphPool.graphs);
   expect(desc).toEqual(["1-my second"]);
+});
+
+// =======================================
+// 4. test the observability.
+// =======================================
+test("3. the pool should be oberservable", () => {
+  expect(observer.observedCreateCount).toEqual(2);
+  expect(observer.observedDeleteCount).toEqual(1);
 });
