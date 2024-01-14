@@ -17,6 +17,10 @@ class DirectedGraphWrapper {
   get name() {
     return this._name;
   }
+
+  get graph() {
+    return this._graph;
+  }
 }
 /** responsible for keeping all the graph made by the user
  */

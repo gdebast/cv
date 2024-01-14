@@ -48,25 +48,27 @@ export class DPLMovieJsonInputView {
   /** add a DPLMovie runtime from a jsonObject read from the file.
    *  If there are errors, this method returns a message.
    *  @param {Object} jsonObject object to be read to create a DPLMovie runtime
-   *  @returns {String} error message. undefined if no error.
+   *  @returns {String} error message. null if no error.
    */
   _addRuntime(jsonObject) {
-    if (!jsonObject.solverName)
-      return "Missing 'solverName' property in json file.";
-    if (!jsonObject.solverType)
-      return "Missing 'solverType' property in json file.";
-    if (!jsonObject.runtimeStartDate)
-      return "Missing 'runtimeStartDate' property in json file.";
-    const runtimeStartDate = new Date(jsonObject.runtimeStartDate);
+    if (jsonObject.SolverName === undefined)
+      return "Missing 'SolverName' property in json file.";
+    if (jsonObject.SolverType === undefined)
+      return "Missing 'SolverType' property in json file.";
+    if (jsonObject.TrackingStartDate === undefined)
+      return "Missing 'TrackingStartDate' property in json file.";
+    const runtimeStartDate = new Date(jsonObject.TrackingStartDate);
     if (!this._isValidDate(runtimeStartDate))
-      return `Cannot convert '${jsonObject.runtimeStartDate}' property in json file in date.`;
+      return `Cannot convert '${jsonObject.TrackingStartDate}' property in json file in date.`;
 
-    this._dplMovieRuntimePool.addRuntime(
-      jsonObject.solverType,
-      jsonObject.solverName,
-      runtimeStartDate
+    const errorMessage = this._dplMovieRuntimePool.addRuntime(
+      jsonObject.SolverType,
+      jsonObject.SolverName,
+      runtimeStartDate,
+      jsonObject.Events
     );
-    return undefined;
+    if (errorMessage) return errorMessage;
+    return null;
   }
   /** display a message and turn the upload button red to indicate to the user that the upload failed.
    * @param {String} message error message to display. If undefined, remove the message and turn the button back to normal.

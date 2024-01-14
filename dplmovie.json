@@ -1,5 +1,6 @@
 {
-  "solverName": "J&J",
-  "solverType": "Deployment Solver",
-  "runtimeStartDate": "2012-04-21T18:25:43-05:00"
+  "Events": "blalb",
+  "SolverName": "J&J",
+  "SolverType": "Deployment Solver",
+  "TrackingStartDate": "2012-04-21T18:25:43-05:00"
 }

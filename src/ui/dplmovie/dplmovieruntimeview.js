@@ -2,6 +2,7 @@ import { PoolSelectionViewBase } from "../poolselectionview/poolselectionviewbas
 
 const CLASS_DPLMOVIESECTION = "dplmovie";
 
+/*panel responsible for displaying the DPLMovieRuntime on the side. */
 export class DPLMovieRuntimeView extends PoolSelectionViewBase {
   constructor(dplMovieRuntimePool) {
     super(

@@ -81,6 +81,10 @@ export class DirectedGraph {
     return this._arcs;
   }
 
+  get nodes() {
+    return this._nodes;
+  }
+
   /** returns all levels of this graph.
    * @returns {Array<DirectedGraphLevel>} all levels of this graph
    */
@@ -121,9 +125,9 @@ export class DirectedGraph {
   }
 
   /** create an Arc in this graph.
-   * @param fromNode the node from which starts the graph
-   * @param toNode the node to which the node is going
-   * @param obj object contained in this node.
+   * @param {DirectedGraphNode} fromNode the node from which starts the graph
+   * @param {DirectedGraphNode} toNode the node to which the node is going
+   * @param {Object} obj object contained in this node.
    * @returns the created arc.
    */
   createArc(fromNode, ToNode, obj = null) {
@@ -144,11 +148,10 @@ export class DirectedGraph {
     this._initializeMetaStructures();
 
     const computer = new DirectedGraphLevelClusterCycleComputer(
-      this._nodes,
+      [...this._nodes] /*pass a copy */,
       debug
     );
     const result = computer.compute();
-
     let { levels: levels, clusters: clusters, cycles: cycles } = result;
     this._levels = levels;
     this._clusters = clusters;
