@@ -1,4 +1,4 @@
-import { ASSERT_TYPE } from "../../utility/assert/assert";
+import { ASSERT, ASSERT_TYPE } from "../../utility/assert/assert";
 import { PoolBase } from "../../utility/poolbase/poolbase";
 import { DPLMovieRuntime } from "./src/dplmovieruntime";
 

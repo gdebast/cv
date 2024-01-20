@@ -15,7 +15,6 @@ export class DPLMovieRuntime {
       null; /*string containing error which indicates if this is valid */
     this._dplMovieRuntimeEvent =
       this._convertJsonEventsToDPLMovieRuntimeEvents(jsonEvents);
-    console.log(this);
   }
 
   // simple getters
@@ -51,7 +50,7 @@ export class DPLMovieRuntime {
   _convertJsonEventsToDPLMovieRuntimeEvents(jsonEvents) {
     const createdEvents = new Map();
 
-    if (!jsonEvents) {
+    if (jsonEvents === undefined) {
       return createdEvents;
     }
 
@@ -105,7 +104,7 @@ export class DPLMovieRuntime {
         jsonEvent.EventId
       }' has a 'EventObjects' property which is not an Array but a '${typeof jsonEvent.EventObjects}'`;
     if (jsonEvent.EventObjects.length === 0)
-      return `The event '${jsonEvent.EventId}' has a 'EventObjects' property which is an empty array'`;
+      return `The event '${jsonEvent.EventId}' has a 'EventObjects' property which is an empty array`;
     return null;
   }
 }
