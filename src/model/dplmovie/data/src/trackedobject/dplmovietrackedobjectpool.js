@@ -77,7 +77,7 @@ export class DPLMovieTrackedObjectPool {
     );
     id_to_trackedObjects.delete(eventObject.ObjectId);
     if (
-      this._typeId_to_trackedObjects.get(eventObject.ObjectClassId).size() === 0
+      this._typeId_to_trackedObjects.get(eventObject.ObjectClassId).size === 0
     )
       this._typeId_to_trackedObjects.delete(eventObject.ObjectClassId);
   }

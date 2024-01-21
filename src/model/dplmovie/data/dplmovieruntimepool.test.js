@@ -10,7 +10,14 @@ const describeRuntimes = function (runtimes) {
 
 const TrackedObjectToFlatObject = function (trackedObjects) {
   return trackedObjects.map(function (trackedObject) {
-    return { Type: trackedObject.Type, Id: trackedObject.Id };
+    const desc = trackedObject
+      .getAllPublicMemberNames()
+      .map(function (member) {
+        let memberValue = JSON.stringify(trackedObject[member]);
+        return `${member}:${memberValue}`;
+      })
+      .join();
+    return { Type: trackedObject.Type, Id: trackedObject.Id, Members: desc };
   });
 };
 
@@ -43,6 +50,37 @@ dplmovieRuntimePool.addRuntime(
       EventId: 1,
       EventObjects: [
         { EventType: "creation", ObjectClassId: "Bucket", ObjectId: "B2" },
+      ],
+      NextEventId: 2,
+    },
+    {
+      EventId: 2,
+      NextEventId: 3,
+      EventObjects: [
+        {
+          EventType: "update",
+          ObjectClassId: "Bucket",
+          ObjectId: "B1",
+          AttributeEvents: [
+            {
+              Name: "EndDate",
+              Type: "Date",
+              Value: "2009-09-17T04:00:00Z",
+            },
+            { Name: "Number", Type: "Number", Value: 1 },
+            {
+              Name: "StartDate",
+              Type: "Date",
+              Value: "2009-09-16T04:00:00Z",
+            },
+          ],
+        },
+      ],
+    },
+    {
+      EventId: 3,
+      EventObjects: [
+        { EventType: "deletion", ObjectClassId: "Bucket", ObjectId: "B1" },
       ],
     },
   ]
@@ -205,7 +243,7 @@ test("6.1 runtime should allow to install a first event", () => {
   const runtimes = dplmovieRuntimePool.runtimes;
   runtimes[1].installFirstEvent();
   expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
-    { Type: "Bucket", Id: "B1" },
+    { Type: "Bucket", Id: "B1", Members: "" },
   ]);
 });
 
@@ -213,9 +251,29 @@ test("6.2 runtime should allow to go to the next event", () => {
   const runtimes = dplmovieRuntimePool.runtimes;
   runtimes[1].nextEvent();
   expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
-    { Type: "Bucket", Id: "B1" },
-    { Type: "Bucket", Id: "B2" },
+    { Type: "Bucket", Id: "B1", Members: "" },
+    { Type: "Bucket", Id: "B2", Members: "" },
   ]);
 });
 
-// TODO: test update/deletion. test creation with attribute
+test("6.3 runtime should handle update events", () => {
+  const runtimes = dplmovieRuntimePool.runtimes;
+  runtimes[1].nextEvent();
+  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
+    {
+      Type: "Bucket",
+      Id: "B1",
+      Members:
+        'EndDate:"2009-09-17T04:00:00.000Z",Number:1,StartDate:"2009-09-16T04:00:00.000Z"',
+    },
+    { Type: "Bucket", Id: "B2", Members: "" },
+  ]);
+});
+
+test("6.4 runtime should handle deletion events", () => {
+  const runtimes = dplmovieRuntimePool.runtimes;
+  runtimes[1].nextEvent();
+  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
+    { Type: "Bucket", Id: "B2", Members: "" },
+  ]);
+});
