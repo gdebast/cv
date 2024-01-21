@@ -1,10 +1,12 @@
-import { ASSERT, ASSERT_TYPE } from "../../utility/assert/assert";
+import { ASSERT_TYPE } from "../../utility/assert/assert";
 import { PoolBase } from "../../utility/poolbase/poolbase";
 import { DPLMovieRuntime } from "./src/dplmovieruntime";
 
 /*class responsible for owning the DPLMovieRuntime*/
 export class DPLMovieRuntimePool extends PoolBase {
-  // returns all the runtime
+  /** returns all the runtime, sorted from the oldest to the newest.
+   * @returns {DPLMovieRuntime} sorted runtimes
+   */
   get runtimes() {
     const sortRuntimes = function (r1, r2) {
       return r1.date < r2.date ? -1 : 1;

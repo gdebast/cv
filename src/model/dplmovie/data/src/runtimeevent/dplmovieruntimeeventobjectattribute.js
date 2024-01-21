@@ -19,6 +19,12 @@ export class DPLMovieRuntimeEventObjectAttribute {
   get errorMessage() {
     return this._errorMessage;
   }
+  get Name() {
+    return this._name;
+  }
+  get Value() {
+    return this._value;
+  }
 
   // -------
   // PRIVATE

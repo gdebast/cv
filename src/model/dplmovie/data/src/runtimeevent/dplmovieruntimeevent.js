@@ -22,6 +22,12 @@ export class DPLMovieRuntimeEvent {
   get id() {
     return this._id;
   }
+  get nextEventId() {
+    return this._nextEventId;
+  }
+  get EventObjects() {
+    return this._eventObjects;
+  }
   get errorMessage() {
     return this._errorMessage;
   }

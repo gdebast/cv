@@ -8,6 +8,12 @@ const describeRuntimes = function (runtimes) {
   });
 };
 
+const TrackedObjectToFlatObject = function (trackedObjects) {
+  return trackedObjects.map(function (trackedObject) {
+    return { Type: trackedObject.Type, Id: trackedObject.Id };
+  });
+};
+
 // test
 const dplmovieRuntimePool = new DPLMovieRuntimePool();
 const observer = new PoolObserverMock(dplmovieRuntimePool);
@@ -24,12 +30,19 @@ dplmovieRuntimePool.addRuntime(
 dplmovieRuntimePool.addRuntime(
   "Deployment Solver",
   "fairshare",
-  new Date(1991, 11, 23),
+  new Date(2000, 11, 23),
   [
     {
       EventId: 0,
       EventObjects: [
         { EventType: "creation", ObjectClassId: "Bucket", ObjectId: "B1" },
+      ],
+      NextEventId: 1,
+    },
+    {
+      EventId: 1,
+      EventObjects: [
+        { EventType: "creation", ObjectClassId: "Bucket", ObjectId: "B2" },
       ],
     },
   ]
@@ -55,7 +68,7 @@ test("1. the pool should be able to create runtimes", () => {
     {
       solverType: "Deployment Solver",
       solverName: "fairshare",
-      date: new Date(1991, 11, 23),
+      date: new Date(2000, 11, 23),
     },
   ]);
 });
@@ -88,7 +101,7 @@ test("3. the pool should be able to delete runtimes", () => {
     {
       solverType: "Deployment Solver",
       solverName: "fairshare",
-      date: new Date(1991, 11, 23),
+      date: new Date(2000, 11, 23),
     },
   ]);
 });
@@ -184,3 +197,25 @@ test("5.7. events with one EventObject which ObjectId is not defined, are not ac
     "There is one Event Object with type 'creation' and class 'Bucket', which does not have a 'ObjectId' property."
   );
 });
+
+// =======================================
+// 6. test that each runtime can be played
+// =======================================
+test("6.1 runtime should allow to install a first event", () => {
+  const runtimes = dplmovieRuntimePool.runtimes;
+  runtimes[1].installFirstEvent();
+  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
+    { Type: "Bucket", Id: "B1" },
+  ]);
+});
+
+test("6.2 runtime should allow to go to the next event", () => {
+  const runtimes = dplmovieRuntimePool.runtimes;
+  runtimes[1].nextEvent();
+  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
+    { Type: "Bucket", Id: "B1" },
+    { Type: "Bucket", Id: "B2" },
+  ]);
+});
+
+// TODO: test update/deletion. test creation with attribute

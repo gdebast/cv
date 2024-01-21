@@ -22,6 +22,18 @@ export class DPLMovieRuntimeEventObject {
   get errorMessage() {
     return this._errorMessage;
   }
+  get Type() {
+    return this._eventType;
+  }
+  get ObjectClassId() {
+    return this._objectClass;
+  }
+  get ObjectId() {
+    return this._objectId;
+  }
+  get Attributes() {
+    return this._objectAttributes;
+  }
 
   // -------
   // PRIVATE

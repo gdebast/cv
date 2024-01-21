@@ -22,3 +22,14 @@ export const ASSERT = function (condition, message) {
   if (!ACTIVATE_ASSERT) return;
   if (!condition) throw new Error(message);
 };
+
+export const ASSERT_ISSTRING = function (stringVal) {
+  if (!ACTIVATE_ASSERT) return;
+  if (typeof stringVal !== "string" && !(stringVal instanceof String))
+    ASSERT(false, `this value is not a string: ${stringVal}`);
+};
+
+export const ASSERT_SWITCHDEFAULT = function (value) {
+  if (!ACTIVATE_ASSERT) return;
+  ASSERT(false, `this value is not supported in the switch-clause: ${value}`);
+};

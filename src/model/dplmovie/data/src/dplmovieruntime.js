@@ -1,4 +1,5 @@
-import { DPLMovieRuntimeEvent } from "./dplmovieruntimeevent";
+import { DPLMovieRuntimeEvent } from "./runtimeevent/dplmovieruntimeevent";
+import { DPLMovieTrackedObjectPool } from "./trackedobject/dplmovietrackedobjectpool";
 
 /* represent a Deployment solver runtime movie */
 export class DPLMovieRuntime {
@@ -15,6 +16,8 @@ export class DPLMovieRuntime {
       null; /*string containing error which indicates if this is valid */
     this._dplMovieRuntimeEvent =
       this._convertJsonEventsToDPLMovieRuntimeEvents(jsonEvents);
+    this._dplMovieTrackedObjectPool = new DPLMovieTrackedObjectPool();
+    this._currentEvent = null;
   }
 
   // simple getters
@@ -33,11 +36,25 @@ export class DPLMovieRuntime {
   get errorMessage() {
     return this._errorMessage;
   }
+  get TrackedObjects() {
+    return this._dplMovieTrackedObjectPool.getAllCurrentTrackedObjects();
+  }
 
+  /** install the first event such that the object are available.
+   */
   installFirstEvent() {
-    /*TODO: this object should have a DPLMovieTrackedObjectPool which can create and own DPLMovieTrackedObject
-            When we install the first event, we have to clean the Pool and tell it to read the first DPLMovieRuntimeEvent.
-      */
+    this._currentEvent = this._getFirstEvent();
+    if (this._currentEvent) {
+      this._dplMovieTrackedObjectPool.initialize();
+      this._dplMovieTrackedObjectPool.applyEvent(this._currentEvent);
+    }
+  }
+
+  nextEvent() {
+    const nextEvent = this._getNextEvent();
+    if (nextEvent === null) return;
+    this._currentEvent = nextEvent;
+    this._dplMovieTrackedObjectPool.applyEvent(this._currentEvent);
   }
 
   // -------
@@ -75,7 +92,7 @@ export class DPLMovieRuntime {
         this._errorMessage = newEvent.errorMessage;
         return createdEvents;
       }
-      createdEvents[newEvent.id] = newEvent;
+      createdEvents.set(newEvent.id, newEvent);
     }
 
     return createdEvents;
@@ -106,5 +123,23 @@ export class DPLMovieRuntime {
     if (jsonEvent.EventObjects.length === 0)
       return `The event '${jsonEvent.EventId}' has a 'EventObjects' property which is an empty array`;
     return null;
+  }
+
+  _getFirstEvent() {
+    let lowestId = 0;
+    let firstEvent = null;
+    this._dplMovieRuntimeEvent.forEach(function (event, eventId) {
+      if (eventId < lowestId || firstEvent === null) {
+        firstEvent = event;
+        lowestId = eventId;
+      }
+    });
+    return firstEvent;
+  }
+
+  _getNextEvent() {
+    if (this._currentEvent === null) return null;
+    if (this._currentEvent.nextEventId === null) return null;
+    return this._dplMovieRuntimeEvent.get(this._currentEvent.nextEventId);
   }
 }
