@@ -9,7 +9,12 @@ const HTML_DELLETEICON =
 
 /** base class for any view offer to the user
  *  to select a pool-object, to delete it and to see them all.
- *  Any derived class should implement createInnerText(poolObjectElt).
+ *  Any derived class should implement:
+ *   - createInnerText(poolObjectElt, poolObject),
+ *        @param poolObjectElt DOM element rendering the object
+ *        @param poolObject pool object to render
+ *   - onNewClickedSelection(poolObject)
+ *        @param poolObject new selected pool object
  */
 export class PoolSelectionViewBase {
   constructor(pool, mainSectionDOMElt) {
@@ -70,6 +75,7 @@ export class PoolSelectionViewBase {
     const self = this;
     poolObjectElt.addEventListener("click", function () {
       self._unselectAllElementsBut(poolObjectElt);
+      self.onNewClickedSelection(poolObject);
     });
 
     // DOM tree creation

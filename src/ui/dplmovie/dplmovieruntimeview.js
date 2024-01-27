@@ -1,3 +1,4 @@
+import { ASSERT_EXIST } from "../../model/utility/assert/assert";
 import { PoolSelectionViewBase } from "../poolselectionview/poolselectionviewbase";
 
 const CLASS_DPLMOVIESECTION = "dplmovie";
@@ -35,5 +36,14 @@ export class DPLMovieRuntimeView extends PoolSelectionViewBase {
     newObjectPoolElt.append(newRuntimeTitleDateElt);
     newRuntimeTitleDateElt.append(newRuntimeTitleElt);
     newRuntimeTitleDateElt.append(newRuntimeDateElt);
+  }
+
+  /** react to a click event by installing the first event of the DPLMovie runtime,
+   *  if there is no event installed yet.
+   * @param {DPLMovieRuntime} poolObject DPLMovie runtime which should now be displayed.
+   */
+  onNewClickedSelection(poolObject) {
+    ASSERT_EXIST(poolObject);
+    if (!poolObject.hasCurrentEvent()) poolObject.installFirstEvent();
   }
 }
