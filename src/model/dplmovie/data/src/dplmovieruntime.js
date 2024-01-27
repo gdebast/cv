@@ -50,9 +50,21 @@ export class DPLMovieRuntime {
     }
   }
 
+  /** return true if the runtime a current event.
+   *  @returns true if an event is currently installed, false otherwise.
+   */
+  hasCurrentEvent() {
+    return this._currentEvent !== null;
+  }
+
+  /** Go to the next event. If there is no next event, install the first event.
+   */
   nextEvent() {
     const nextEvent = this._getNextEvent();
-    if (nextEvent === null) return;
+    if (nextEvent === null) {
+      this.installFirstEvent();
+      return;
+    }
     this._currentEvent = nextEvent;
     this._dplMovieTrackedObjectPool.applyEvent(this._currentEvent);
   }

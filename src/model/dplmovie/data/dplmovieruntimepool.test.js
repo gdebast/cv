@@ -241,24 +241,37 @@ test("5.7. events with one EventObject which ObjectId is not defined, are not ac
 // =======================================
 test("6.1 runtime should allow to install a first event", () => {
   const runtimes = dplmovieRuntimePool.runtimes;
-  runtimes[1].installFirstEvent();
+  const playableRuntime = runtimes[1];
+  const hasEventBefore = playableRuntime.hasCurrentEvent();
+  playableRuntime.installFirstEvent();
+  const hasEventAfter = playableRuntime.hasCurrentEvent();
   expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
     { Type: "Bucket", Id: "B1", Members: "" },
   ]);
+  expect(hasEventBefore).toEqual(false);
+  expect(hasEventAfter).toEqual(true);
 });
 
 test("6.2 runtime should allow to go to the next event", () => {
   const runtimes = dplmovieRuntimePool.runtimes;
-  runtimes[1].nextEvent();
+  const playableRuntime = runtimes[1];
+  const hasEventBefore = playableRuntime.hasCurrentEvent();
+  playableRuntime.nextEvent();
+  const hasEventAfter = playableRuntime.hasCurrentEvent();
   expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
     { Type: "Bucket", Id: "B1", Members: "" },
     { Type: "Bucket", Id: "B2", Members: "" },
   ]);
+  expect(hasEventBefore).toEqual(true);
+  expect(hasEventAfter).toEqual(true);
 });
 
 test("6.3 runtime should handle update events", () => {
   const runtimes = dplmovieRuntimePool.runtimes;
-  runtimes[1].nextEvent();
+  const playableRuntime = runtimes[1];
+  const hasEventBefore = playableRuntime.hasCurrentEvent();
+  playableRuntime.nextEvent();
+  const hasEventAfter = playableRuntime.hasCurrentEvent();
   expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
     {
       Type: "Bucket",
@@ -268,12 +281,32 @@ test("6.3 runtime should handle update events", () => {
     },
     { Type: "Bucket", Id: "B2", Members: "" },
   ]);
+  expect(hasEventBefore).toEqual(true);
+  expect(hasEventAfter).toEqual(true);
 });
 
 test("6.4 runtime should handle deletion events", () => {
   const runtimes = dplmovieRuntimePool.runtimes;
-  runtimes[1].nextEvent();
+  const playableRuntime = runtimes[1];
+  const hasEventBefore = playableRuntime.hasCurrentEvent();
+  playableRuntime.nextEvent();
+  const hasEventAfter = playableRuntime.hasCurrentEvent();
   expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
     { Type: "Bucket", Id: "B2", Members: "" },
   ]);
+  expect(hasEventBefore).toEqual(true);
+  expect(hasEventAfter).toEqual(true);
+});
+
+test("6.5 runtime should handle no next event by looping to the first event", () => {
+  const runtimes = dplmovieRuntimePool.runtimes;
+  const playableRuntime = runtimes[1];
+  const hasEventBefore = playableRuntime.hasCurrentEvent();
+  playableRuntime.nextEvent();
+  const hasEventAfter = playableRuntime.hasCurrentEvent();
+  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
+    { Type: "Bucket", Id: "B1", Members: "" },
+  ]);
+  expect(hasEventBefore).toEqual(true);
+  expect(hasEventAfter).toEqual(true);
 });
