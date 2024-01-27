@@ -43,10 +43,13 @@ export class DPLMovieTrackedObjectPool {
     this._fillReferences();
   }
 
+  /**
+   *  @returns all current tracked objects sorted per type->id
+   */
   getAllCurrentTrackedObjects() {
     const trackedObjects = [];
     const sorting = function (trackedObject1, trackedObject2) {
-      if (trackedObject1.Type !== trackedObject2.Type)
+      if (trackedObject1.Type === trackedObject2.Type)
         return trackedObject1.Id < trackedObject2.Id ? -1 : 1;
       return trackedObject1.Type < trackedObject2.Type ? -1 : 1;
     };
@@ -56,7 +59,7 @@ export class DPLMovieTrackedObjectPool {
     return trackedObjects.sort(sorting);
   }
 
-  /** reset the pool
+  /** reset/initialize the pool
    */
   initialize() {
     this._typeId_to_trackedObjects = new Map();

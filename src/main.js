@@ -1,6 +1,6 @@
 import { PortalAppLinker } from "./ui/portal/portalapplinker";
 import { createBouncingCircles } from "./ui/dplmovie/canvasTest";
-import { DPLMovieJsonInputView } from "./ui/dplmovie/dplmoviejsoninputview";
+import { DPLMovieJsonInputView } from "./ui/dplmovie/jsoninput/dplmoviejsoninputview";
 import { DPLMovieRuntimeView } from "./ui/dplmovie/dplmovieruntimeview";
 import { DPLMovieRuntimePool } from "./model/dplmovie/data/dplmovieruntimepool";
 import { DirectedGraphWrapperPool } from "./model/graphplayer/data/directedgraphwrapperpool";
@@ -8,6 +8,7 @@ import { GraphCreationView } from "./ui/graphplayer/graphcreationview";
 import { GraphSelectionView } from "./ui/graphplayer/graphselectionview";
 import { DirectedGraphVisualizer } from "./model/utility/directedgraph/directedgraphvisualizer";
 import { DirectedGraph } from "./model/utility/directedgraph/directedgraph";
+import { DPLMovieRuntimePlayerView } from "./ui/dplmovie/player/dplmovieruntimeplayerview";
 
 const linker = new PortalAppLinker();
 
@@ -15,6 +16,9 @@ const linker = new PortalAppLinker();
 const dplMovieRuntimePool = new DPLMovieRuntimePool();
 const dplMovieJsonInputView = new DPLMovieJsonInputView(dplMovieRuntimePool);
 const dplMovieRuntimeView = new DPLMovieRuntimeView(dplMovieRuntimePool);
+const dplMovieRuntimePlayerView = new DPLMovieRuntimePlayerView(
+  dplMovieRuntimeView
+);
 
 //Graph player
 const graphPool = new DirectedGraphWrapperPool();

@@ -69,6 +69,12 @@ export class DPLMovieRuntime {
     this._dplMovieTrackedObjectPool.applyEvent(this._currentEvent);
   }
 
+  /** Go to the previous event. If there is no previous event, go to the last event.
+   */
+  previousEvent() {
+    //TODO
+  }
+
   // -------
   // PRIVATE
   // -------

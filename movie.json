@@ -160,7 +160,7 @@
             }
           ],
           "EventType": "creation",
-          "ObjectClassId": "InventoryConsumerDetail",
+          "ObjectClassId": "InventoryProducerDetail",
           "ObjectId": "2d\\/6582d348"
         }
       ],
@@ -206,7 +206,7 @@
             }
           ],
           "EventType": "creation",
-          "ObjectClassId": "InventoryConsumerDetail",
+          "ObjectClassId": "InventoryProducerDetail",
           "ObjectId": "2c\\/6582d348"
         }
       ],

@@ -15,6 +15,12 @@ const HTML_DELLETEICON =
  *        @param poolObject pool object to render
  *   - onNewClickedSelection(poolObject)
  *        @param poolObject new selected pool object
+ *  This class can be observed by implementing by calling registerObserver(observer).
+ *  The observer must implement:
+ *   - notifyDeletePoolObject(poolObject), which is triggered when a pool object gets deleted.
+ *        @param poolObject deleted object
+ *   - notifySelectedPoolObject(poolObject), which is triggered when a pool object is selected.
+ *        @param poolObject seleted object
  */
 export class PoolSelectionViewBase {
   constructor(pool, mainSectionDOMElt) {
@@ -25,6 +31,14 @@ export class PoolSelectionViewBase {
     this._view = mainSectionDOMElt.querySelector(`.${CLASS_VIEW}`);
     ASSERT_EXIST(this._view);
     this._pool.registerObserver(this);
+    this._observers = [];
+  }
+
+  /** register a new observer.
+   * @param observer observer.
+   */
+  registerObserver(observer) {
+    this._observers.push(observer);
   }
 
   /** Observer patern with the pool:
@@ -40,6 +54,9 @@ export class PoolSelectionViewBase {
   notifyRuntimeDeletion(poolObject) {
     ASSERT_EXIST(poolObject);
     this._deleteViewElement(poolObject);
+    this._observers.forEach(function (observer) {
+      observer.notifyDeletePoolObject(poolObject);
+    });
   }
 
   // -------
@@ -76,6 +93,9 @@ export class PoolSelectionViewBase {
     poolObjectElt.addEventListener("click", function () {
       self._unselectAllElementsBut(poolObjectElt);
       self.onNewClickedSelection(poolObject);
+      self._observers.forEach(function (observer) {
+        observer.notifySelectedPoolObject(poolObject);
+      });
     });
 
     // DOM tree creation

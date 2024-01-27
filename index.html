@@ -11,6 +11,14 @@
       rel="stylesheet"
       href="src/ui/poolselectionview/poolselectionview.css"
     />
+    <link
+      rel="stylesheet"
+      href="src/ui/dplmovie/jsoninput/dplmoviejsoninputview.css"
+    />
+    <link
+      rel="stylesheet"
+      href="src/ui/dplmovie/player/dplmovieruntimeplayerview.css"
+    />
     <title>Gatien De Bast</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" />
     <link
@@ -73,6 +81,7 @@
       </button>
 
       <!-- DPL Movie navigation -->
+      <!-- --- Upload button --- -->
       <button
         class="dplmovie-upload-btn app-btn app-specific-btn hidden"
         for="dplmovie-button"
@@ -102,6 +111,82 @@
           </svg>
         </label>
         <input id="dpl-movie-fileItem" type="file" />
+      </button>
+
+      <!-- --- Previous Event button --- -->
+      <button
+        class="dplmovie-previous-event-btn app-btn app-specific-btn hidden"
+        for="dplmovie-button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="app-btn-icon-medium"
+          viewBox="0 0 512 512"
+        >
+          <path
+            d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64z"
+            fill="none"
+            stroke="currentColor"
+            stroke-miterlimit="10"
+            stroke-width="32"
+          />
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="32"
+            d="M296 352l-96-96 96-96"
+          />
+        </svg>
+      </button>
+
+      <!-- --- Restart button --- -->
+      <button
+        class="dplmovie-restart-btn app-btn app-specific-btn hidden"
+        for="dplmovie-button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="app-btn-icon-medium"
+          viewBox="0 0 512 512"
+        >
+          <path
+            d="M240 424v-96c116.4 0 159.39 33.76 208 96 0-119.23-39.57-240-208-240V88L64 256z"
+            fill="none"
+            stroke="currentColor"
+            stroke-linejoin="round"
+            stroke-width="32"
+          />
+        </svg>
+      </button>
+
+      <!-- --- Next Event button --- -->
+      <button
+        class="dplmovie-next-event-btn app-btn app-specific-btn hidden"
+        for="dplmovie-button"
+      >
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          class="app-btn-icon-medium"
+          viewBox="0 0 512 512"
+        >
+          <path
+            d="M64 256c0 106 86 192 192 192s192-86 192-192S362 64 256 64 64 150 64 256z"
+            fill="none"
+            stroke="currentColor"
+            stroke-miterlimit="10"
+            stroke-width="32"
+          />
+          <path
+            fill="none"
+            stroke="currentColor"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="32"
+            d="M216 352l96-96-96-96"
+          />
+        </svg>
       </button>
 
       <!-- Graph Player navigation -->

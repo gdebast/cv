@@ -1,0 +1,7 @@
+/*hidding class - 
+  we have a local class to differentiate global from local hidding. 
+  Both should be active to view the player
+*/
+.player-hidden {
+  display: none;
+}
