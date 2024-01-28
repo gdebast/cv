@@ -1,3 +1,4 @@
+import { ASSERT_ISSTRING } from "../../../utility/assert/assert";
 import { DPLMovieRuntimeEvent } from "./runtimeevent/dplmovieruntimeevent";
 import { DPLMovieTrackedObjectPool } from "./trackedobject/dplmovietrackedobjectpool";
 
@@ -36,8 +37,14 @@ export class DPLMovieRuntime {
   get errorMessage() {
     return this._errorMessage;
   }
-  get TrackedObjects() {
-    return this._dplMovieTrackedObjectPool.getAllCurrentTrackedObjects();
+
+  /** returns the tracked object of a given type.
+   * @param {String} type type of the tracked objects.
+   * @return {DPLMovieTrackedObject} tracked object in the state of the movie.
+   */
+  getTrackedObjects(type) {
+    ASSERT_ISSTRING(type);
+    return this._dplMovieTrackedObjectPool.getTrackedObjects(type);
   }
 
   /** install the first event such that the object are available.

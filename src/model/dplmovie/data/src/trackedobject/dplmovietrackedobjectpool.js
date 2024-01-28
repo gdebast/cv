@@ -4,6 +4,7 @@ import {
   ASSERT_SWITCHDEFAULT,
   ASSERT_TYPE,
 } from "../../../../utility/assert/assert";
+import { mapToArray } from "../../../../utility/toarray/toarray";
 import { DPLMovieRuntimeEvent } from "../runtimeevent/dplmovieruntimeevent";
 import { DPLMovieRuntimeEventObjectReferenceAttributeValue } from "../runtimeevent/dplmovieruntimeeventobjectreferenceattributevalue";
 import { DPLMovieTrackedObject } from "./dplmovietrackedobject";
@@ -43,20 +44,15 @@ export class DPLMovieTrackedObjectPool {
     this._fillReferences();
   }
 
-  /**
-   *  @returns all current tracked objects sorted per type->id
+  /** returns the tracked object of a given object class.
+   * @param {String} objectClassId Id object the class of the tracked objects.
+   * @return {DPLMovieTrackedObject} tracked objects of the pool.
    */
-  getAllCurrentTrackedObjects() {
-    const trackedObjects = [];
-    const sorting = function (trackedObject1, trackedObject2) {
-      if (trackedObject1.Type === trackedObject2.Type)
-        return trackedObject1.Id < trackedObject2.Id ? -1 : 1;
-      return trackedObject1.Type < trackedObject2.Type ? -1 : 1;
-    };
-    this._typeId_to_trackedObjects.forEach(function (id_object_map) {
-      id_object_map.forEach((object) => trackedObjects.push(object));
-    });
-    return trackedObjects.sort(sorting);
+  getTrackedObjects(objectClassId) {
+    ASSERT_ISSTRING(objectClassId);
+    if (!this._typeId_to_trackedObjects.has(objectClassId)) return [];
+    const id_object_map = this._typeId_to_trackedObjects.get(objectClassId);
+    return mapToArray(id_object_map, this._trackedObjectSortPredicate);
   }
 
   /** reset/initialize the pool
@@ -223,5 +219,11 @@ export class DPLMovieTrackedObjectPool {
       `Event Object with ObjectClassId '${objectClassId}' and ObjectId '${objectId}', should be ${purpose}  but it is not found.`
     );
     return id_to_trackedObjects;
+  }
+
+  _trackedObjectSortPredicate(trackedObject1, trackedObject2) {
+    if (trackedObject1.Type === trackedObject2.Type)
+      return trackedObject1.Id < trackedObject2.Id ? -1 : 1;
+    return trackedObject1.Type < trackedObject2.Type ? -1 : 1;
   }
 }

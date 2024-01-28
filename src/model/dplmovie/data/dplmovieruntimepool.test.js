@@ -245,9 +245,9 @@ test("6.1 runtime should allow to install a first event", () => {
   const hasEventBefore = playableRuntime.hasCurrentEvent();
   playableRuntime.installFirstEvent();
   const hasEventAfter = playableRuntime.hasCurrentEvent();
-  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
-    { Type: "Bucket", Id: "B1", Members: "" },
-  ]);
+  expect(
+    TrackedObjectToFlatObject(runtimes[1].getTrackedObjects("Bucket"))
+  ).toEqual([{ Type: "Bucket", Id: "B1", Members: "" }]);
   expect(hasEventBefore).toEqual(false);
   expect(hasEventAfter).toEqual(true);
 });
@@ -258,7 +258,9 @@ test("6.2 runtime should allow to go to the next event", () => {
   const hasEventBefore = playableRuntime.hasCurrentEvent();
   playableRuntime.nextEvent();
   const hasEventAfter = playableRuntime.hasCurrentEvent();
-  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
+  expect(
+    TrackedObjectToFlatObject(runtimes[1].getTrackedObjects("Bucket"))
+  ).toEqual([
     { Type: "Bucket", Id: "B1", Members: "" },
     { Type: "Bucket", Id: "B2", Members: "" },
   ]);
@@ -272,7 +274,9 @@ test("6.3 runtime should handle update events", () => {
   const hasEventBefore = playableRuntime.hasCurrentEvent();
   playableRuntime.nextEvent();
   const hasEventAfter = playableRuntime.hasCurrentEvent();
-  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
+  expect(
+    TrackedObjectToFlatObject(runtimes[1].getTrackedObjects("Bucket"))
+  ).toEqual([
     {
       Type: "Bucket",
       Id: "B1",
@@ -291,9 +295,9 @@ test("6.4 runtime should handle deletion events", () => {
   const hasEventBefore = playableRuntime.hasCurrentEvent();
   playableRuntime.nextEvent();
   const hasEventAfter = playableRuntime.hasCurrentEvent();
-  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
-    { Type: "Bucket", Id: "B2", Members: "" },
-  ]);
+  expect(
+    TrackedObjectToFlatObject(runtimes[1].getTrackedObjects("Bucket"))
+  ).toEqual([{ Type: "Bucket", Id: "B2", Members: "" }]);
   expect(hasEventBefore).toEqual(true);
   expect(hasEventAfter).toEqual(true);
 });
@@ -304,9 +308,9 @@ test("6.5 runtime should handle no next event by looping to the first event", ()
   const hasEventBefore = playableRuntime.hasCurrentEvent();
   playableRuntime.nextEvent();
   const hasEventAfter = playableRuntime.hasCurrentEvent();
-  expect(TrackedObjectToFlatObject(runtimes[1].TrackedObjects)).toEqual([
-    { Type: "Bucket", Id: "B1", Members: "" },
-  ]);
+  expect(
+    TrackedObjectToFlatObject(runtimes[1].getTrackedObjects("Bucket"))
+  ).toEqual([{ Type: "Bucket", Id: "B1", Members: "" }]);
   expect(hasEventBefore).toEqual(true);
   expect(hasEventAfter).toEqual(true);
 });

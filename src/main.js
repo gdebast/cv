@@ -9,6 +9,7 @@ import { GraphSelectionView } from "./ui/graphplayer/graphselectionview";
 import { DirectedGraphVisualizer } from "./model/utility/directedgraph/directedgraphvisualizer";
 import { DirectedGraph } from "./model/utility/directedgraph/directedgraph";
 import { DPLMovieRuntimePlayerView } from "./ui/dplmovie/player/dplmovieruntimeplayerview";
+import { DPLMovieCanvasView } from "./ui/dplmovie/canvas/dplmoviecanvasview";
 
 const linker = new PortalAppLinker();
 
@@ -18,6 +19,10 @@ const dplMovieJsonInputView = new DPLMovieJsonInputView(dplMovieRuntimePool);
 const dplMovieRuntimeView = new DPLMovieRuntimeView(dplMovieRuntimePool);
 const dplMovieRuntimePlayerView = new DPLMovieRuntimePlayerView(
   dplMovieRuntimeView
+);
+const dplMovieCavansView = new DPLMovieCanvasView(
+  dplMovieRuntimeView,
+  dplMovieRuntimePlayerView
 );
 
 //Graph player
