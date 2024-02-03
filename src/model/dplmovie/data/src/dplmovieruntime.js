@@ -139,7 +139,6 @@ export class DPLMovieRuntime {
       while (currentId <= highestId) {
         if (createdEvents.has(currentId)) {
           event.NextEvent = createdEvents.get(currentId);
-          console.log(event);
           return;
         }
         currentId++;

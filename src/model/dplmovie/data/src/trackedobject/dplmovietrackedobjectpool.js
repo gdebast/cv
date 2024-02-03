@@ -192,6 +192,7 @@ export class DPLMovieTrackedObjectPool {
           );
         }
         trackedObjectToFill[update.name] = newArrayForTrackedObject;
+        continue;
       }
       ASSERT(
         false,
