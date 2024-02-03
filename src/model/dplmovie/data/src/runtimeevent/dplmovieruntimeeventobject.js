@@ -99,11 +99,12 @@ export class DPLMovieRuntimeEventObject {
       typeof jsonObjectAttribute.Value !== "number" &&
       !(jsonObjectAttribute.Value instanceof Number) &&
       typeof jsonObjectAttribute.Value !== "boolean" &&
-      !(jsonObjectAttribute.Value instanceof Boolean)
+      !(jsonObjectAttribute.Value instanceof Boolean) &&
+      !(jsonObjectAttribute.Value instanceof Array)
     )
       return `There is one Event Object Attribute with name '${
         jsonObjectAttribute.Name
-      }' which 'Value' property is not a string, a boolean or a number but a '${typeof jsonObjectAttribute.Value}'.`;
+      }' which 'Value' property is not a string, a boolean, an array or a number but a '${typeof jsonObjectAttribute.Value}'.`;
 
     // check attribute type
     if (jsonObjectAttribute.Type === undefined)

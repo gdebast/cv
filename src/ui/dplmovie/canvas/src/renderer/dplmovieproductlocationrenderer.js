@@ -1,22 +1,36 @@
-import { ASSERT, ASSERT_EXIST } from "../../../../model/utility/assert/assert";
+import {
+  ASSERT,
+  ASSERT_EXIST,
+} from "../../../../../model/utility/assert/assert";
+import {
+  drawHeaderCell,
+  getHeaderCellHeigth,
+  getLineWidth,
+} from "./src/dplmovierendererhelper";
 
 const OBJECTLASS_HANDLEDTYPE = "ProductLocation";
 
 /* values are in pixels */
-const PRODUCTLOCATION_CELL_BASE_HEIGHT = 75;
-const PRODUCTLOCATION_CELL_BASE_WIDTH = 200;
-const PRODUCTLOCATION_CELL_BASE_ROUNDNESS = 10;
 const PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X = 30;
 const PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y = 40;
-const PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y_INCREMENT = 5;
-const PRODUCTLOCATION_BASE_PREFEREDFONTSIZE = 20;
+const PRODUCTLOCATION_CELL_BASE_Y_INCREMENT = 5;
 
+/*color*/
+const PRODUCTLOCATION_CELL_BACKGROUNDCOLOR = "#1864ab";
+
+/** class responsible for rendering ProductLocation of a DPL Movie as cell header.
+ * @param canvasContext canvas on which to draw.
+ */
 export class DPLMovieProductLocationRenderer {
   constructor(canvasContext) {
     ASSERT_EXIST(canvasContext);
     this._canvasContext = canvasContext;
     this._intialize();
   }
+
+  // ------
+  // PUBLIC
+  // ------
 
   /** render the ProductLocations of the given DPLMovieRuntime.
    *  @param dplMovieRuntime DPLMovie runtime.
@@ -33,16 +47,32 @@ export class DPLMovieProductLocationRenderer {
     }
   }
 
-  /** reset the renderer.
+  /** reset the renderer by erasing all its creation.
    */
   reset() {
     for (const [_, rect] of this._productLocationPositions) {
-      this._canvasContext.clearRect(rect.X, rect.Y, rect.Width, rect.Height);
+      this._canvasContext.clearRect(
+        rect.X - rect.LineWidth,
+        rect.Y - rect.LineWidth,
+        rect.Width + 2 * rect.LineWidth,
+        rect.Height + 2 * rect.LineWidth
+      );
     }
     this._productLocationPositions = new Map();
     this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
     this._currentY = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y;
   }
+
+  /** return the positions of the ProductLocations
+   * @returns map of productLocationId and rectangle of those ProductLocation
+   */
+  getProductLocationPositions() {
+    return this._productLocationPositions;
+  }
+
+  // -------
+  // PRIVATE
+  // -------
 
   /** intialize the renderer.
    */
@@ -62,41 +92,28 @@ export class DPLMovieProductLocationRenderer {
     );
     const context = this._canvasContext;
 
-    // draw the rectangle
-    context.beginPath();
-    context.roundRect(
+    const createdRect = drawHeaderCell(
+      context,
+      ProductLocattionTrackedObject.Id,
+      PRODUCTLOCATION_CELL_BACKGROUNDCOLOR,
       this._currentX,
       this._currentY,
-      PRODUCTLOCATION_CELL_BASE_WIDTH,
-      PRODUCTLOCATION_CELL_BASE_HEIGHT,
-      [PRODUCTLOCATION_CELL_BASE_ROUNDNESS]
+      1 /*zoomFactor*/
     );
-    context.stroke();
 
-    // draw the text
-    context.font = `${PRODUCTLOCATION_BASE_PREFEREDFONTSIZE}px sans-serif`;
-    context.textAlign = "center";
-    context.textBaseline = "middle";
-    context.strokeText(
+    this._productLocationPositions.set(
       ProductLocattionTrackedObject.Id,
-      this._currentX + PRODUCTLOCATION_CELL_BASE_WIDTH / 2,
-      this._currentY + PRODUCTLOCATION_CELL_BASE_HEIGHT / 2
+      createdRect
     );
-
-    // remember the positions.
-    const lineSize = 1;
-    this._productLocationPositions.set(ProductLocattionTrackedObject.Id, {
-      X: this._currentX - lineSize,
-      Y: this._currentY - lineSize,
-      Width: PRODUCTLOCATION_CELL_BASE_WIDTH + 2 * lineSize,
-      Height: PRODUCTLOCATION_CELL_BASE_HEIGHT + 2 * lineSize,
-    });
   }
 
   /** increment the positionning to render the next Product-Location
    */
   _incrementPosition() {
     this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
-    this._currentY += PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y_INCREMENT;
+    this._currentY +=
+      PRODUCTLOCATION_CELL_BASE_Y_INCREMENT +
+      getLineWidth(1 /*zoomFactor*/) +
+      getHeaderCellHeigth(1 /*zoomFactor*/);
   }
 }

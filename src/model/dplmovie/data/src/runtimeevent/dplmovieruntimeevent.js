@@ -1,3 +1,4 @@
+import { ASSERT_TYPE } from "../../../../utility/assert/assert";
 import { DPLMovieRuntimeEventObject } from "./dplmovieruntimeeventobject";
 
 const POSSIBLE_EVENT_TYPES = ["creation", "update", "deletion"];
@@ -7,29 +8,34 @@ export class DPLMovieRuntimeEvent {
   // ------
   // PUBLIC
   // ------
-  constructor(id, jsonEventObjects, nextEventId) {
+  constructor(id, jsonEventObjects) {
     this._id = id;
-    this._nextEventId = nextEventId;
     this._errorMessage =
       null; /*string containing error which indicates if this is valid */
     this._eventObjects =
       this._convertJsonEventObjectsToDPLMovieRuntimeEventObject(
         jsonEventObjects
       );
+    this._nextEvent = null;
   }
 
   // simple getter
   get id() {
     return this._id;
   }
-  get nextEventId() {
-    return this._nextEventId;
-  }
   get EventObjects() {
     return this._eventObjects;
   }
   get errorMessage() {
     return this._errorMessage;
+  }
+  get NextEvent() {
+    return this._nextEvent;
+  }
+
+  set NextEvent(nextEvent) {
+    ASSERT_TYPE(nextEvent, DPLMovieRuntimeEvent);
+    this._nextEvent = nextEvent;
   }
 
   // -------

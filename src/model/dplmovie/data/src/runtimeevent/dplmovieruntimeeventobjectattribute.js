@@ -44,14 +44,14 @@ export class DPLMovieRuntimeEventObjectAttribute {
     // attribute value refering to other objects
     if (
       type.startsWith(ARRAY_START) &&
-      type.startsWith(ARRAY_END) &&
-      _isString(jsonValue)
+      type.endsWith(ARRAY_END) &&
+      this._isArrayOfString(jsonValue)
     ) {
       const referredObjectClassId = type.substring(
         ARRAY_START.length,
         type.length - 1
       );
-      return jsonValue.split(",").map(function (referredObjectId) {
+      return jsonValue.map(function (referredObjectId) {
         return new DPLMovieRuntimeEventObjectReferenceAttributeValue(
           referredObjectClassId,
           referredObjectId
@@ -70,5 +70,17 @@ export class DPLMovieRuntimeEventObjectAttribute {
 
   _isString(value) {
     return typeof value === "string" || value instanceof String;
+  }
+
+  /**
+   * @param {Any} value
+   * @returns true if all elements are strings
+   */
+  _isArrayOfString(value) {
+    if (!(value instanceof Array)) return false;
+    for (const elt of value) {
+      if (!this._isString(elt)) return false;
+    }
+    return true;
   }
 }

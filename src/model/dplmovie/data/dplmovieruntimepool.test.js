@@ -44,18 +44,15 @@ dplmovieRuntimePool.addRuntime(
       EventObjects: [
         { EventType: "creation", ObjectClassId: "Bucket", ObjectId: "B1" },
       ],
-      NextEventId: 1,
     },
     {
       EventId: 1,
       EventObjects: [
         { EventType: "creation", ObjectClassId: "Bucket", ObjectId: "B2" },
       ],
-      NextEventId: 2,
     },
     {
       EventId: 2,
-      NextEventId: 3,
       EventObjects: [
         {
           EventType: "update",

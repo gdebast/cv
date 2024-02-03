@@ -1,5 +1,6 @@
 import { ASSERT_EXIST } from "../../../model/utility/assert/assert";
-import { DPLMovieProductLocationRenderer } from "./src/dplmovieproductlocationrenderer";
+import { DPLMovieBucketRenderer } from "./src/renderer/dplmoviebucketrenderer";
+import { DPLMovieProductLocationRenderer } from "./src/renderer/dplmovieproductlocationrenderer";
 
 const CLASS_DPLMOVIECANVAS = "dplmovie-canvas";
 
@@ -22,7 +23,6 @@ export class DPLMovieCanvasView {
     if (poolObject === this._dplMovieRuntimeToPlay) {
       this._dplMovieRuntimeToPlay = null;
       this._eraseCanvas();
-      this._createRenderers();
     }
   }
   notifySelectedPoolObject(poolObject) {
@@ -83,6 +83,11 @@ export class DPLMovieCanvasView {
     const productLocationRenderer = new DPLMovieProductLocationRenderer(
       this._canvasContext
     );
+    const bucketRenderer = new DPLMovieBucketRenderer(
+      this._canvasContext,
+      productLocationRenderer
+    );
     this._renderers.push(productLocationRenderer);
+    this._renderers.push(bucketRenderer);
   }
 }

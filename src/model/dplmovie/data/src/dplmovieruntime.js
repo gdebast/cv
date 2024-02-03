@@ -108,10 +108,15 @@ export class DPLMovieRuntime {
         this._errorMessage = errormessage;
         return createdEvents;
       }
+
+      if (createdEvents.has(jsonEvent.EventId)) {
+        this._errorMessage = `Duplicate event id '${jsonEvent.EventId}'`;
+        return createdEvents;
+      }
+
       const newEvent = new DPLMovieRuntimeEvent(
         jsonEvent.EventId,
-        jsonEvent.EventObjects,
-        jsonEvent.NextEventId !== undefined ? jsonEvent.NextEventId : null
+        jsonEvent.EventObjects
       );
       if (newEvent.errorMessage) {
         this._errorMessage = newEvent.errorMessage;
@@ -119,6 +124,27 @@ export class DPLMovieRuntime {
       }
       createdEvents.set(newEvent.id, newEvent);
     }
+
+    // finally, fill the next Event in each Event.
+    let highestIdFound = false;
+    let highestId = 0;
+    createdEvents.forEach(function (_, id) {
+      if (!highestIdFound || highestId < id) {
+        highestId = id;
+        highestIdFound = true;
+      }
+    });
+    createdEvents.forEach(function (event, id) {
+      let currentId = id + 1;
+      while (currentId <= highestId) {
+        if (createdEvents.has(currentId)) {
+          event.NextEvent = createdEvents.get(currentId);
+          console.log(event);
+          return;
+        }
+        currentId++;
+      }
+    });
 
     return createdEvents;
   }
@@ -132,13 +158,6 @@ export class DPLMovieRuntime {
       return `An event does not contain any EventId.`;
     if (!Number.isInteger(jsonEvent.EventId))
       return `An EventId is not a Number but a '${typeof jsonEvent.EventId}'.`;
-    if (
-      jsonEvent.NextEventId !== undefined &&
-      !Number.isInteger(jsonEvent.NextEventId)
-    )
-      return `The NextEventId of event '${
-        jsonEvent.EventId
-      }' is not a Number but '${typeof jsonEvent.NextEventId}'.`;
     if (jsonEvent.EventObjects === undefined)
       return `The event '${jsonEvent.EventId}' does not contain any 'EventObjects' property`;
     if (!(jsonEvent.EventObjects instanceof Array))
@@ -164,7 +183,6 @@ export class DPLMovieRuntime {
 
   _getNextEvent() {
     if (this._currentEvent === null) return null;
-    if (this._currentEvent.nextEventId === null) return null;
-    return this._dplMovieRuntimeEvent.get(this._currentEvent.nextEventId);
+    return this._currentEvent.NextEvent;
   }
 }
