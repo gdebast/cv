@@ -16,6 +16,7 @@ export class DPLMovieRuntimeEvent {
         jsonEventObjects
       );
     this._nextEvent = null;
+    this._previousEvent = null;
   }
 
   // simple getter
@@ -31,10 +32,17 @@ export class DPLMovieRuntimeEvent {
   get NextEvent() {
     return this._nextEvent;
   }
+  get PreviousEvent() {
+    return this._previousEvent;
+  }
 
   set NextEvent(nextEvent) {
     ASSERT_TYPE(nextEvent, DPLMovieRuntimeEvent);
     this._nextEvent = nextEvent;
+  }
+  set PreviousEvent(nextEvent) {
+    ASSERT_TYPE(nextEvent, DPLMovieRuntimeEvent);
+    this._previousEvent = nextEvent;
   }
 
   // -------

@@ -387,9 +387,9 @@ test("5.11. update events with an attribute without PreviousValue property, are 
   );
 });
 
-// =======================================
-// 6. test that each runtime can be played
-// =======================================
+// ===============================================
+// 6. test that each runtime can be played forward
+// ===============================================
 test("6.1 runtime should allow to install a first event", () => {
   const runtimes = dplmovieRuntimePool.runtimes;
   const playableRuntime = runtimes[1];
@@ -481,3 +481,7 @@ test("6.6 runtime should handle no next event by looping to the first event", ()
   expect(hasEventBefore).toEqual(true);
   expect(hasEventAfter).toEqual(true);
 });
+
+// ================================================
+// 7. test that each runtime can be played backward
+// ================================================

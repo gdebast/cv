@@ -5,6 +5,11 @@ import {
   ASSERT_TYPE,
 } from "../../../../utility/assert/assert";
 import { mapToArray } from "../../../../utility/toarray/toarray";
+import {
+  EVENTTYPE_CREATION,
+  EVENTTYPE_DELETION,
+  EVENTTYPE_UPDATE,
+} from "../runtimeevent/dplmovieruntimeenventtype";
 import { DPLMovieRuntimeEvent } from "../runtimeevent/dplmovieruntimeevent";
 import { DPLMovieRuntimeEventObjectReferenceAttributeValue } from "../runtimeevent/dplmovieruntimeeventobjectreferenceattributevalue";
 import { DPLMovieTrackedObject } from "./dplmovietrackedobject";
@@ -19,8 +24,8 @@ export class DPLMovieTrackedObjectPool {
     this.initialize();
   }
 
-  /** apply the event by updating/creating/deleling all the tracked objects of this event.
-   * @param {DPLMovieRuntimeEvent} dplMovieRuntimeEvent event to read to update the
+  /** apply the event by updating/creating/deleting all the tracked objects of this event.
+   * @param {DPLMovieRuntimeEvent} dplMovieRuntimeEvent event to read
    */
   applyEvent(dplMovieRuntimeEvent) {
     ASSERT_TYPE(dplMovieRuntimeEvent, DPLMovieRuntimeEvent);
@@ -28,14 +33,39 @@ export class DPLMovieTrackedObjectPool {
       const eventObjectType = eventObject.Type;
       ASSERT_ISSTRING(eventObjectType);
       switch (eventObjectType) {
-        case "creation":
-          this._createFromEventObject(eventObject);
+        case EVENTTYPE_CREATION:
+          this._createFromEventObject(eventObject, false);
           break;
-        case "update":
-          this._updateFromEventObject(eventObject);
+        case EVENTTYPE_UPDATE:
+          this._updateFromEventObject(eventObject, false);
           break;
-        case "deletion":
+        case EVENTTYPE_DELETION:
           this._deleteFromEventObject(eventObject);
+          break;
+        default:
+          ASSERT_SWITCHDEFAULT(eventObjectType);
+      }
+    }
+    this._fillReferences();
+  }
+  /** revert the event. Each event-object of type "creation" will be treated as a deletion,
+   *  an update will be an update and a deletion will be a creation.
+   * @param {DPLMovieRuntimeEvent} dplMovieRuntimeEvent event to read
+   */
+  revertEvent(dplMovieRuntimeEvent) {
+    ASSERT_TYPE(dplMovieRuntimeEvent, DPLMovieRuntimeEvent);
+    for (const eventObject of dplMovieRuntimeEvent.EventObjects) {
+      const eventObjectType = eventObject.Type;
+      ASSERT_ISSTRING(eventObjectType);
+      switch (eventObjectType) {
+        case EVENTTYPE_CREATION:
+          this._deleteFromEventObject(eventObject);
+          break;
+        case EVENTTYPE_UPDATE:
+          this._updateFromEventObject(eventObject, true);
+          break;
+        case EVENTTYPE_DELETION:
+          this._createFromEventObject(eventObject, false);
           break;
         default:
           ASSERT_SWITCHDEFAULT(eventObjectType);
@@ -83,8 +113,9 @@ export class DPLMovieTrackedObjectPool {
 
   /** apply the event object to the pool by updating the corresponding tracked object.
    * @param {DPLMovieRuntimeEventObject} eventObject event to apply
+   * @param {Boolean} usePreviousValue true if we should use the PreviousValue, false if we should read the Value.
    */
-  _updateFromEventObject(eventObject) {
+  _updateFromEventObject(eventObject, usePreviousValue) {
     // find the object
     const id_to_trackedObjects = this._getIdToTrackedObjectMap(
       eventObject.ObjectClassId,
@@ -99,19 +130,25 @@ export class DPLMovieTrackedObjectPool {
     for (const attribute of eventObject.Attributes) {
       // if we have to update a reference, do it after.
       if (
-        this._postponeReferenceFillingIfNeeded(trackedObjectToUpdate, attribute)
+        this._postponeReferenceFillingIfNeeded(
+          trackedObjectToUpdate,
+          attribute,
+          usePreviousValue
+        )
       )
         continue;
 
       // update simple values
-      trackedObjectToUpdate[attribute.Name] = attribute.Value;
+      trackedObjectToUpdate[attribute.Name] =
+        usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
     }
   }
 
   /** apply the event object to the pool by creating the corresponding tracked object.
    * @param {DPLMovieRuntimeEventObject} eventObject event to apply
+   * @param {Boolean} usePreviousValue true if we should use the PreviousValue, false if we should read the Value.
    */
-  _createFromEventObject(eventObject) {
+  _createFromEventObject(eventObject, usePreviousValue) {
     const objectClassId = eventObject.ObjectClassId;
     const objectId = eventObject.ObjectId;
     ASSERT(
@@ -122,11 +159,18 @@ export class DPLMovieTrackedObjectPool {
     const newTrackedObject = new DPLMovieTrackedObject(objectClassId, objectId);
     for (const attribute of eventObject.Attributes) {
       // if we have to update a reference, do it after.
-      if (this._postponeReferenceFillingIfNeeded(newTrackedObject, attribute))
+      if (
+        this._postponeReferenceFillingIfNeeded(
+          newTrackedObject,
+          attribute,
+          usePreviousValue
+        )
+      )
         continue;
 
       // update simple values
-      newTrackedObject[attribute.Name] = attribute.Value;
+      newTrackedObject[attribute.Name] =
+        usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
     }
 
     // fill the map
@@ -141,17 +185,30 @@ export class DPLMovieTrackedObjectPool {
   /** postpone if needed the filling of this tracked object with this attribute name and value.
    * @param {DPLMovieTrackedObject} trackedObjectToUpdate tracked object for which the reference update is postponed.
    * @param {DPLMovieRuntimeEventObjectAttribute} attribute
+   * @param {Boolean} usePreviousValue true if we should use the PreviousValue, false if we should read the Value.
    * @returns true if the filling of this attribute value should be postponed
    */
-  _postponeReferenceFillingIfNeeded(trackedObjectToUpdate, attribute) {
+  _postponeReferenceFillingIfNeeded(
+    trackedObjectToUpdate,
+    attribute,
+    usePreviousValue
+  ) {
+    const attributeValue =
+      usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
+
+    ASSERT(
+      attributeValue != undefined,
+      `The expected value to read is not filled (usePreviousValue =${usePreviousValue})`
+    );
+
     if (
-      attribute.Value instanceof
+      attributeValue instanceof
         DPLMovieRuntimeEventObjectReferenceAttributeValue ||
-      attribute.Value instanceof Array
+      attributeValue instanceof Array
     ) {
       this._trackedObjectForWhichToFindReferences.push({
         trakedObject: trackedObjectToUpdate,
-        value: attribute.Value,
+        value: attributeValue,
         name: attribute.Name,
       });
       return true;

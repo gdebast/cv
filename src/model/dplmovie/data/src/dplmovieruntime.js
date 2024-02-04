@@ -19,6 +19,8 @@ export class DPLMovieRuntime {
       this._convertJsonEventsToDPLMovieRuntimeEvents(jsonEvents);
     this._dplMovieTrackedObjectPool = new DPLMovieTrackedObjectPool();
     this._currentEvent = null;
+    this._firstEvent = this._findFirstOrLastEvent(false);
+    this._lastEvent = this._findFirstOrLastEvent(true);
   }
 
   // simple getters
@@ -50,14 +52,14 @@ export class DPLMovieRuntime {
   /** install the first event such that the object are available.
    */
   installFirstEvent() {
-    this._currentEvent = this._getFirstEvent();
+    this._currentEvent = this._firstEvent;
     if (this._currentEvent) {
       this._dplMovieTrackedObjectPool.initialize();
       this._dplMovieTrackedObjectPool.applyEvent(this._currentEvent);
     }
   }
 
-  /** return true if the runtime a current event.
+  /** return true if the runtime has a current event.
    *  @returns true if an event is currently installed, false otherwise.
    */
   hasCurrentEvent() {
@@ -79,7 +81,19 @@ export class DPLMovieRuntime {
   /** Go to the previous event. If there is no previous event, go to the last event.
    */
   previousEvent() {
-    //TODO
+    if (this._currentEvent === null) {
+      this.installFirstEvent();
+      return;
+    }
+    const previousEvent = this._getPreviousEvent();
+    if (previousEvent === null) {
+      /*we are reverting the first event, so we have to install up to the last...*/
+      // TODO
+      return;
+    }
+
+    this._dplMovieTrackedObjectPool.revertEvent(this._currentEvent);
+    this._currentEvent = previousEvent;
   }
 
   // -------
@@ -125,7 +139,7 @@ export class DPLMovieRuntime {
       createdEvents.set(newEvent.id, newEvent);
     }
 
-    // finally, fill the next Event in each Event.
+    // finally, fill the next and previous Event in each Event.
     let highestIdFound = false;
     let highestId = 0;
     createdEvents.forEach(function (_, id) {
@@ -143,6 +157,11 @@ export class DPLMovieRuntime {
         }
         currentId++;
       }
+    });
+    createdEvents.forEach(function (event, _) {
+      if (event.NextEvent === null) return;
+      const nextEvent = event.NextEvent;
+      nextEvent.PreviousEvent = event;
     });
 
     return createdEvents;
@@ -168,20 +187,39 @@ export class DPLMovieRuntime {
     return null;
   }
 
-  _getFirstEvent() {
-    let lowestId = 0;
-    let firstEvent = null;
+  /**
+   * @param findLast if true, we are looking for the last. if false, the first.
+   * @returns the first or last event in the movie.
+   */
+  _findFirstOrLastEvent(findLast) {
+    let foundId = 0;
+    let foundEvent = null;
     this._dplMovieRuntimeEvent.forEach(function (event, eventId) {
-      if (eventId < lowestId || firstEvent === null) {
-        firstEvent = event;
-        lowestId = eventId;
+      if (findLast === false && (eventId < foundId || foundEvent === null)) {
+        foundEvent = event;
+        foundId = eventId;
+      }
+      if (findLast === true && (eventId > foundId || foundEvent === null)) {
+        foundEvent = event;
+        foundId = eventId;
       }
     });
-    return firstEvent;
+    return foundEvent;
   }
 
+  /**
+   * @returns the next event of the current event.
+   */
   _getNextEvent() {
     if (this._currentEvent === null) return null;
     return this._currentEvent.NextEvent;
+  }
+
+  /**
+   * @returns the previous event of the current event.
+   */
+  _getPreviousEvent() {
+    if (this._currentEvent === null) return null;
+    return this._currentEvent.PreviousEvent;
   }
 }
