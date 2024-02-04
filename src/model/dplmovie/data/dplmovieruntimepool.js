@@ -19,6 +19,7 @@ export class DPLMovieRuntimePool extends PoolBase {
    *  @param {String} solverName  name of the solver
    *  @param {Date}   runtimeDate date when the solver was run
    *  @param {Array}  jsonEvents array of json events
+   *  @returns an error message or null
    */
   addRuntime(solverType, solverName, runtimeDate, jsonEvents) {
     ASSERT_TYPE(runtimeDate, Date);

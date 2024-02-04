@@ -9,10 +9,14 @@ export class DPLMovieRuntimeEventObjectAttribute {
   // ------
   // PUBLIC
   // ------
-  constructor(name, type, jsonValue) {
+  constructor(name, type, jsonValue, jsonPreviousValue) {
     this._name = name;
     this._errorMessage = null;
     this._value = this._convertJsonValueToJsValue(type, jsonValue);
+    this._previousValue = this._convertJsonValueToJsValue(
+      type,
+      jsonPreviousValue
+    );
   }
 
   // simple getter
@@ -25,6 +29,9 @@ export class DPLMovieRuntimeEventObjectAttribute {
   get Value() {
     return this._value;
   }
+  get PreviousValue() {
+    return this._previousValue;
+  }
 
   // -------
   // PRIVATE
@@ -36,6 +43,7 @@ export class DPLMovieRuntimeEventObjectAttribute {
    */
   _convertJsonValueToJsValue(type, jsonValue) {
     // simple attribute value
+    if (jsonValue === null) return null;
     if (type === "Boolean") return new Boolean(jsonValue);
     if (type === "String") return new String(jsonValue);
     if (type === "Number") return new Number(jsonValue);

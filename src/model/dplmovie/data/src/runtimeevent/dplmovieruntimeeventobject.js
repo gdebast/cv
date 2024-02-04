@@ -1,3 +1,8 @@
+import {
+  EVENTTYPE_CREATION,
+  EVENTTYPE_DELETION,
+  EVENTTYPE_UPDATE,
+} from "./dplmovieruntimeenventtype";
 import { DPLMovieRuntimeEventObjectAttribute } from "./dplmovieruntimeeventobjectattribute";
 
 /** represents an creation/update/deletion event of an object of a certain type.
@@ -61,7 +66,12 @@ export class DPLMovieRuntimeEventObject {
       const newAttribute = new DPLMovieRuntimeEventObjectAttribute(
         jsonObjectAttribute.Name,
         jsonObjectAttribute.Type,
-        jsonObjectAttribute.Value
+        jsonObjectAttribute.Value !== undefined
+          ? jsonObjectAttribute.Value
+          : null,
+        jsonObjectAttribute.PreviousValue !== undefined
+          ? jsonObjectAttribute.PreviousValue
+          : null
       );
 
       const newAttributeErrorMessage = newAttribute.errorMessage;
@@ -91,16 +101,14 @@ export class DPLMovieRuntimeEventObject {
       return `There is one Event Object Attribute which 'Name' property is not a string but a '${typeof jsonObjectAttribute.Name}'.`;
 
     // check attribute value
-    if (jsonObjectAttribute.Value === undefined)
-      return `There is one Event Object Attribute with name '${jsonObjectAttribute.Name}' without any 'Value' property.`;
     if (
-      typeof jsonObjectAttribute.Value !== "string" &&
-      !(jsonObjectAttribute.Value instanceof String) &&
-      typeof jsonObjectAttribute.Value !== "number" &&
-      !(jsonObjectAttribute.Value instanceof Number) &&
-      typeof jsonObjectAttribute.Value !== "boolean" &&
-      !(jsonObjectAttribute.Value instanceof Boolean) &&
-      !(jsonObjectAttribute.Value instanceof Array)
+      jsonObjectAttribute.Value === undefined &&
+      [EVENTTYPE_CREATION, EVENTTYPE_UPDATE].includes(this._eventType)
+    )
+      return `There is one Event Object Attribute with name '${jsonObjectAttribute.Name}' without any 'Value' property even if it is in a '${this._eventType}' event.`;
+    if (
+      jsonObjectAttribute.Value !== undefined &&
+      !this._isAttributeValueTypeValid(jsonObjectAttribute.Value)
     )
       return `There is one Event Object Attribute with name '${
         jsonObjectAttribute.Name
@@ -119,6 +127,36 @@ export class DPLMovieRuntimeEventObject {
         jsonObjectAttribute.Value
       }', which 'Type' property is not a string but a '${typeof jsonObjectAttribute.Value}'.`;
 
+    // check the attribute previous value
+    if (
+      jsonObjectAttribute.PreviousValue === undefined &&
+      [EVENTTYPE_DELETION, EVENTTYPE_UPDATE].includes(this._eventType)
+    )
+      return `There is one Event Object Attribute with name '${jsonObjectAttribute.Name}' without any 'PreviousValue' property even if it is in a '${this._eventType}' event.`;
+    if (
+      jsonObjectAttribute.PreviousValue !== undefined &&
+      !this._isAttributeValueTypeValid(jsonObjectAttribute.PreviousValue)
+    )
+      return `There is one Event Object Attribute with name '${
+        jsonObjectAttribute.Name
+      }' which 'PreviousValue' property is not a string, a boolean, an array or a number but a '${typeof jsonObjectAttribute.PreviousValue}'.`;
     return null;
+  }
+
+  /**
+   * @param {Any} value
+   * @returns true if the js type of the value is valid (null, string, number, boolean or array)
+   */
+  _isAttributeValueTypeValid(value) {
+    return (
+      value === null ||
+      typeof value === "string" ||
+      value instanceof String ||
+      typeof value === "number" ||
+      value instanceof Number ||
+      typeof value === "boolean" ||
+      value instanceof Boolean ||
+      value instanceof Array
+    );
   }
 }

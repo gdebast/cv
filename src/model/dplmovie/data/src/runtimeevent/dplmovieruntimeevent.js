@@ -1,7 +1,6 @@
 import { ASSERT_TYPE } from "../../../../utility/assert/assert";
+import { POSSIBLE_EVENT_TYPES } from "./dplmovieruntimeenventtype";
 import { DPLMovieRuntimeEventObject } from "./dplmovieruntimeeventobject";
-
-const POSSIBLE_EVENT_TYPES = ["creation", "update", "deletion"];
 
 /** It is a frame of the DPL movie, which contains what has changed on objects */
 export class DPLMovieRuntimeEvent {

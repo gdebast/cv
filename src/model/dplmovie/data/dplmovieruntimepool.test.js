@@ -37,17 +37,17 @@ const TrackedObjectToFlatObject = function (trackedObjects) {
 // test
 const dplmovieRuntimePool = new DPLMovieRuntimePool();
 const observer = new PoolObserverMock(dplmovieRuntimePool);
-dplmovieRuntimePool.addRuntime(
+const errorMessage1 = dplmovieRuntimePool.addRuntime(
   "Deployment Solver",
   "FIFO",
   new Date(1988, 0, 10)
 );
-dplmovieRuntimePool.addRuntime(
+const errorMessage2 = dplmovieRuntimePool.addRuntime(
   "Deployment Solver",
   "lotsize",
   new Date(1991, 11, 23)
 );
-dplmovieRuntimePool.addRuntime(
+const errorMessage3 = dplmovieRuntimePool.addRuntime(
   "Deployment Solver",
   "fairshare",
   new Date(2000, 11, 23),
@@ -76,12 +76,14 @@ dplmovieRuntimePool.addRuntime(
               Name: "EndDate",
               Type: "Date",
               Value: "2009-09-17T04:00:00Z",
+              PreviousValue: null,
             },
-            { Name: "Number", Type: "Number", Value: 1 },
+            { Name: "Number", Type: "Number", Value: 1, PreviousValue: null },
             {
               Name: "StartDate",
               Type: "Date",
               Value: "2009-09-16T04:00:00Z",
+              PreviousValue: null,
             },
           ],
         },
@@ -90,7 +92,24 @@ dplmovieRuntimePool.addRuntime(
     {
       EventId: 3,
       EventObjects: [
-        { EventType: "deletion", ObjectClassId: "Bucket", ObjectId: "B1" },
+        {
+          EventType: "deletion",
+          ObjectClassId: "Bucket",
+          ObjectId: "B1",
+          AttributeEvents: [
+            {
+              Name: "EndDate",
+              Type: "Date",
+              PreviousValue: "2009-09-17T04:00:00Z",
+            },
+            { Name: "Number", Type: "Number", PreviousValue: 1 },
+            {
+              Name: "StartDate",
+              Type: "Date",
+              PreviousValue: "2009-09-16T04:00:00Z",
+            },
+          ],
+        },
       ],
     },
     {
@@ -114,6 +133,9 @@ const runtimes = dplmovieRuntimePool.runtimes;
 // 1. test that the runtimes are correctly created.
 // ================================================
 test("1. the pool should be able to create runtimes", () => {
+  expect(errorMessage1).toEqual(null);
+  expect(errorMessage2).toEqual(null);
+  expect(errorMessage3).toEqual(null);
   const runtimeDesc = describeRuntimes(runtimes);
   expect(runtimeDesc).toEqual([
     {
@@ -256,6 +278,112 @@ test("5.7. events with one EventObject which ObjectId is not defined, are not ac
   );
   expect(message).toEqual(
     "There is one Event Object with type 'creation' and class 'Bucket', which does not have a 'ObjectId' property."
+  );
+});
+test("5.8. events with an attribute without Name property, are not accepted.", () => {
+  const message = dplmovieRuntimePool.addRuntime(
+    "Unhappy",
+    "Unhappy",
+    new Date(1988, 0, 10),
+    [
+      {
+        EventId: 0,
+        EventObjects: [
+          {
+            EventType: "creation",
+            ObjectClassId: "Bucket",
+            ObjectId: "B1",
+            AttributeEvents: [{}],
+          },
+        ],
+      },
+    ]
+  );
+  expect(message).toEqual(
+    "There is one Event Object Attribute without any 'Name' property."
+  );
+});
+
+test("5.9. creation events with an attribute without Value property, are not accepted.", () => {
+  const message = dplmovieRuntimePool.addRuntime(
+    "Unhappy",
+    "Unhappy",
+    new Date(1988, 0, 10),
+    [
+      {
+        EventId: 0,
+        EventObjects: [
+          {
+            EventType: "creation",
+            ObjectClassId: "Bucket",
+            ObjectId: "B1",
+            AttributeEvents: [{ Name: "Number" }],
+          },
+        ],
+      },
+    ]
+  );
+  expect(message).toEqual(
+    "There is one Event Object Attribute with name 'Number' without any 'Value' property even if it is in a 'creation' event."
+  );
+});
+
+test("5.10. events with an attribute without Type property, are not accepted.", () => {
+  const message = dplmovieRuntimePool.addRuntime(
+    "Unhappy",
+    "Unhappy",
+    new Date(1988, 0, 10),
+    [
+      {
+        EventId: 0,
+        EventObjects: [
+          {
+            EventType: "creation",
+            ObjectClassId: "Bucket",
+            ObjectId: "B1",
+            AttributeEvents: [{ Name: "Number", Value: 1 }],
+          },
+        ],
+      },
+    ]
+  );
+  expect(message).toEqual(
+    "There is one Event Object Attribute with name 'Number' and value '1', without any 'Type' property."
+  );
+});
+
+test("5.11. update events with an attribute without PreviousValue property, are not accepted.", () => {
+  const message = dplmovieRuntimePool.addRuntime(
+    "Unhappy",
+    "Unhappy",
+    new Date(1988, 0, 10),
+    [
+      {
+        EventId: 0,
+        EventObjects: [
+          {
+            EventType: "creation",
+            ObjectClassId: "Bucket",
+            ObjectId: "B1",
+            AttributeEvents: [{ Name: "Number", Value: 1, Type: "Number" }],
+          },
+        ],
+      },
+      {
+        EventId: 1,
+        EventObjects: [
+          {
+            EventType: "update",
+            ObjectClassId: "Bucket",
+            ObjectId: "B1",
+            AttributeEvents: [{ Name: "Number", Type: "Number", Value: 2 }],
+          },
+        ],
+      },
+    ]
+  );
+  expect(message).toEqual(
+    "There is one Event Object Attribute with name 'Number' without any 'PreviousValue' property even if it is in a 'update' event."
   );
 });
 
