@@ -65,7 +65,7 @@ export class DPLMovieTrackedObjectPool {
           this._updateFromEventObject(eventObject, true);
           break;
         case EVENTTYPE_DELETION:
-          this._createFromEventObject(eventObject, false);
+          this._createFromEventObject(eventObject, true);
           break;
         default:
           ASSERT_SWITCHDEFAULT(eventObjectType);
@@ -197,7 +197,7 @@ export class DPLMovieTrackedObjectPool {
       usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
 
     ASSERT(
-      attributeValue != undefined,
+      attributeValue !== undefined,
       `The expected value to read is not filled (usePreviousValue =${usePreviousValue})`
     );
 

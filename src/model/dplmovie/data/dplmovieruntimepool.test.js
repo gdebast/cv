@@ -17,6 +17,11 @@ const TrackedObjectToFlatObject = function (trackedObjects) {
   return trackedObjects.map(function (trackedObject) {
     const desc = trackedObject
       .getAllPublicMemberNames()
+      .filter(function (member) {
+        return (
+          trackedObject[member] !== null
+        ); /*null values are not printed such that we can compare. */
+      })
       .map(function (member) {
         if (!(trackedObject[member] instanceof Array)) {
           let memberValue = JSON.stringify(trackedObject[member]);
@@ -485,3 +490,47 @@ test("6.6 runtime should handle no next event by looping to the first event", ()
 // ================================================
 // 7. test that each runtime can be played backward
 // ================================================
+
+test("7.1 runtime should handle backtracking an creation event.", () => {
+  const runtimes = dplmovieRuntimePool.runtimes;
+  const playableRuntime = runtimes[1];
+  playableRuntime.nextEvent();
+  playableRuntime.previousEvent();
+  expect(
+    TrackedObjectToFlatObject(runtimes[1].getTrackedObjects("Bucket"))
+  ).toEqual([{ Type: "Bucket", Id: "B1", Members: "" }]);
+});
+
+test("7.2 runtime should handle backtracking an update event.", () => {
+  const runtimes = dplmovieRuntimePool.runtimes;
+  const playableRuntime = runtimes[1];
+  playableRuntime.nextEvent();
+  playableRuntime.nextEvent();
+  playableRuntime.previousEvent();
+  expect(
+    TrackedObjectToFlatObject(runtimes[1].getTrackedObjects("Bucket"))
+  ).toEqual([
+    { Type: "Bucket", Id: "B1", Members: "" },
+    { Type: "Bucket", Id: "B2", Members: "" },
+  ]);
+});
+
+test("7.3 runtime should handle backtracking a delete event.", () => {
+  const runtimes = dplmovieRuntimePool.runtimes;
+  const playableRuntime = runtimes[1];
+  playableRuntime.nextEvent();
+  playableRuntime.nextEvent();
+  playableRuntime.previousEvent();
+  console.log(playableRuntime);
+  expect(
+    TrackedObjectToFlatObject(runtimes[1].getTrackedObjects("Bucket"))
+  ).toEqual([
+    {
+      Type: "Bucket",
+      Id: "B1",
+      Members:
+        'EndDate:"2009-09-17T04:00:00.000Z",Number:1,StartDate:"2009-09-16T04:00:00.000Z"',
+    },
+    { Type: "Bucket", Id: "B2", Members: "" },
+  ]);
+});
