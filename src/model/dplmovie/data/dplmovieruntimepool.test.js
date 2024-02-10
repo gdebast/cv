@@ -491,7 +491,7 @@ test("6.6 runtime should handle no next event by looping to the first event", ()
 // 7. test that each runtime can be played backward
 // ================================================
 
-test("7.1 runtime should handle backtracking an creation event.", () => {
+test("7.1 runtime should handle backtracking a creation event.", () => {
   const runtimes = dplmovieRuntimePool.runtimes;
   const playableRuntime = runtimes[1];
   playableRuntime.nextEvent();
