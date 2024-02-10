@@ -20,11 +20,14 @@ const PRODUCTLOCATION_CELL_BACKGROUNDCOLOR = "#1864ab";
 
 /** class responsible for rendering ProductLocation of a DPL Movie as cell header.
  * @param canvasContext canvas on which to draw.
+ * @param geometryConfig configuration of the geometry.
  */
 export class DPLMovieProductLocationRenderer {
-  constructor(canvasContext) {
+  constructor(canvasContext, geometryConfig) {
     ASSERT_EXIST(canvasContext);
+    ASSERT_EXIST(geometryConfig);
     this._canvasContext = canvasContext;
+    this._geometryConfig = geometryConfig;
     this._intialize();
   }
 
@@ -98,7 +101,7 @@ export class DPLMovieProductLocationRenderer {
       PRODUCTLOCATION_CELL_BACKGROUNDCOLOR,
       this._currentX,
       this._currentY,
-      1 /*zoomFactor*/
+      this._geometryConfig.zoomFactor
     );
 
     this._productLocationPositions.set(
@@ -113,7 +116,7 @@ export class DPLMovieProductLocationRenderer {
     this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
     this._currentY +=
       PRODUCTLOCATION_CELL_BASE_Y_INCREMENT +
-      getLineWidth(1 /*zoomFactor*/) +
-      getHeaderCellHeigth(1 /*zoomFactor*/);
+      getLineWidth(this._geometryConfig.zoomFactor) +
+      getHeaderCellHeigth(this._geometryConfig.zoomFactor);
   }
 }

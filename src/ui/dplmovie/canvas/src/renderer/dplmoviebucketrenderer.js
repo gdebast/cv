@@ -14,13 +14,16 @@ const BUCKET_CELL_BACKGROUNDCOLOR = "#228be6";
 /** class responsible for rendering ProductLocation of a DPL Movie as cell header.
  * @param canvasContext canvas on which to draw.
  * @param dplMovieProductLocationRenderer renderer of the Product-Locations
+ * @param geometryConfig configuration of the geometry.
  */
 export class DPLMovieBucketRenderer {
-  constructor(canvasContext, dplMovieProductLocationRenderer) {
+  constructor(canvasContext, dplMovieProductLocationRenderer, geometryConfig) {
     ASSERT_EXIST(canvasContext);
     ASSERT_EXIST(dplMovieProductLocationRenderer);
+    ASSERT_EXIST(geometryConfig);
     this._canvasContext = canvasContext;
     this._productLocationRenderer = dplMovieProductLocationRenderer;
+    this._geometryConfig = geometryConfig;
     this._intialize();
   }
 
@@ -79,9 +82,9 @@ export class DPLMovieBucketRenderer {
     const x =
       productLocationRect.X +
       productLocationRect.Width +
-      BUCKET_CELL_BASE_X_INCREMENT +
-      (BUCKET_CELL_BASE_X_INCREMENT +
-        getHeaderCellWith(1 /*no zoom factor */)) *
+      BUCKET_CELL_BASE_X_INCREMENT * this._geometryConfig.zoomFactor +
+      (BUCKET_CELL_BASE_X_INCREMENT * this._geometryConfig.zoomFactor +
+        getHeaderCellWith(this._geometryConfig.zoomFactor)) *
         (bucket.Number - 1);
     const y = productLocationRect.Y;
 
@@ -91,7 +94,7 @@ export class DPLMovieBucketRenderer {
       BUCKET_CELL_BACKGROUNDCOLOR,
       x,
       y,
-      1
+      this._geometryConfig.zoomFactor
     );
     this._bucketPositions.set(bucket.Id, rect);
   }

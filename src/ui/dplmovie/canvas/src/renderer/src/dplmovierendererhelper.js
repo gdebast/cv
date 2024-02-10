@@ -50,8 +50,8 @@ export const drawHeaderCell = function (
   y,
   zoomFactor
 ) {
-  const finalX = zoomFactor * x;
-  const finalY = zoomFactor * y;
+  const finalX = x;
+  const finalY = y;
   const finalHeight = getHeaderCellHeigth(zoomFactor);
   const finalWidth = getHeaderCellWith(zoomFactor);
   const finalLineWidth = getLineWidth(zoomFactor);
