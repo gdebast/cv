@@ -1,0 +1,10 @@
+.dplmovie-canvas {
+  margin: 1.2rem 1.2rem 1.2rem 1.2rem;
+  max-width: 98%;
+  cursor: grab;
+}
+
+/* show that the canvas is grabbed*/
+.grabbed-dplmovie-canvas {
+  cursor: grabbing;
+}

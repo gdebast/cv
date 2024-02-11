@@ -4,6 +4,7 @@ import { DPLMovieProductLocationRenderer } from "./src/renderer/dplmovieproductl
 import { DPLMovieGeometryConfig } from "./src/renderer/src/dplmoviegeometryconfig";
 
 const CLASS_DPLMOVIECANVAS = "dplmovie-canvas";
+const CLASS_GRABBEDDPLMOVIECANVAS = "grabbed-dplmovie-canvas";
 
 /** handles the html canvas displaying the DPL movie
  * @param dplMovieRuntimeView the side view which controls which DPLMovie runtime to display.
@@ -74,16 +75,20 @@ export class DPLMovieCanvasView {
     this._mouseKeyDown = false;
     canvas.addEventListener("mousedown", function () {
       self._mouseKeyDown = true;
+      // add a grabbing mousse
+      canvas.classList.add(CLASS_GRABBEDDPLMOVIECANVAS);
     });
     canvas.addEventListener("mousemove", function (event) {
       if (!self._mouseKeyDown) return;
-      console.log(event);
-      /*TODO
-      event.movementY and movementX gives the movement of the mouse.
-      */
+      self._eraseCanvas();
+      self._geometryConfig.xRef = self._geometryConfig.xRef - event.movementX;
+      self._geometryConfig.yRef = self._geometryConfig.yRef - event.movementY;
+      self._displayOnCanvas();
     });
     canvas.addEventListener("mouseup", function () {
       self._mouseKeyDown = false;
+      // remove the grabbing mouse
+      canvas.classList.remove(CLASS_GRABBEDDPLMOVIECANVAS);
     });
   }
 
@@ -124,7 +129,14 @@ export class DPLMovieCanvasView {
     this._renderers.push(bucketRenderer);
   }
 
+  /** given a previous factor and an input (a positive or negative value),
+   *  this method computes the new zomm factor.
+   *  @param {Integer} previousFactor previous zoom factor.
+   *  @param {Integer} input negative (zoom out) or positive (zoom in) number
+   *  @returns {Float} new zoom factor.
+   */
   _computeNewZoomFactor(previousFactor, input) {
+    if (input === 0) return previousFactor;
     const result = previousFactor + (input > 0 ? 0.05 : -0.05);
     if (result <= 0.2) return 0.2; /*min reach */
     if (result >= 2) return 2; /*max reach */

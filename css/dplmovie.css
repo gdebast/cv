@@ -39,12 +39,3 @@
   margin-top: 0.8rem;
   font-size: 1rem;
 }
-
-/*************************/
-/*     runtime canvas    */
-/*************************/
-
-.dplmovie-canvas {
-  margin: 1.2rem 1.2rem 1.2rem 1.2rem;
-  max-width: 98%;
-}

@@ -40,6 +40,7 @@ export const getHeaderCellHeigth = function (zoomFactor) {
  * @param {Integer} x top-left corner x (without zoom factor)
  * @param {Integer} y top-left corner y (without zoom factor)
  * @param {Integer} zoomFactor zoom factor.
+ * @param {Object} coordReference optional object giving the x-y reference
  * @returns a rectangle object with X, Y, Width and Heigth properties.
  */
 export const drawHeaderCell = function (
@@ -48,10 +49,11 @@ export const drawHeaderCell = function (
   backgroundColor,
   x,
   y,
-  zoomFactor
+  zoomFactor,
+  coordReference = null
 ) {
-  const finalX = x;
-  const finalY = y;
+  const finalX = coordReference === null ? x : x - coordReference.xRef;
+  const finalY = coordReference === null ? y : y - coordReference.yRef;
   const finalHeight = getHeaderCellHeigth(zoomFactor);
   const finalWidth = getHeaderCellWith(zoomFactor);
   const finalLineWidth = getLineWidth(zoomFactor);

@@ -62,8 +62,10 @@ export class DPLMovieProductLocationRenderer {
       );
     }
     this._productLocationPositions = new Map();
-    this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
-    this._currentY = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y;
+    this._currentX =
+      PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X - this._geometryConfig.xRef;
+    this._currentY =
+      PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y - this._geometryConfig.yRef;
   }
 
   /** return the positions of the ProductLocations
@@ -101,7 +103,8 @@ export class DPLMovieProductLocationRenderer {
       PRODUCTLOCATION_CELL_BACKGROUNDCOLOR,
       this._currentX,
       this._currentY,
-      this._geometryConfig.zoomFactor
+      this._geometryConfig.zoomFactor,
+      this._geometryConfig
     );
 
     this._productLocationPositions.set(
