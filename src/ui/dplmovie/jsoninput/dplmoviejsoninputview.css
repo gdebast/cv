@@ -1,3 +1,11 @@
+/* upload DPLMovie json file */
+#dpl-movie-fileItem {
+  display: none;
+}
+.dpl-movie-fileItem-label {
+  cursor: pointer;
+}
+
 .dplmovie-upload-btn {
   margin-right: 4.8rem; /*make sure that the upload button stand out of the others*/
 }

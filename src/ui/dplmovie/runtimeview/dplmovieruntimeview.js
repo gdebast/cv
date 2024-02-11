@@ -1,5 +1,5 @@
-import { ASSERT_EXIST } from "../../model/utility/assert/assert";
-import { PoolSelectionViewBase } from "../poolselectionview/poolselectionviewbase";
+import { ASSERT_EXIST } from "../../../model/utility/assert/assert";
+import { PoolSelectionViewBase } from "../../poolselectionview/poolselectionviewbase";
 
 const CLASS_DPLMOVIESECTION = "dplmovie";
 

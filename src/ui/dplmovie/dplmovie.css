@@ -1,0 +1,15 @@
+/*************************/
+/*      main view        */
+/*************************/
+
+.dplmovie-runtime-canvas {
+  display: grid;
+  grid-template-columns: 1fr 5fr;
+  background-color: #e9f3fd;
+}
+
+.dplmovie-box {
+  box-shadow: inset 0 0 0.5rem 0rem #141010;
+  background-color: #fff;
+  border-radius: 1.2rem;
+}

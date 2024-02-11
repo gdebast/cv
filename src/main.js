@@ -1,7 +1,7 @@
 import { PortalAppLinker } from "./ui/portal/portalapplinker";
 import { createBouncingCircles } from "./ui/dplmovie/canvasTest";
 import { DPLMovieJsonInputView } from "./ui/dplmovie/jsoninput/dplmoviejsoninputview";
-import { DPLMovieRuntimeView } from "./ui/dplmovie/dplmovieruntimeview";
+import { DPLMovieRuntimeView } from "./ui/dplmovie/runtimeview/dplmovieruntimeview";
 import { DPLMovieRuntimePool } from "./model/dplmovie/data/dplmovieruntimepool";
 import { DirectedGraphWrapperPool } from "./model/graphplayer/data/directedgraphwrapperpool";
 import { GraphCreationView } from "./ui/graphplayer/graphcreationview";
