@@ -143,10 +143,18 @@ export class DPLMovieCanvasView {
       "InventoryProducerDetail",
       "IPD"
     );
+    const openAllocationRenderer = new DPLMovieAllocableRenderer(
+      this._canvasContext,
+      productLocationRenderer,
+      this._geometryConfig,
+      "DPLOpenInternalAllocation",
+      "Opened"
+    );
     this._renderers.push(productLocationRenderer);
     this._renderers.push(bucketRenderer);
     this._renderers.push(icdRenderer);
     this._renderers.push(ipdRenderer);
+    this._renderers.push(openAllocationRenderer);
   }
 
   /** given a previous factor and an input (a positive or negative value),
