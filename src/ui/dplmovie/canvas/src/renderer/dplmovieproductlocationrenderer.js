@@ -29,6 +29,8 @@ export class DPLMovieProductLocationRenderer {
     this._canvasContext = canvasContext;
     this._geometryConfig = geometryConfig;
     this._intialize();
+    this._reservedVerticalSpaces =
+      []; /*contains vertical spaces registered by other components */
   }
 
   // ------
@@ -75,6 +77,22 @@ export class DPLMovieProductLocationRenderer {
     return this._productLocationPositions;
   }
 
+  /** reserve some vertical space. This can be used by other renderers.
+   * @param space vertical space in pixel without zoom
+   */
+  reserveVerticalSpace(space) {
+    this._reservedVerticalSpaces.push(space);
+  }
+
+  /** return the total reserved space without zoom.
+   * @returns {Integer} total reserved space.
+   */
+  getTotalVerticalReservedSpace() {
+    return this._reservedVerticalSpaces.reduce(function (acc, val) {
+      return acc + val;
+    }, 0);
+  }
+
   // -------
   // PRIVATE
   // -------
@@ -118,7 +136,8 @@ export class DPLMovieProductLocationRenderer {
   _incrementPosition() {
     this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
     this._currentY +=
-      PRODUCTLOCATION_CELL_BASE_Y_INCREMENT +
+      PRODUCTLOCATION_CELL_BASE_Y_INCREMENT * this._geometryConfig.zoomFactor +
+      this.getTotalVerticalReservedSpace() * this._geometryConfig.zoomFactor +
       getLineWidth(this._geometryConfig.zoomFactor) +
       getHeaderCellHeigth(this._geometryConfig.zoomFactor);
   }

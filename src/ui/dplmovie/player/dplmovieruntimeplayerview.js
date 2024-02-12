@@ -7,6 +7,7 @@ const CLASS_LOCALHIDDEN = "player-hidden";
 
 /**
  *  class responsible for playing the current DPLMovieRuntime displayed.
+ *  Other class can observe the forward, reset and backward buttons pressed.
  *  @param dplMovieRuntimeView side view of the different DPLMovie runtimes.
  */
 export class DPLMovieRuntimePlayerView {
@@ -22,6 +23,7 @@ export class DPLMovieRuntimePlayerView {
     ASSERT_EXIST(this._resetButton);
     this._connect();
     this._toggleHideIfNeeded();
+    this._observers = [];
   }
 
   // Implement the Observer pattern with DPLMovieRuntimeView.
@@ -34,6 +36,14 @@ export class DPLMovieRuntimePlayerView {
   notifySelectedPoolObject(poolObject) {
     this._dplMovieRuntimeToPlay = poolObject;
     this._toggleHideIfNeeded();
+  }
+
+  /** register an observer which will be notified on forward, reset and backward button press.
+   *  This observer must implement notifyOnPlayerPressed()
+   *  @param observer observer to notify.
+   */
+  registerObserver(observer) {
+    this._observers.push(observer);
   }
 
   // -------
@@ -49,18 +59,27 @@ export class DPLMovieRuntimePlayerView {
     this._forwardButton.addEventListener("click", function () {
       if (self._dplMovieRuntimeToPlay === null) return;
       self._dplMovieRuntimeToPlay.nextEvent();
+      self._observers.forEach((obs) => {
+        obs.notifyOnPlayerPressed();
+      });
     });
 
     // reset button click event
     this._resetButton.addEventListener("click", function () {
       if (self._dplMovieRuntimeToPlay === null) return;
       self._dplMovieRuntimeToPlay.installFirstEvent();
+      self._observers.forEach((obs) => {
+        obs.notifyOnPlayerPressed();
+      });
     });
 
     // backward button click event
     this._backwardButton.addEventListener("click", function () {
       if (self._dplMovieRuntimeToPlay === null) return;
       self._dplMovieRuntimeToPlay.previousEvent();
+      self._observers.forEach((obs) => {
+        obs.notifyOnPlayerPressed();
+      });
     });
   }
 

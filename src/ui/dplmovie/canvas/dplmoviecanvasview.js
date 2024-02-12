@@ -1,4 +1,5 @@
 import { ASSERT_EXIST } from "../../../model/utility/assert/assert";
+import { DPLMovieAllocableRenderer } from "./src/renderer/dplmovieallocablerenderer";
 import { DPLMovieBucketRenderer } from "./src/renderer/dplmoviebucketrenderer";
 import { DPLMovieProductLocationRenderer } from "./src/renderer/dplmovieproductlocationrenderer";
 import { DPLMovieGeometryConfig } from "./src/renderer/src/dplmoviegeometryconfig";
@@ -18,6 +19,7 @@ export class DPLMovieCanvasView {
     dplMovieRuntimeView.registerObserver(this);
     this._inializeCanvas();
     this._createRenderers();
+    dplMoviePlayerView.registerObserver(this);
   }
 
   // implement observer pattern with DPLMovieRuntimeView
@@ -36,7 +38,10 @@ export class DPLMovieCanvasView {
   }
 
   // implement observer pattern with DPLMoviePlayerView (forward, backward, reset)
-  // TODO
+  notifyOnPlayerPressed() {
+    this._eraseCanvas();
+    this._displayOnCanvas();
+  }
 
   // -------
   // PRIVATE
@@ -62,7 +67,6 @@ export class DPLMovieCanvasView {
     // zoom
     canvas.addEventListener("wheel", function (event) {
       if (!event.shiftKey) return;
-      console.log(event);
       self._eraseCanvas();
       self._geometryConfig.zoomFactor = self._computeNewZoomFactor(
         self._geometryConfig.zoomFactor,
@@ -125,8 +129,24 @@ export class DPLMovieCanvasView {
       productLocationRenderer,
       this._geometryConfig
     );
+    const icdRenderer = new DPLMovieAllocableRenderer(
+      this._canvasContext,
+      productLocationRenderer,
+      this._geometryConfig,
+      "InventoryConsumerDetail",
+      "ICD"
+    );
+    const ipdRenderer = new DPLMovieAllocableRenderer(
+      this._canvasContext,
+      productLocationRenderer,
+      this._geometryConfig,
+      "InventoryProducerDetail",
+      "IPD"
+    );
     this._renderers.push(productLocationRenderer);
     this._renderers.push(bucketRenderer);
+    this._renderers.push(icdRenderer);
+    this._renderers.push(ipdRenderer);
   }
 
   /** given a previous factor and an input (a positive or negative value),
