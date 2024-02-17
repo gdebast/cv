@@ -1,3 +1,5 @@
+"use strict";
+
 /** class used to mock an observer of a pool, in the purpose of testing.
  */
 export class PoolObserverMock {

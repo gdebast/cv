@@ -1,3 +1,5 @@
+"use strict";
+
 import { ASSERT_TYPE } from "../../../../utility/assert/assert";
 import { POSSIBLE_EVENT_TYPES } from "./dplmovieruntimeenventtype";
 import { DPLMovieRuntimeEventObject } from "./dplmovieruntimeeventobject";

@@ -1,3 +1,5 @@
+"use strict";
+
 import {
   ASSERT_EXIST,
   ASSERT_ISSTRING,

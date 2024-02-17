@@ -1,3 +1,5 @@
+"use strict";
+
 import { ASSERT_ISSTRING } from "../../../utility/assert/assert";
 import { DPLMovieRuntimeEvent } from "./runtimeevent/dplmovieruntimeevent";
 import { DPLMovieTrackedObjectPool } from "./trackedobject/dplmovietrackedobjectpool";

@@ -1,3 +1,5 @@
+"use strict";
+
 import { ASSERT_TYPE } from "../assert/assert";
 
 export const setToArray = function (set) {

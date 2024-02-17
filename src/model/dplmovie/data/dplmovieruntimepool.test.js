@@ -1,3 +1,5 @@
+"use strict";
+
 import { DPLMovieRuntimePool } from "./dplmovieruntimepool";
 import { PoolObserverMock } from "../../utility/poolbase/poolobservermock";
 

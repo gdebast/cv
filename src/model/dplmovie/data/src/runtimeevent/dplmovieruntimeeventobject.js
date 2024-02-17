@@ -1,3 +1,5 @@
+"use strict";
+
 import {
   EVENTTYPE_CREATION,
   EVENTTYPE_DELETION,

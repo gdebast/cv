@@ -1,3 +1,5 @@
+"use strict";
+
 import { ASSERT_ISSTRING } from "../../../../utility/assert/assert";
 
 export class DPLMovieTrackedObject {

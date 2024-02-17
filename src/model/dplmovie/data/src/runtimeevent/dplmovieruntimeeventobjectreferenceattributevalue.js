@@ -1,3 +1,5 @@
+"use strict";
+
 /** represents an reference to a tracked object, stored in another tracked object.
  */
 export class DPLMovieRuntimeEventObjectReferenceAttributeValue {

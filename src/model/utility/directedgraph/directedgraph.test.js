@@ -1,3 +1,5 @@
+"use strict";
+
 import { DirectedGraph } from "./directedgraph";
 
 const sortNode = function (n1, n2) {

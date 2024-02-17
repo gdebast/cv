@@ -1,3 +1,5 @@
+"use strict";
+
 /* list of possible event types */
 export const EVENTTYPE_CREATION = "creation";
 export const EVENTTYPE_DELETION = "deletion";

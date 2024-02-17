@@ -1,3 +1,5 @@
+"use strict";
+
 const ACTIVATE_ASSERT =
   process.env.NODE_ENV === "development" ||
   process.env.NODE_ENV ===

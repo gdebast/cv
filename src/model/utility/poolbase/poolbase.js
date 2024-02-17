@@ -1,3 +1,5 @@
+"use strict";
+
 import { ASSERT, ASSERT_EXIST } from "../assert/assert";
 import { mapToArray } from "../toarray/toarray";
 

@@ -1,3 +1,5 @@
+"use strict";
+
 import { DirectedGraphWrapperPool } from "./directedgraphwrapperpool";
 import { PoolObserverMock } from "../../utility/poolbase/poolobservermock";
 

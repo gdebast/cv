@@ -130,6 +130,8 @@ export class DirectedGraph {
    * @param {Object} obj object contained in this node.
    * @returns the created arc.
    */
+  "use strict";
+
   createArc(fromNode, ToNode, obj = null) {
     ASSERT_TYPE(fromNode, DirectedGraphNode);
     ASSERT_TYPE(ToNode, DirectedGraphNode);

@@ -1,3 +1,5 @@
+"use strict";
+
 import { DPLMovieRuntimeEventObjectReferenceAttributeValue } from "./dplmovieruntimeeventobjectreferenceattributevalue";
 
 const ARRAY_START = "Array<";

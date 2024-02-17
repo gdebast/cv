@@ -1,3 +1,5 @@
+"use strict";
+
 import { setToArray } from "../../toarray/toarray";
 
 export class DirectedGraphCluster {

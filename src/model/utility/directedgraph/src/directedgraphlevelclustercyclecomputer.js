@@ -1,3 +1,5 @@
+"use strict";
+
 import { DirectedGraphLevel } from "./directedgraphlevel";
 import { DirectedGraphCycle } from "./directedgraphcycle";
 import { DirectedGraphCluster } from "./directedgraphcluster";

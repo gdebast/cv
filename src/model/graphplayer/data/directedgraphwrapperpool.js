@@ -1,3 +1,5 @@
+"use strict";
+
 import { ASSERT_EXIST, ASSERT_TYPE } from "../../utility/assert/assert";
 import { DirectedGraph } from "../../utility/directedgraph/directedgraph";
 import { PoolBase } from "../../utility/poolbase/poolbase";
