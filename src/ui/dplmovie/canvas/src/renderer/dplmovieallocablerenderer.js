@@ -1,7 +1,14 @@
 "use strict";
 
 import { ASSERT, ASSERT_EXIST, ASSERT_ISSTRING, ASSERT_SWITCHDEFAULT } from "../../../../../model/utility/assert/assert";
-import { drawAllocable, drawLineHeader, eraseRectangle, getAllocableMinimalXSpacing, getLineHeaderHeight } from "./src/dplmovierendererhelper";
+import {
+  drawAllocable,
+  drawLineHeader,
+  eraseRectangle,
+  getAllocableMinimalXSpacing,
+  getAllocaleDimension,
+  getLineHeaderHeight,
+} from "./src/dplmovierendererhelper";
 
 const ALLOCABLE_BASE_LINE_INCREMENT = 10;
 
@@ -68,11 +75,12 @@ export class DPLMovieAllocableRenderer {
         const buckets_parts = this._getBuckets(allocableObject, dplMovieRuntime);
         allocableToBucketsMap.set(allocableObject, buckets_parts);
         for (const bucket_part of buckets_parts) {
-          if (!bucketToAllocableMap.has(bucket_part)) {
-            bucketToAllocableMap.set(bucket_part, [allocableObject]);
+          const key = this._makeBucketPartKey(bucket_part.bucket, bucket_part.part);
+          if (!bucketToAllocableMap.has(key)) {
+            bucketToAllocableMap.set(key, [allocableObject]);
             continue;
           }
-          bucketToAllocableMap.get(bucket_part).push(allocableObject);
+          bucketToAllocableMap.get(key).push(allocableObject);
         }
       }
 
@@ -104,6 +112,7 @@ export class DPLMovieAllocableRenderer {
       this._lineHeaderRect.push(lineRect);
 
       /*draw the allocables */
+      const bucketPartNbrOfAllocable = new Map(); /*holds the number of already drawn allocable in a bucket-part.*/
       for (const [allocable, buckets_parts] of allocableToBucketsMap) {
         /*find the start and end of the X position.*/
         let allocableXstart = null; /*hold the start of the x coordinates */
@@ -144,16 +153,37 @@ export class DPLMovieAllocableRenderer {
         }
         ASSERT(allocableXstart !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any start x position`);
         ASSERT(allocableXend !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any end x position`);
+
+        /*find the start of the y position */
+        // we look first in the map of already drawn allocables.
+        let nbrInSameBucketPart = 0;
+        for (const { bucket, part } of buckets_parts) {
+          const key = this._makeBucketPartKey(bucket, part);
+          if (bucketPartNbrOfAllocable.has(key)) {
+            nbrInSameBucketPart = Math.max(nbrInSameBucketPart, bucketPartNbrOfAllocable.get(key));
+          }
+        }
+        const allocableY = lineRect.Y + nbrInSameBucketPart * (minimalAllocableSpacing + getAllocaleDimension(this._geometryConfig.zoomFactor));
+
         const allocableRect = drawAllocable(
           this._canvasContext,
           String(this._getQuantity(allocable)),
           ALLOCABLE_BACKGROUNDCOLOR,
           allocableXstart,
           allocableXend,
-          lineRect.Y /*TODO: compute allocable Y */,
+          allocableY,
           this._geometryConfig.zoomFactor
         );
         this._allocableRects.set(allocable.Id, allocableRect);
+
+        // remember the number of already drawn allocables in the same bucket-part.
+        for (const { bucket, part } of buckets_parts) {
+          const key = this._makeBucketPartKey(bucket, part);
+          if (bucketPartNbrOfAllocable.has(key)) {
+            const oldNbr = bucketPartNbrOfAllocable.get(key);
+            bucketPartNbrOfAllocable.set(key, oldNbr + 1);
+          } else bucketPartNbrOfAllocable.set(key, 1);
+        }
       }
     }
   }
@@ -177,6 +207,15 @@ export class DPLMovieAllocableRenderer {
   // -------
   // PRIVATE
   // -------
+
+  /** make a key for the map indexing on bucket-part.
+   * @param {DPLMovieTrackedObject} bucket
+   * @param {string} part full/start/end
+   * @returns key
+   */
+  _makeBucketPartKey(bucket, part) {
+    return `${bucket.Id}-${part}`;
+  }
 
   /** return the Bucket tracked object which overlap with this allocable object
    * @param {DPLMovieTrackedObject} allocable allocable object

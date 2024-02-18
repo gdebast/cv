@@ -64,6 +64,10 @@ export const getAllocableMinimalXSpacing = function (zoomFactor) {
   return LINEELT_BASE_MINSPACING * zoomFactor;
 };
 
+export const getAllocaleDimension = function (zoomFactor) {
+  return LINEELT_BASE_DIMENSION * zoomFactor;
+};
+
 /** erase this rectangle from the canvas.
  * @param {CanvasRenderingContext2D} canvasContext canvas context on which to erase.
  * @param {Object} rectangle object having a X, Y, Width, Height and LineWidth property.
@@ -182,7 +186,7 @@ export const drawLineHeader = function (canvasContext, text, backgroundColor, x,
 export const drawAllocable = function (canvasContext, text, backgroundColor, xStart, xEnd, y, zoomFactor) {
   ASSERT(xStart < xEnd, `the x positions are not respected : xStart:${xStart} - xEnd:${xEnd}`);
 
-  const finalHeight = LINEELT_BASE_DIMENSION * zoomFactor;
+  const finalHeight = getAllocaleDimension(zoomFactor);
   const finalWidth = xEnd - xStart;
   const finalLineWidth = getLineWidth(zoomFactor);
   const finalRoundness = zoomFactor * CELL_BASE_ROUNDNESS;
