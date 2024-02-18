@@ -1,3 +1,5 @@
+"use strict";
+
 import { ASSERT_EXIST } from "../../../model/utility/assert/assert";
 import { DPLMovieAllocableRenderer } from "./src/renderer/dplmovieallocablerenderer";
 import { DPLMovieBucketRenderer } from "./src/renderer/dplmoviebucketrenderer";
@@ -68,10 +70,7 @@ export class DPLMovieCanvasView {
     canvas.addEventListener("wheel", function (event) {
       if (!event.shiftKey) return;
       self._eraseCanvas();
-      self._geometryConfig.zoomFactor = self._computeNewZoomFactor(
-        self._geometryConfig.zoomFactor,
-        event.wheelDeltaY
-      );
+      self._geometryConfig.zoomFactor = self._computeNewZoomFactor(self._geometryConfig.zoomFactor, event.wheelDeltaY);
       self._displayOnCanvas();
     });
 
@@ -120,18 +119,12 @@ export class DPLMovieCanvasView {
    */
   _createRenderers() {
     this._renderers = [];
-    const productLocationRenderer = new DPLMovieProductLocationRenderer(
-      this._canvasContext,
-      this._geometryConfig
-    );
-    const bucketRenderer = new DPLMovieBucketRenderer(
-      this._canvasContext,
-      productLocationRenderer,
-      this._geometryConfig
-    );
+    const productLocationRenderer = new DPLMovieProductLocationRenderer(this._canvasContext, this._geometryConfig);
+    const bucketRenderer = new DPLMovieBucketRenderer(this._canvasContext, productLocationRenderer, this._geometryConfig);
     const icdRenderer = new DPLMovieAllocableRenderer(
       this._canvasContext,
       productLocationRenderer,
+      bucketRenderer,
       this._geometryConfig,
       "InventoryConsumerDetail",
       "ICD"
@@ -139,6 +132,7 @@ export class DPLMovieCanvasView {
     const ipdRenderer = new DPLMovieAllocableRenderer(
       this._canvasContext,
       productLocationRenderer,
+      bucketRenderer,
       this._geometryConfig,
       "InventoryProducerDetail",
       "IPD"
@@ -146,6 +140,7 @@ export class DPLMovieCanvasView {
     const openAllocationRenderer = new DPLMovieAllocableRenderer(
       this._canvasContext,
       productLocationRenderer,
+      bucketRenderer,
       this._geometryConfig,
       "DPLOpenInternalAllocation",
       "Opened"
@@ -155,6 +150,15 @@ export class DPLMovieCanvasView {
     this._renderers.push(icdRenderer);
     this._renderers.push(ipdRenderer);
     this._renderers.push(openAllocationRenderer);
+
+    /*TODO: this system of renderer registered linerly will not work 
+      because if the line header grow, the second productlocation 
+      cell is already drawn. A better architecture is to chain the renderer:
+      when a productlocation is done, we can draw it buckets.
+      when the bucket are done, we can draw its lines.
+      the productlocation renderer should have a registerAfterProductLocationDrawnObserver,
+      which is the bucket, and the allocable headers
+     */
   }
 
   /** given a previous factor and an input (a positive or negative value),

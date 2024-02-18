@@ -1,34 +1,37 @@
 "use strict";
 
-import {
-  ASSERT_EXIST,
-  ASSERT_ISSTRING,
-} from "../../../../../model/utility/assert/assert";
-import {
-  drawHeaderCell,
-  getHeaderCellHeigth,
-} from "./src/dplmovierendererhelper";
+import { ASSERT, ASSERT_EXIST, ASSERT_ISSTRING, ASSERT_SWITCHDEFAULT } from "../../../../../model/utility/assert/assert";
+import { drawAllocable, drawLineHeader, eraseRectangle, getAllocableMinimalXSpacing, getLineHeaderHeight } from "./src/dplmovierendererhelper";
 
 const ALLOCABLE_BASE_LINE_INCREMENT = 10;
 
 /*color*/
-const ALLOCABLE_CELL_BACKGROUNDCOLOR = "#1864ab";
+const ALLOCABLE_CELLHEADER_BACKGROUNDCOLOR = "#a7d1f5";
+const ALLOCABLE_BACKGROUNDCOLOR = "#d0ebff";
+
+/*tracked object properties */
+const TRACKEDOBJECT_PROPERTY_STARTDATE = "StartDate";
+const TRACKEDOBJECT_PROPERTY_ENDDATE = "EndDate";
+const TRACKEDOBJECT_PROPERTY_IPDID = "InventoryProducerDetailId";
+const TRACKEDOBJECT_PROPERTY_PRODUCTLOCATIONID = "ProductLocation";
+const TRACKEDOBJECT_PROPERTY_QUANTITY = "Quantity";
+const TRACKEDOBJECT_PROPERTY_RESERVEDQUANTITY = "ReservedQuantity";
+
+/*bucket part enum*/
+const BUCKETPART_FULL = "full";
+const BUCKETPART_START = "start";
+const BUCKETPART_END = "end";
 
 export class DPLMovieAllocableRenderer {
   /** class responsible for displaying the object that can be allocated.
    * @param canvasContext canvas on which to draw.
    * @param dplMovieProductLocationRenderer renderer of the Product-Locations
+   * @param dplMovieBucketRenderer renderer of the Buckets
    * @param geometryConfig configuration of the geometry.
    * @param {String} objectClassId object class to display
    * @param {String} lineCellText text to display line header cell
    */
-  constructor(
-    canvasContext,
-    dplMovieProductLocationRenderer,
-    geometryConfig,
-    objectClassId,
-    lineCellText
-  ) {
+  constructor(canvasContext, dplMovieProductLocationRenderer, dplMovieBucketRenderer, geometryConfig, objectClassId, lineCellText) {
     ASSERT_EXIST(canvasContext);
     ASSERT_EXIST(dplMovieProductLocationRenderer);
     ASSERT_EXIST(geometryConfig);
@@ -36,55 +39,260 @@ export class DPLMovieAllocableRenderer {
     ASSERT_ISSTRING(lineCellText);
     this._canvasContext = canvasContext;
     this._productLocationRenderer = dplMovieProductLocationRenderer;
+    this._dplMovieBucketRenderer = dplMovieBucketRenderer;
     this._geometryConfig = geometryConfig;
     this._objectClassId = objectClassId;
     this._lineCellText = lineCellText;
-    this._yIncrement =
-      this._productLocationRenderer.getTotalVerticalReservedSpace();
-    this._productLocationRenderer.reserveVerticalSpace(
-      getHeaderCellHeigth(1) + ALLOCABLE_BASE_LINE_INCREMENT
-    );
     this._lineHeaderRect = [];
+    this._allocableRects = new Map();
   }
 
   /** render the allocable object of the given DPLMovieRuntime.
-   *  @param dplMovieRuntime DPLMovie runtime.
+   *  @param {DPLMovieRuntime} dplMovieRuntime DPLMovie runtime.
    */
   render(dplMovieRuntime) {
     ASSERT_EXIST(this._canvasContext);
     ASSERT_EXIST(dplMovieRuntime);
 
-    const productLocationId_Rect =
-      this._productLocationRenderer.getProductLocationPositions();
-    for (const [_, rect] of productLocationId_Rect) {
+    const minimalAllocableSpacing = getAllocableMinimalXSpacing(this._geometryConfig.zoomFactor);
+    const productLocationId_Rect = this._productLocationRenderer.getProductLocationPositions();
+    for (const [prodLocId, prodlocrRect] of productLocationId_Rect) {
+      /*find in which buckets the allocables are*/
+      const bucketToAllocableMap = new Map();
+      const allocableToBucketsMap = new Map();
+      // it is import to sort the allocable base on their date such that the drawing is deterministic
+      const allocableObjects = this._sortAllocableBaseOnDates(dplMovieRuntime.getTrackedObjects(this._objectClassId));
+      for (const allocableObject of allocableObjects) {
+        const allocableProductLocationId = this._getProductLocationId(allocableObject);
+        if (allocableProductLocationId !== prodLocId) continue;
+        const buckets_parts = this._getBuckets(allocableObject, dplMovieRuntime);
+        allocableToBucketsMap.set(allocableObject, buckets_parts);
+        for (const bucket_part of buckets_parts) {
+          if (!bucketToAllocableMap.has(bucket_part)) {
+            bucketToAllocableMap.set(bucket_part, [allocableObject]);
+            continue;
+          }
+          bucketToAllocableMap.get(bucket_part).push(allocableObject);
+        }
+      }
+
+      /*compute the largest number of allocable in one bucket part */
+      let maxNumberOfAllocableInBucketPart = 0;
+      for (const [_, allocables] of bucketToAllocableMap) {
+        maxNumberOfAllocableInBucketPart = Math.max(maxNumberOfAllocableInBucketPart, allocables.length);
+      }
+
       /*draw the line header */
+      // the heigh of the line depends on the maximum number of allocable in the buckets.
+      const alreadyReservedVerticalSpace = this._productLocationRenderer.getReservedSpace(prodLocId);
       const lineYStart =
-        rect.Y +
-        rect.Height +
-        this._yIncrement * this._geometryConfig.zoomFactor +
-        ALLOCABLE_BASE_LINE_INCREMENT * this._geometryConfig.zoomFactor;
-      const lineRect = drawHeaderCell(
+        prodlocrRect.Y +
+        prodlocrRect.Height +
+        ALLOCABLE_BASE_LINE_INCREMENT * this._geometryConfig.zoomFactor +
+        alreadyReservedVerticalSpace * this._geometryConfig.zoomFactor;
+      const heigthToReserve = getLineHeaderHeight(maxNumberOfAllocableInBucketPart, 1) + ALLOCABLE_BASE_LINE_INCREMENT;
+      this._productLocationRenderer.reserveSpace(prodLocId, heigthToReserve);
+      const lineRect = drawLineHeader(
         this._canvasContext,
         this._lineCellText,
-        ALLOCABLE_CELL_BACKGROUNDCOLOR,
-        rect.X,
+        ALLOCABLE_CELLHEADER_BACKGROUNDCOLOR,
+        prodlocrRect.X,
         lineYStart,
-        this._geometryConfig.zoomFactor
+        this._geometryConfig.zoomFactor,
+        maxNumberOfAllocableInBucketPart
       );
       this._lineHeaderRect.push(lineRect);
+
+      /*draw the allocables */
+      for (const [allocable, buckets_parts] of allocableToBucketsMap) {
+        /*find the start and end of the X position.*/
+        let allocableXstart = null; /*hold the start of the x coordinates */
+        let allocableXend = null; /*hold the end of the x coordinates */
+        for (const { bucket, part } of buckets_parts) {
+          const bucketRect = this._dplMovieBucketRenderer.getProductLocationBucketPosition(prodLocId, bucket.Id);
+          ASSERT_EXIST(bucketRect);
+          let newXstart = 0;
+          let newXend = 0;
+          switch (part) {
+            case BUCKETPART_START:
+              {
+                const middleBucketX = bucketRect.X + bucketRect.Width / 2;
+                newXstart = bucketRect.X;
+                newXend = middleBucketX - minimalAllocableSpacing / 2;
+              }
+              break;
+            case BUCKETPART_END:
+              {
+                const middleBucketX = bucketRect.X + bucketRect.Width / 2;
+                newXstart = middleBucketX + minimalAllocableSpacing / 2;
+                newXend = bucketRect.X + bucketRect.Width;
+              }
+              break;
+            case BUCKETPART_FULL:
+              {
+                newXstart = bucketRect.X;
+                newXend = bucketRect.X + bucketRect.Width;
+              }
+              break;
+            default:
+              ASSERT_SWITCHDEFAULT(part);
+          }
+          newXstart = Math.floor(newXstart);
+          newXend = Math.floor(newXend);
+          allocableXstart = allocableXstart !== null ? Math.max(allocableXstart, newXstart) : newXstart;
+          allocableXend = allocableXend !== null ? Math.max(allocableXend, newXend) : newXend;
+        }
+        ASSERT(allocableXstart !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any start x position`);
+        ASSERT(allocableXend !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any end x position`);
+        const allocableRect = drawAllocable(
+          this._canvasContext,
+          String(this._getQuantity(allocable)),
+          ALLOCABLE_BACKGROUNDCOLOR,
+          allocableXstart,
+          allocableXend,
+          lineRect.Y /*TODO: compute allocable Y */,
+          this._geometryConfig.zoomFactor
+        );
+        this._allocableRects.set(allocable.Id, allocableRect);
+      }
     }
   }
 
   /** reset the renderer by erasing all its creation.
    */
   reset() {
+    // erase the line-header rectangles
     for (const rect of this._lineHeaderRect) {
-      this._canvasContext.clearRect(
-        rect.X - rect.LineWidth,
-        rect.Y - rect.LineWidth,
-        rect.Width + 2 * rect.LineWidth,
-        rect.Height + 2 * rect.LineWidth
-      );
+      eraseRectangle(this._canvasContext, rect);
     }
+    this._lineHeaderRect = [];
+
+    // erase the allocables
+    for (const [_, rect] of this._allocableRects) {
+      eraseRectangle(this._canvasContext, rect);
+    }
+    this._allocableRects = new Map();
+  }
+
+  // -------
+  // PRIVATE
+  // -------
+
+  /** return the Bucket tracked object which overlap with this allocable object
+   * @param {DPLMovieTrackedObject} allocable allocable object
+   * @param {DPLMovieRuntime} dplMovieRuntime DPLMovie runtime.
+   * @returns {DPLMovieTrackedObject} buckets overlapping with the allocable
+   * @return {Array<pair<Bucket,Part>>} an array of object containing the bucket and the part (start, end, full)
+   */
+  _getBuckets(allocable, dplMovieRuntime) {
+    // find first the start date and end date of the allocable.
+    const [startDate, endDate] = this._getPeriod(allocable);
+
+    // find the buckets
+    dplMovieRuntime.getTrackedObjects("Bucket");
+    const buckets = [];
+    for (const bucket of dplMovieRuntime.getTrackedObjects("Bucket")) {
+      if (bucket.StartDate > startDate && bucket.EndDate < endDate) {
+        buckets.push({ bucket: bucket, part: BUCKETPART_FULL });
+        continue;
+      }
+
+      const bucketMiddleDate = new Date(bucket.StartDate.getTime() + (bucket.EndDate - bucket.StartDate) / 2);
+      const overlapOrContainedInStart = this._overlapsOrContains(bucket.StartDate, bucketMiddleDate, startDate, endDate);
+      const overlapOrContainedInEnd = this._overlapsOrContains(bucketMiddleDate, bucket.EndDate, startDate, endDate);
+      if (overlapOrContainedInStart && overlapOrContainedInEnd) {
+        buckets.push({ bucket: bucket, part: BUCKETPART_FULL });
+        continue;
+      }
+      if (overlapOrContainedInStart) {
+        buckets.push({ bucket: bucket, part: BUCKETPART_START });
+        continue;
+      }
+      if (overlapOrContainedInEnd) {
+        buckets.push({ bucket: bucket, part: BUCKETPART_END });
+        continue;
+      }
+    }
+    return buckets;
+  }
+
+  /** return the start date and end date of an allocable
+   * @param {DPLMovieTrackedObject} allocable allocable object
+   * @returns {Array<Date>} start date and end date.
+   */
+  _getPeriod(allocable) {
+    let startDate = null;
+    if (allocable.hasOwnProperty(TRACKEDOBJECT_PROPERTY_STARTDATE)) startDate = allocable.StartDate;
+    else if (allocable.hasOwnProperty(TRACKEDOBJECT_PROPERTY_IPDID)) startDate = allocable.InventoryProducerDetailId.StartDate;
+    ASSERT(
+      startDate !== null && startDate !== undefined,
+      `There is no way we can get a StartDate from the allocable tracked object '${this._objectClassId}' with Id '${allocable.Id}'`
+    );
+    let endDate = null;
+    if (allocable.hasOwnProperty(TRACKEDOBJECT_PROPERTY_ENDDATE)) endDate = allocable.EndDate;
+    else if (allocable.hasOwnProperty(TRACKEDOBJECT_PROPERTY_IPDID)) endDate = allocable.InventoryProducerDetailId.EndDate;
+    ASSERT(
+      endDate !== null && endDate !== undefined,
+      `There is no way we can get an EndDate from the allocable tracked object '${this._objectClassId}' with Id '${allocable.Id}'`
+    );
+    return [startDate, endDate];
+  }
+
+  /**
+   * @param {Date} firstPeriodStarDate first period start date
+   * @param {Date} firstPeriodEndDate first period end date
+   * @param {Date} secondPeriodStarDate second period start date
+   * @param {Date} secondPeriodEndDate second period end date
+   * @returns true if the first period overlarps or contains the second.
+   */
+  _overlapsOrContains(firstPeriodStarDate, firstPeriodEndDate, secondPeriodStarDate, secondPeriodEndDate) {
+    return (
+      (firstPeriodStarDate <= secondPeriodStarDate && firstPeriodEndDate > secondPeriodStarDate) ||
+      (firstPeriodStarDate < secondPeriodEndDate && firstPeriodEndDate > secondPeriodEndDate)
+    );
+  }
+
+  /** return the product-location id of this allocable.
+   * @param {DPLMovieTrackedObject} allocableObject
+   */
+  _getProductLocationId(allocable) {
+    let productLocationId = null;
+    if (allocable.hasOwnProperty(TRACKEDOBJECT_PROPERTY_PRODUCTLOCATIONID)) productLocationId = allocable.ProductLocation.Id;
+    else if (allocable.hasOwnProperty(TRACKEDOBJECT_PROPERTY_IPDID)) productLocationId = allocable.InventoryProducerDetailId.ProductLocation.Id;
+    ASSERT(
+      productLocationId !== null && productLocationId !== undefined,
+      `There is no way we can get a ProductLocationId from the allocable tracked object '${this._objectClassId}' with Id '${allocable.Id}'`
+    );
+    return productLocationId;
+  }
+
+  /**
+   * @param {DPLMovieTrackedObject} allocable
+   * @returns the quantity of this allocable.
+   */
+  _getQuantity(allocable) {
+    let quantity = null;
+    if (allocable.hasOwnProperty(TRACKEDOBJECT_PROPERTY_QUANTITY)) quantity = allocable.Quantity;
+    else if (allocable.hasOwnProperty(TRACKEDOBJECT_PROPERTY_RESERVEDQUANTITY)) quantity = allocable.ReservedQuantity;
+    ASSERT(
+      quantity !== null && quantity !== undefined,
+      `There is no way we can get a quantity from the allocable tracked object '${this._objectClassId}' with Id '${allocable.Id}'`
+    );
+    return quantity;
+  }
+
+  /** return a sorted version of the given array.
+   *  The allocables are first sorted on their start-date (chronologically) and then on their end date (anti-chronologically).
+   * @param {Array<DPLMovieTrackedObject>} allocableObject
+   * @returns sorted array of allocable.
+   */
+  _sortAllocableBaseOnDates(allocables) {
+    const self = this;
+    return allocables.sort(function (allocable1, allocable2) {
+      const [startDate1, endDate1] = self._getPeriod(allocable1);
+      const [startDate2, endDate2] = self._getPeriod(allocable2);
+      if (startDate1 !== startDate2) return startDate1 - startDate2;
+      return endDate2 - endDate1;
+    });
   }
 }

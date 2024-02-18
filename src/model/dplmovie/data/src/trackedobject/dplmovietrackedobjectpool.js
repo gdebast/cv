@@ -1,20 +1,14 @@
 "use strict";
 
-import {
-  ASSERT,
-  ASSERT_ISSTRING,
-  ASSERT_SWITCHDEFAULT,
-  ASSERT_TYPE,
-} from "../../../../utility/assert/assert";
+import { ASSERT, ASSERT_ISSTRING, ASSERT_SWITCHDEFAULT, ASSERT_TYPE } from "../../../../utility/assert/assert";
 import { mapToArray } from "../../../../utility/toarray/toarray";
-import {
-  EVENTTYPE_CREATION,
-  EVENTTYPE_DELETION,
-  EVENTTYPE_UPDATE,
-} from "../runtimeevent/dplmovieruntimeenventtype";
+import { EVENTTYPE_CREATION, EVENTTYPE_DELETION, EVENTTYPE_UPDATE } from "../runtimeevent/dplmovieruntimeenventtype";
 import { DPLMovieRuntimeEvent } from "../runtimeevent/dplmovieruntimeevent";
 import { DPLMovieRuntimeEventObjectReferenceAttributeValue } from "../runtimeevent/dplmovieruntimeeventobjectreferenceattributevalue";
 import { DPLMovieTrackedObject } from "./dplmovietrackedobject";
+
+const BUCKET = "Bucket";
+const PASTBUCKET_NAME = "past";
 
 /** responsible for owning the tracked object.
  */
@@ -49,6 +43,7 @@ export class DPLMovieTrackedObjectPool {
       }
     }
     this._fillReferences();
+    this._handlePastBucket();
   }
   /** revert the event. Each event-object of type "creation" will be treated as a deletion,
    *  an update will be an update and a deletion will be a creation.
@@ -74,6 +69,7 @@ export class DPLMovieTrackedObjectPool {
       }
     }
     this._fillReferences();
+    this._handlePastBucket();
   }
 
   /** returns the tracked object of a given object class.
@@ -101,16 +97,9 @@ export class DPLMovieTrackedObjectPool {
    * @param {DPLMovieRuntimeEventObject} eventObject event to apply
    */
   _deleteFromEventObject(eventObject) {
-    const id_to_trackedObjects = this._getIdToTrackedObjectMap(
-      eventObject.ObjectClassId,
-      eventObject.ObjectId,
-      "deleted"
-    );
+    const id_to_trackedObjects = this._getIdToTrackedObjectMap(eventObject.ObjectClassId, eventObject.ObjectId, "deleted");
     id_to_trackedObjects.delete(eventObject.ObjectId);
-    if (
-      this._typeId_to_trackedObjects.get(eventObject.ObjectClassId).size === 0
-    )
-      this._typeId_to_trackedObjects.delete(eventObject.ObjectClassId);
+    if (this._typeId_to_trackedObjects.get(eventObject.ObjectClassId).size === 0) this._typeId_to_trackedObjects.delete(eventObject.ObjectClassId);
   }
 
   /** apply the event object to the pool by updating the corresponding tracked object.
@@ -119,30 +108,16 @@ export class DPLMovieTrackedObjectPool {
    */
   _updateFromEventObject(eventObject, usePreviousValue) {
     // find the object
-    const id_to_trackedObjects = this._getIdToTrackedObjectMap(
-      eventObject.ObjectClassId,
-      eventObject.ObjectId,
-      "updated"
-    );
-    const trackedObjectToUpdate = id_to_trackedObjects.get(
-      eventObject.ObjectId
-    );
+    const id_to_trackedObjects = this._getIdToTrackedObjectMap(eventObject.ObjectClassId, eventObject.ObjectId, "updated");
+    const trackedObjectToUpdate = id_to_trackedObjects.get(eventObject.ObjectId);
 
     // update the object
     for (const attribute of eventObject.Attributes) {
       // if we have to update a reference, do it after.
-      if (
-        this._postponeReferenceFillingIfNeeded(
-          trackedObjectToUpdate,
-          attribute,
-          usePreviousValue
-        )
-      )
-        continue;
+      if (this._postponeReferenceFillingIfNeeded(trackedObjectToUpdate, attribute, usePreviousValue)) continue;
 
       // update simple values
-      trackedObjectToUpdate[attribute.Name] =
-        usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
+      trackedObjectToUpdate[attribute.Name] = usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
     }
   }
 
@@ -154,34 +129,23 @@ export class DPLMovieTrackedObjectPool {
     const objectClassId = eventObject.ObjectClassId;
     const objectId = eventObject.ObjectId;
     ASSERT(
-      this._typeId_to_trackedObjects.get(objectClassId)?.get(objectId) ===
-        undefined,
+      this._typeId_to_trackedObjects.get(objectClassId)?.get(objectId) === undefined,
       `At event tracked object '${objectClassId}' with id '${objectId}' already exists`
     );
     const newTrackedObject = new DPLMovieTrackedObject(objectClassId, objectId);
     for (const attribute of eventObject.Attributes) {
       // if we have to update a reference, do it after.
-      if (
-        this._postponeReferenceFillingIfNeeded(
-          newTrackedObject,
-          attribute,
-          usePreviousValue
-        )
-      )
-        continue;
+      if (this._postponeReferenceFillingIfNeeded(newTrackedObject, attribute, usePreviousValue)) continue;
 
       // update simple values
-      newTrackedObject[attribute.Name] =
-        usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
+      newTrackedObject[attribute.Name] = usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
     }
 
     // fill the map
     if (!this._typeId_to_trackedObjects.has(objectClassId)) {
       this._typeId_to_trackedObjects.set(objectClassId, new Map());
     }
-    this._typeId_to_trackedObjects
-      .get(objectClassId)
-      .set(objectId, newTrackedObject);
+    this._typeId_to_trackedObjects.get(objectClassId).set(objectId, newTrackedObject);
   }
 
   /** postpone if needed the filling of this tracked object with this attribute name and value.
@@ -190,24 +154,12 @@ export class DPLMovieTrackedObjectPool {
    * @param {Boolean} usePreviousValue true if we should use the PreviousValue, false if we should read the Value.
    * @returns true if the filling of this attribute value should be postponed
    */
-  _postponeReferenceFillingIfNeeded(
-    trackedObjectToUpdate,
-    attribute,
-    usePreviousValue
-  ) {
-    const attributeValue =
-      usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
+  _postponeReferenceFillingIfNeeded(trackedObjectToUpdate, attribute, usePreviousValue) {
+    const attributeValue = usePreviousValue === true ? attribute.PreviousValue : attribute.Value;
 
-    ASSERT(
-      attributeValue !== undefined,
-      `The expected value to read is not filled (usePreviousValue =${usePreviousValue})`
-    );
+    ASSERT(attributeValue !== undefined, `The expected value to read is not filled (usePreviousValue =${usePreviousValue})`);
 
-    if (
-      attributeValue instanceof
-        DPLMovieRuntimeEventObjectReferenceAttributeValue ||
-      attributeValue instanceof Array
-    ) {
+    if (attributeValue instanceof DPLMovieRuntimeEventObjectReferenceAttributeValue || attributeValue instanceof Array) {
       this._trackedObjectForWhichToFindReferences.push({
         trakedObject: trackedObjectToUpdate,
         value: attributeValue,
@@ -222,19 +174,10 @@ export class DPLMovieTrackedObjectPool {
   _fillReferences() {
     for (const update of this._trackedObjectForWhichToFindReferences) {
       const trackedObjectToFill = update.trakedObject;
-      if (
-        update.value instanceof
-        DPLMovieRuntimeEventObjectReferenceAttributeValue
-      ) {
+      if (update.value instanceof DPLMovieRuntimeEventObjectReferenceAttributeValue) {
         // find the referred object
-        const id_to_trackedObjects = this._getIdToTrackedObjectMap(
-          update.value.ReferredObjectClassId,
-          update.value.ReferredObjectId,
-          "referred to"
-        );
-        trackedObjectToFill[update.name] = id_to_trackedObjects.get(
-          update.value.ReferredObjectId
-        );
+        const id_to_trackedObjects = this._getIdToTrackedObjectMap(update.value.ReferredObjectClassId, update.value.ReferredObjectId, "referred to");
+        trackedObjectToFill[update.name] = id_to_trackedObjects.get(update.value.ReferredObjectId);
         continue;
       }
       if (update.value instanceof Array) {
@@ -246,17 +189,12 @@ export class DPLMovieTrackedObjectPool {
             referenceAttributeValue.ReferredObjectId,
             "referred to"
           );
-          newArrayForTrackedObject.push(
-            id_to_trackedObjects.get(referenceAttributeValue.ReferredObjectId)
-          );
+          newArrayForTrackedObject.push(id_to_trackedObjects.get(referenceAttributeValue.ReferredObjectId));
         }
         trackedObjectToFill[update.name] = newArrayForTrackedObject;
         continue;
       }
-      ASSERT(
-        false,
-        `this update of tracked object could not be read: ${update}`
-      );
+      ASSERT(false, `this update of tracked object could not be read: ${update}`);
     }
     this._trackedObjectForWhichToFindReferences = [];
   }
@@ -272,8 +210,7 @@ export class DPLMovieTrackedObjectPool {
       this._typeId_to_trackedObjects.has(objectClassId),
       `Event Object with ObjectClassId '${objectClassId}' and ObjectId '${objectId}', should be ${purpose} but it is not found.`
     );
-    const id_to_trackedObjects =
-      this._typeId_to_trackedObjects.get(objectClassId);
+    const id_to_trackedObjects = this._typeId_to_trackedObjects.get(objectClassId);
     ASSERT(
       id_to_trackedObjects.has(objectId),
       `Event Object with ObjectClassId '${objectClassId}' and ObjectId '${objectId}', should be ${purpose}  but it is not found.`
@@ -282,8 +219,41 @@ export class DPLMovieTrackedObjectPool {
   }
 
   _trackedObjectSortPredicate(trackedObject1, trackedObject2) {
-    if (trackedObject1.Type === trackedObject2.Type)
-      return trackedObject1.Id < trackedObject2.Id ? -1 : 1;
+    if (trackedObject1.Type === trackedObject2.Type) return trackedObject1.Id < trackedObject2.Id ? -1 : 1;
     return trackedObject1.Type < trackedObject2.Type ? -1 : 1;
+  }
+
+  /** make or delete the past bucket when necessary.
+   */
+  _handlePastBucket() {
+    // nothing to do if there is no buckets.
+    if (!this._typeId_to_trackedObjects.has(BUCKET)) return;
+
+    // if the past bucket is alone, deletes it.
+    const bucketsMap = this._typeId_to_trackedObjects.get(BUCKET);
+    if (bucketsMap.size == 1 && bucketsMap.has(PASTBUCKET_NAME)) {
+      this._typeId_to_trackedObjects.delete(BUCKET);
+      return;
+    }
+
+    // if there are some buckets, but the past bucket does not exist, creates it
+    if (bucketsMap.size > 0 && bucketsMap.has(PASTBUCKET_NAME) == false) {
+      const pastBucket = new DPLMovieTrackedObject(BUCKET, PASTBUCKET_NAME);
+
+      pastBucket.Number = 0;
+      let endDate = null;
+      bucketsMap.forEach(function (otherBucket) {
+        if (endDate === null || endDate > otherBucket.StartDate) endDate = otherBucket.StartDate;
+      });
+      pastBucket.StartDate = new Date(0);
+      pastBucket.EndDate = endDate;
+      ASSERT(
+        pastBucket.StartDate < pastBucket.EndDate,
+        `fail to make the past bucket because its date range is wrong: startdate:${pastBucket.StartDate} - enddate:${pastBucket.EndDate}.`
+      );
+
+      bucketsMap.set(PASTBUCKET_NAME, pastBucket);
+      return;
+    }
   }
 }

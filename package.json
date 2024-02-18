@@ -12,5 +12,8 @@
     "build": "parcel build index.html --dist-dir ./dist",
     "test": "node --experimental-vm-modules node_modules/jest/bin/jest.js"
   },
-  "type": "module"
+  "type": "module",
+  "prettier": {
+    "printWidth": 150
+  }
 }

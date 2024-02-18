@@ -1,12 +1,5 @@
-import {
-  ASSERT,
-  ASSERT_EXIST,
-} from "../../../../../model/utility/assert/assert";
-import {
-  drawHeaderCell,
-  getHeaderCellHeigth,
-  getLineWidth,
-} from "./src/dplmovierendererhelper";
+import { ASSERT, ASSERT_EXIST } from "../../../../../model/utility/assert/assert";
+import { drawHeaderCell, eraseRectangle, getHeaderCellHeigth, getLineWidth } from "./src/dplmovierendererhelper";
 
 const OBJECTLASS_HANDLEDTYPE = "ProductLocation";
 
@@ -16,7 +9,7 @@ const PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y = 40;
 const PRODUCTLOCATION_CELL_BASE_Y_INCREMENT = 5;
 
 /*color*/
-const PRODUCTLOCATION_CELL_BACKGROUNDCOLOR = "#1864ab";
+const PRODUCTLOCATION_CELL_BACKGROUNDCOLOR = "#228be6";
 
 /** class responsible for rendering ProductLocation of a DPL Movie as cell header.
  * @param canvasContext canvas on which to draw.
@@ -29,8 +22,6 @@ export class DPLMovieProductLocationRenderer {
     this._canvasContext = canvasContext;
     this._geometryConfig = geometryConfig;
     this._intialize();
-    this._reservedVerticalSpaces =
-      []; /*contains vertical spaces registered by other components */
   }
 
   // ------
@@ -43,12 +34,10 @@ export class DPLMovieProductLocationRenderer {
   render(dplMovieRuntime) {
     ASSERT_EXIST(this._canvasContext);
     ASSERT_EXIST(dplMovieRuntime);
-    const productLocationTrackedObjects = dplMovieRuntime.getTrackedObjects(
-      OBJECTLASS_HANDLEDTYPE
-    );
+    const productLocationTrackedObjects = dplMovieRuntime.getTrackedObjects(OBJECTLASS_HANDLEDTYPE);
     for (const productLocation of productLocationTrackedObjects) {
       this._drawOneProductLocation(productLocation);
-      this._incrementPosition();
+      this._incrementPosition(productLocation.Id);
     }
   }
 
@@ -56,18 +45,12 @@ export class DPLMovieProductLocationRenderer {
    */
   reset() {
     for (const [_, rect] of this._productLocationPositions) {
-      this._canvasContext.clearRect(
-        rect.X - rect.LineWidth,
-        rect.Y - rect.LineWidth,
-        rect.Width + 2 * rect.LineWidth,
-        rect.Height + 2 * rect.LineWidth
-      );
+      eraseRectangle(this._canvasContext, rect);
     }
     this._productLocationPositions = new Map();
-    this._currentX =
-      PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X - this._geometryConfig.xRef;
-    this._currentY =
-      PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y - this._geometryConfig.yRef;
+    this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X - this._geometryConfig.xRef;
+    this._currentY = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y - this._geometryConfig.yRef;
+    this._reservedVerticalSpaces = new Map();
   }
 
   /** return the positions of the ProductLocations
@@ -77,20 +60,27 @@ export class DPLMovieProductLocationRenderer {
     return this._productLocationPositions;
   }
 
-  /** reserve some vertical space. This can be used by other renderers.
-   * @param space vertical space in pixel without zoom
+  /** get the reserved space for this product-location id up to now.
+   *  The returned value is without zooming factor.
+   * @param {String} productLocationId
    */
-  reserveVerticalSpace(space) {
-    this._reservedVerticalSpaces.push(space);
+  getReservedSpace(productLocationId) {
+    if (!this._reservedVerticalSpaces.has(productLocationId)) return 0;
+    return this._reservedVerticalSpaces.get(productLocationId);
   }
 
-  /** return the total reserved space without zoom.
-   * @returns {Integer} total reserved space.
+  /** reserve space for this product-location id.
+   *  The given value is without zooming factor.
+   * @param {String} productLocationId
+   * @param {Integer} heigthToReserve
    */
-  getTotalVerticalReservedSpace() {
-    return this._reservedVerticalSpaces.reduce(function (acc, val) {
-      return acc + val;
-    }, 0);
+  reserveSpace(productLocationId, heigthToReserve) {
+    if (!this._reservedVerticalSpaces.has(productLocationId)) {
+      this._reservedVerticalSpaces.set(productLocationId, heigthToReserve);
+      return;
+    }
+    const spaceUpTonow = this._reservedVerticalSpaces.get(productLocationId);
+    this._reservedVerticalSpaces.set(productLocationId, spaceUpTonow + heigthToReserve);
   }
 
   // -------
@@ -103,6 +93,7 @@ export class DPLMovieProductLocationRenderer {
     this._productLocationPositions = new Map();
     this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
     this._currentY = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y;
+    this._reservedVerticalSpaces = new Map(); /* ProductLocationId->integer map, containing vertical spaces registered by other components */
   }
 
   /** draw one product-location cell.
@@ -125,19 +116,17 @@ export class DPLMovieProductLocationRenderer {
       this._geometryConfig
     );
 
-    this._productLocationPositions.set(
-      ProductLocattionTrackedObject.Id,
-      createdRect
-    );
+    this._productLocationPositions.set(ProductLocattionTrackedObject.Id, createdRect);
   }
 
   /** increment the positionning to render the next Product-Location
+   *  @param {String} productLocationId previous product-Location Id
    */
-  _incrementPosition() {
+  _incrementPosition(productLocationId) {
     this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
     this._currentY +=
       PRODUCTLOCATION_CELL_BASE_Y_INCREMENT * this._geometryConfig.zoomFactor +
-      this.getTotalVerticalReservedSpace() * this._geometryConfig.zoomFactor +
+      this.getReservedSpace(productLocationId) * this._geometryConfig.zoomFactor +
       getLineWidth(this._geometryConfig.zoomFactor) +
       getHeaderCellHeigth(this._geometryConfig.zoomFactor);
   }
