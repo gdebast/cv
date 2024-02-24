@@ -25,7 +25,6 @@ const TRACKEDOBJECT_PROPERTY_QUANTITY = "Quantity";
 const TRACKEDOBJECT_PROPERTY_RESERVEDQUANTITY = "ReservedQuantity";
 
 /*bucket part enum*/
-const BUCKETPART_FULL = "full";
 const BUCKETPART_START = "start";
 const BUCKETPART_END = "end";
 
@@ -112,7 +111,7 @@ export class DPLMovieAllocableRenderer {
       this._lineHeaderRect.push(lineRect);
 
       /*draw the allocables */
-      const bucketPartNbrOfAllocable = new Map(); /*holds the number of already drawn allocable in a bucket-part.*/
+      const bucketPartPosition = new Set(); /*holds the bucket-part-position's where we already drawn an allocable in a bucket-part.*/
       for (const [allocable, buckets_parts] of allocableToBucketsMap) {
         /*find the start and end of the X position.*/
         let allocableXstart = null; /*hold the start of the x coordinates */
@@ -137,33 +136,40 @@ export class DPLMovieAllocableRenderer {
                 newXend = bucketRect.X + bucketRect.Width;
               }
               break;
-            case BUCKETPART_FULL:
-              {
-                newXstart = bucketRect.X;
-                newXend = bucketRect.X + bucketRect.Width;
-              }
-              break;
             default:
               ASSERT_SWITCHDEFAULT(part);
           }
           newXstart = Math.floor(newXstart);
           newXend = Math.floor(newXend);
-          allocableXstart = allocableXstart !== null ? Math.max(allocableXstart, newXstart) : newXstart;
+          allocableXstart = allocableXstart !== null ? Math.min(allocableXstart, newXstart) : newXstart;
           allocableXend = allocableXend !== null ? Math.max(allocableXend, newXend) : newXend;
         }
         ASSERT(allocableXstart !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any start x position`);
         ASSERT(allocableXend !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any end x position`);
 
         /*find the start of the y position */
-        // we look first in the map of already drawn allocables.
-        let nbrInSameBucketPart = 0;
-        for (const { bucket, part } of buckets_parts) {
-          const key = this._makeBucketPartKey(bucket, part);
-          if (bucketPartNbrOfAllocable.has(key)) {
-            nbrInSameBucketPart = Math.max(nbrInSameBucketPart, bucketPartNbrOfAllocable.get(key));
+        /* The logic here loops over a possible position (integer representing a y positionning).
+           if the possible position is not already taken by all bucket-part's (x positionning),
+           we use this position (= fill foundPosition).
+        */
+        let foundPosition = null;
+        let tentativePosition = 0;
+        while (foundPosition == null) {
+          // check if all bucket-part are free for this position
+          let isTentativePositionFree = true;
+          for (const { bucket, part } of buckets_parts) {
+            const key = this._makeBucketPartPositionKey(bucket, part, tentativePosition);
+            if (bucketPartPosition.has(key)) {
+              isTentativePositionFree = false;
+              break;
+            }
           }
+          // stop if the position is free; continue otherwise with the next position
+          if (isTentativePositionFree) foundPosition = tentativePosition;
+          else tentativePosition++;
         }
-        const allocableY = lineRect.Y + nbrInSameBucketPart * (minimalAllocableSpacing + getAllocaleDimension(this._geometryConfig.zoomFactor));
+        ASSERT(foundPosition !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any y position`);
+        const allocableY = lineRect.Y + foundPosition * (minimalAllocableSpacing + getAllocaleDimension(this._geometryConfig.zoomFactor));
 
         const allocableRect = drawAllocable(
           this._canvasContext,
@@ -176,13 +182,14 @@ export class DPLMovieAllocableRenderer {
         );
         this._allocableRects.set(allocable.Id, allocableRect);
 
-        // remember the number of already drawn allocables in the same bucket-part.
+        // remember that this allocable occupies these bucket-part-position's.
         for (const { bucket, part } of buckets_parts) {
-          const key = this._makeBucketPartKey(bucket, part);
-          if (bucketPartNbrOfAllocable.has(key)) {
-            const oldNbr = bucketPartNbrOfAllocable.get(key);
-            bucketPartNbrOfAllocable.set(key, oldNbr + 1);
-          } else bucketPartNbrOfAllocable.set(key, 1);
+          const key = this._makeBucketPartPositionKey(bucket, part, foundPosition);
+          ASSERT(
+            !bucketPartPosition.has(key),
+            `the bucket-part-position '${key}' has been taken by a '${this._objectClassId}' with id '${allocable.Id}', but it was already taken`
+          );
+          bucketPartPosition.add(key);
         }
       }
     }
@@ -204,35 +211,51 @@ export class DPLMovieAllocableRenderer {
     this._allocableRects = new Map();
   }
 
+  /** return the rectangle drawn for an allocable.
+   */
+  getAllocablePosition(c) {
+    ASSERT(this._allocableRects.has(allocableId), `the allocable with type '${this._objectClassId}' and Id '${allocableId}' was not drawn.`);
+    return this._allocableRects.get(allocableId);
+  }
+
   // -------
   // PRIVATE
   // -------
 
   /** make a key for the map indexing on bucket-part.
    * @param {DPLMovieTrackedObject} bucket
-   * @param {string} part full/start/end
+   * @param {String} part start/end
    * @returns key
    */
   _makeBucketPartKey(bucket, part) {
     return `${bucket.Id}-${part}`;
   }
 
+  /** make a key for the map indexing on bucket-part-position.
+   * @param {DPLMovieTrackedObject} bucket
+   * @param {String} part start/end, which is the column in the bucket
+   * @param {Integer} position row in the bucket
+   * @returns key
+   */
+  _makeBucketPartPositionKey(bucket, part, position) {
+    return `${bucket.Id}-${part}-${position}`;
+  }
+
   /** return the Bucket tracked object which overlap with this allocable object
    * @param {DPLMovieTrackedObject} allocable allocable object
    * @param {DPLMovieRuntime} dplMovieRuntime DPLMovie runtime.
    * @returns {DPLMovieTrackedObject} buckets overlapping with the allocable
-   * @return {Array<pair<Bucket,Part>>} an array of object containing the bucket and the part (start, end, full)
+   * @return {Array<pair<Bucket,Part>>} an array of object containing the bucket and the part (start/end)
    */
   _getBuckets(allocable, dplMovieRuntime) {
     // find first the start date and end date of the allocable.
     const [startDate, endDate] = this._getPeriod(allocable);
 
     // find the buckets
-    dplMovieRuntime.getTrackedObjects("Bucket");
     const buckets = [];
     for (const bucket of dplMovieRuntime.getTrackedObjects("Bucket")) {
       if (bucket.StartDate > startDate && bucket.EndDate < endDate) {
-        buckets.push({ bucket: bucket, part: BUCKETPART_FULL });
+        buckets.push({ bucket: bucket, part: BUCKETPART_START }, { bucket: bucket, part: BUCKETPART_END });
         continue;
       }
 
@@ -240,7 +263,7 @@ export class DPLMovieAllocableRenderer {
       const overlapOrContainedInStart = this._overlapsOrContains(bucket.StartDate, bucketMiddleDate, startDate, endDate);
       const overlapOrContainedInEnd = this._overlapsOrContains(bucketMiddleDate, bucket.EndDate, startDate, endDate);
       if (overlapOrContainedInStart && overlapOrContainedInEnd) {
-        buckets.push({ bucket: bucket, part: BUCKETPART_FULL });
+        buckets.push({ bucket: bucket, part: BUCKETPART_START }, { bucket: bucket, part: BUCKETPART_END });
         continue;
       }
       if (overlapOrContainedInStart) {
