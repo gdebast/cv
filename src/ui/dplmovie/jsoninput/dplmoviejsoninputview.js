@@ -3,9 +3,7 @@ const CLASS_DPLMOVIEUPLOADBTN = "dplmovie-upload-btn";
 const CLASS_APPBTNERROR = "app-btn-error";
 const CLASS_APPBTNERRORMESSAGEBOX = "app-btn-error-message-box";
 const dplMovieJsonInputElt = document.getElementById(DPLMOVIEJSONINPUTELTID);
-const dplMovieJsonInputBtnElt = document.querySelector(
-  `.${CLASS_DPLMOVIEUPLOADBTN}`
-);
+const dplMovieJsonInputBtnElt = document.querySelector(`.${CLASS_DPLMOVIEUPLOADBTN}`);
 const HTML_CLOSE =
   '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"> <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M368 368L144 144M368 144L144 368"/> </svg>';
 
@@ -51,22 +49,13 @@ export class DPLMovieJsonInputView {
    *  @returns {String} error message. null if no error.
    */
   _addRuntime(jsonObject) {
-    if (jsonObject.SolverName === undefined)
-      return "Missing 'SolverName' property in json file.";
-    if (jsonObject.SolverType === undefined)
-      return "Missing 'SolverType' property in json file.";
-    if (jsonObject.TrackingStartDate === undefined)
-      return "Missing 'TrackingStartDate' property in json file.";
-    const runtimeStartDate = new Date(jsonObject.TrackingStartDate);
-    if (!this._isValidDate(runtimeStartDate))
-      return `Cannot convert '${jsonObject.TrackingStartDate}' property in json file in date.`;
+    if (jsonObject.SolverName === undefined) return "Missing 'SolverName' property in json file.";
+    if (jsonObject.SolverType === undefined) return "Missing 'SolverType' property in json file.";
+    let runtimeStartDate = new Date();
+    if (jsonObject.TrackingStartDate !== undefined) runtimeStartDate = new Date(jsonObject.TrackingStartDate);
+    if (!this._isValidDate(runtimeStartDate)) return `Cannot convert '${jsonObject.TrackingStartDate}' property in json file in date.`;
 
-    const errorMessage = this._dplMovieRuntimePool.addRuntime(
-      jsonObject.SolverType,
-      jsonObject.SolverName,
-      runtimeStartDate,
-      jsonObject.Events
-    );
+    const errorMessage = this._dplMovieRuntimePool.addRuntime(jsonObject.SolverType, jsonObject.SolverName, runtimeStartDate, jsonObject.Events);
     if (errorMessage) return errorMessage;
     return null;
   }
@@ -76,9 +65,7 @@ export class DPLMovieJsonInputView {
   _toggleErrorOnUpload(message) {
     if (!message) {
       dplMovieJsonInputBtnElt.classList.remove(CLASS_APPBTNERROR);
-      const messageBoxElt = document.querySelector(
-        `.${CLASS_APPBTNERRORMESSAGEBOX}`
-      );
+      const messageBoxElt = document.querySelector(`.${CLASS_APPBTNERRORMESSAGEBOX}`);
       if (messageBoxElt) dplMovieJsonInputBtnElt.removeChild(messageBoxElt);
       return;
     }
