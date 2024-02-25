@@ -1,6 +1,7 @@
 "use strict";
 
 import { ASSERT_EXIST } from "../../../model/utility/assert/assert";
+import { DPLMovieAllocableLinkRenderer } from "./src/renderer/dplmovieallocablelinkrenderer";
 import { DPLMovieAllocableRenderer } from "./src/renderer/dplmovieallocablerenderer";
 import { DPLMovieBucketRenderer } from "./src/renderer/dplmoviebucketrenderer";
 import { DPLMovieProductLocationRenderer } from "./src/renderer/dplmovieproductlocationrenderer";
@@ -145,11 +146,22 @@ export class DPLMovieCanvasView {
       "DPLOpenInternalAllocation",
       "Opened"
     );
+    const internalAllocationRenderer = new DPLMovieAllocableLinkRenderer(
+      this._canvasContext,
+      ipdRenderer,
+      icdRenderer,
+      this._geometryConfig,
+      "DPLInternalAllocation",
+      "InventoryProducerDetailId",
+      "InventoryConsumerDetailId",
+      "Quantity"
+    );
     this._renderers.push(productLocationRenderer);
     this._renderers.push(bucketRenderer);
     this._renderers.push(icdRenderer);
     this._renderers.push(ipdRenderer);
     this._renderers.push(openAllocationRenderer);
+    this._renderers.push(internalAllocationRenderer);
 
     /*TODO: this system of renderer registered linerly will not work 
       because if the line header grow, the second productlocation 

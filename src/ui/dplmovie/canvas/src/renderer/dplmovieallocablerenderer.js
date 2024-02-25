@@ -212,10 +212,18 @@ export class DPLMovieAllocableRenderer {
   }
 
   /** return the rectangle drawn for an allocable.
+   * @param {String} allocableId allocable id
+   * @returns a rectangle
    */
-  getAllocablePosition(c) {
+  getAllocablePosition(allocableId) {
     ASSERT(this._allocableRects.has(allocableId), `the allocable with type '${this._objectClassId}' and Id '${allocableId}' was not drawn.`);
     return this._allocableRects.get(allocableId);
+  }
+
+  /** returns the object class id of the allocable that this renderer is making.
+   */
+  getAllocableObjectClassId() {
+    return this._objectClassId;
   }
 
   // -------

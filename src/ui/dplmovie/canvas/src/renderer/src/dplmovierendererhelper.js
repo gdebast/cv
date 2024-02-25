@@ -11,11 +11,15 @@ const CELL_BASE_ROUNDNESS = 10;
 const CELL_BASE_PREFEREDFONTSIZE = 20;
 const CELL_BASE_LINEWIDTH = 4;
 
-/*Line */
+/*Line header */
 const LINEHEADER_BASE_HEIGHT = 75;
 const LINEHEADER_BASE_ADDITIONAL_HEIGHT = 25;
 const LINEELT_BASE_DIMENSION = 50; /*an element is a square, there is no width and no heigth but a single dimension */
 const LINEELT_BASE_MINSPACING = 8; /*an element is a square, the spacing between them extends in both direction */
+
+/* Arrow */
+const ARROW_BASE_LINEWIDTH = 4;
+const ARROW_BASE_ENDLINE = 10;
 
 /*color*/
 const CELL_STROKECOLOR = "black";
@@ -218,4 +222,52 @@ export const drawAllocable = function (canvasContext, text, backgroundColor, xSt
     Height: finalHeight,
     LineWidth: finalLineWidth,
   };
+};
+
+/** draw an arrow with a text aside, from (xStart;yStart) to (xEnd;yEnd).
+ * @param {CanvasRenderingContext2D} canvasContext canvas context on which to draw.
+ * @param {String} text text to write
+ * @param {String} color color of the arrow
+ * @param {Integer} xStart start X position (relative)
+ * @param {Integer} yStart start Y position (relative)
+ * @param {Integer} xEnd end X position (relative)
+ * @param {Integer} yEnd end Y position (relative)
+ * @param {Integer} zoomFactor zoom factor.
+ * @returns an Arrow object with pointerLength, thickness, xStart, yStart, xEnd, and yEnd properties.
+ */
+export const drawArrow = function (canvasContext, text, color, xStart, yStart, xEnd, yEnd, zoomFactor) {
+  const arrowThickness = ARROW_BASE_LINEWIDTH * zoomFactor;
+  const pointingEndLineLength = ARROW_BASE_ENDLINE * zoomFactor;
+  canvasContext.lineWidth = arrowThickness;
+  canvasContext.lineJoin = "round";
+  canvasContext.fillStyle = color;
+  canvasContext.beginPath();
+  canvasContext.moveTo(xStart, yStart);
+  canvasContext.lineTo(xEnd, yEnd);
+
+  // draw the pointing head
+  const dx = xEnd - xStart;
+  const dy = yEnd - yStart;
+  const angle = Math.atan2(dy, dx);
+  canvasContext.lineTo(xEnd - pointingEndLineLength * Math.cos(angle - Math.PI / 6), yEnd - pointingEndLineLength * Math.sin(angle - Math.PI / 6));
+  canvasContext.moveTo(xEnd, yEnd);
+  canvasContext.lineTo(xEnd - pointingEndLineLength * Math.cos(angle + Math.PI / 6), yEnd - pointingEndLineLength * Math.sin(angle + Math.PI / 6));
+
+  canvasContext.stroke();
+
+  return { pointerLength: pointingEndLineLength, thickness: arrowThickness, xStart: xStart, yStart: yStart, xEnd: xEnd, yEnd: yEnd };
+};
+
+/** erase an arrow .
+ * @param {CanvasRenderingContext2D} canvasContext canvas context on which to erase.
+ * @param {Object} arrow characteristics of the arrow to erase
+ */
+export const eraseArrow = function (canvasContext, arrow) {
+  const rectX = Math.min(arrow.xStart, arrow.xEnd) - arrow.pointerLength;
+  const rectY = Math.min(arrow.yStart, arrow.yEnd) - arrow.pointerLength;
+  const rectWidth = Math.max(arrow.xStart, arrow.xEnd) - rectX + arrow.pointerLength;
+  const rectHeigth = Math.max(arrow.yStart, arrow.yEnd) - rectY + arrow.pointerLength;
+  ASSERT(rectWidth > 0, `negative width computed with the arrow: rectX=${rectX}, xStart=${arrow.xStart}, xEnd=${arrow.xEnd}`);
+  ASSERT(rectHeigth > 0, `negative heigth computed with the arrow: rectX=${rectY}, yStart=${arrow.yStart}, yEnd=${arrow.yEnd}`);
+  canvasContext.clearRect(rectX, rectY, rectWidth, rectHeigth);
 };
