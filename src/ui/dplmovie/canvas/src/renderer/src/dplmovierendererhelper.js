@@ -8,7 +8,6 @@ import { ASSERT } from "../../../../../../model/utility/assert/assert";
 const CELL_BASE_HEIGHT = 75;
 const CELL_BASE_WIDTH = 200;
 const CELL_BASE_ROUNDNESS = 10;
-const CELL_BASE_PREFEREDFONTSIZE = 20;
 const CELL_BASE_LINEWIDTH = 4;
 
 /*Line header */
@@ -23,7 +22,11 @@ const ARROW_BASE_ENDLINE = 10;
 
 /*color*/
 const CELL_STROKECOLOR = "black";
-const CELL_TEXTFILLCOLOR = "black";
+
+/*font */
+const PREFEREDFONTSIZE = 20;
+const FONT = "sans-serif";
+const TEXTCOLOR = "black";
 
 /**
  * @param {Integer} zoomFactor zoom factor.
@@ -115,12 +118,7 @@ export const drawHeaderCell = function (canvasContext, text, backgroundColor, x,
   canvasContext.stroke();
 
   // draw the text
-  canvasContext.font = `${Math.floor(CELL_BASE_PREFEREDFONTSIZE * zoomFactor)}px sans-serif`;
-  canvasContext.textAlign = "center";
-  canvasContext.textBaseline = "middle";
-  canvasContext.lineWidth = 1;
-  canvasContext.fillStyle = CELL_TEXTFILLCOLOR;
-  canvasContext.fillText(text, finalX + finalWidth / 2, finalY + finalHeight / 2);
+  _drawText(canvasContext, text, finalX + finalWidth / 2, finalY + finalHeight / 2, zoomFactor);
 
   // return the positions.
   return {
@@ -160,12 +158,7 @@ export const drawLineHeader = function (canvasContext, text, backgroundColor, x,
   canvasContext.stroke();
 
   // draw the text
-  canvasContext.font = `${Math.floor(CELL_BASE_PREFEREDFONTSIZE * zoomFactor)}px sans-serif`;
-  canvasContext.textAlign = "center";
-  canvasContext.textBaseline = "middle";
-  canvasContext.lineWidth = 1;
-  canvasContext.fillStyle = CELL_TEXTFILLCOLOR;
-  canvasContext.fillText(text, x + finalWidth / 2, y + finalHeight / 2);
+  _drawText(canvasContext, text, x + finalWidth / 2, y + finalHeight / 2, zoomFactor);
 
   // return the positions.
   return {
@@ -207,12 +200,7 @@ export const drawAllocable = function (canvasContext, text, backgroundColor, xSt
   canvasContext.stroke();
 
   // draw the text
-  canvasContext.font = `${Math.floor(CELL_BASE_PREFEREDFONTSIZE * zoomFactor)}px sans-serif`;
-  canvasContext.textAlign = "center";
-  canvasContext.textBaseline = "middle";
-  canvasContext.lineWidth = 1;
-  canvasContext.fillStyle = CELL_TEXTFILLCOLOR;
-  canvasContext.fillText(text, xStart + finalWidth / 2, y + finalHeight / 2);
+  _drawText(canvasContext, text, xStart + finalWidth / 2, y + finalHeight / 2, zoomFactor);
 
   // return the positions.
   return {
@@ -241,9 +229,11 @@ export const drawArrow = function (canvasContext, text, color, xStart, yStart, x
   canvasContext.lineWidth = arrowThickness;
   canvasContext.lineJoin = "round";
   canvasContext.fillStyle = color;
+  canvasContext.strokeStyle = color;
   canvasContext.beginPath();
   canvasContext.moveTo(xStart, yStart);
   canvasContext.lineTo(xEnd, yEnd);
+  canvasContext.stroke();
 
   // draw the pointing head
   const dx = xEnd - xStart;
@@ -252,8 +242,18 @@ export const drawArrow = function (canvasContext, text, color, xStart, yStart, x
   canvasContext.lineTo(xEnd - pointingEndLineLength * Math.cos(angle - Math.PI / 6), yEnd - pointingEndLineLength * Math.sin(angle - Math.PI / 6));
   canvasContext.moveTo(xEnd, yEnd);
   canvasContext.lineTo(xEnd - pointingEndLineLength * Math.cos(angle + Math.PI / 6), yEnd - pointingEndLineLength * Math.sin(angle + Math.PI / 6));
-
   canvasContext.stroke();
+
+  // draw the text
+  const textXcenter = xStart + (xEnd - xStart) / 2;
+  const textYcenter = yStart + (yEnd - yStart) / 2;
+  const radius = PREFEREDFONTSIZE * zoomFactor;
+  canvasContext.fillStyle = "white";
+  canvasContext.strokeStyle = "white";
+  canvasContext.beginPath();
+  canvasContext.ellipse(textXcenter, textYcenter, radius, radius, 0, 0, Math.PI * 2);
+  canvasContext.fill();
+  _drawText(canvasContext, text, textXcenter, textYcenter, zoomFactor);
 
   return { pointerLength: pointingEndLineLength, thickness: arrowThickness, xStart: xStart, yStart: yStart, xEnd: xEnd, yEnd: yEnd };
 };
@@ -270,4 +270,14 @@ export const eraseArrow = function (canvasContext, arrow) {
   ASSERT(rectWidth > 0, `negative width computed with the arrow: rectX=${rectX}, xStart=${arrow.xStart}, xEnd=${arrow.xEnd}`);
   ASSERT(rectHeigth > 0, `negative heigth computed with the arrow: rectX=${rectY}, yStart=${arrow.yStart}, yEnd=${arrow.yEnd}`);
   canvasContext.clearRect(rectX, rectY, rectWidth, rectHeigth);
+};
+
+const _drawText = function (canvasContext, text, x, y, zoomFactor) {
+  canvasContext.font = `${Math.floor(PREFEREDFONTSIZE * zoomFactor)}px ${FONT}`;
+  canvasContext.textAlign = "center";
+  canvasContext.textBaseline = "middle";
+  canvasContext.lineWidth = 1;
+  canvasContext.fillStyle = TEXTCOLOR;
+  canvasContext.fillText(text, x, y);
+  canvasContext.stroke();
 };
