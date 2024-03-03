@@ -1,5 +1,7 @@
+"use strict";
+
 import { ASSERT, ASSERT_EXIST, ASSERT_ISSTRING } from "../../../../../model/utility/assert/assert";
-import { drawArrow, eraseArrow } from "./src/dplmovierendererhelper";
+import { drawArrow } from "./src/dplmovierendererhelper";
 
 export class DPLMovieAllocableLinkRenderer {
   /** class responsible for renderering any link/line from one allocable to another.
@@ -38,7 +40,6 @@ export class DPLMovieAllocableLinkRenderer {
     this._fromAllocableProperty = fromAllocableProperty;
     this._toAllocableProperty = toAllocableProperty;
     this._linkTextProperty = linkTextProperty;
-    this._linkIdToArrow = new Map();
   }
 
   /** render the link between allocable object of the given DPLMovieRuntime.
@@ -52,7 +53,7 @@ export class DPLMovieAllocableLinkRenderer {
       const fromAllocableRect = this._fromAllocableRenderer.getAllocablePosition(fromAllocable.Id);
       const toAllocableRect = this._toAllocableRenderer.getAllocablePosition(toAllocable.Id);
       const linkPosition = this._findLinkPosition(fromAllocableRect, toAllocableRect);
-      const line = drawArrow(
+      drawArrow(
         this._canvasContext,
         new String(link[this._linkTextProperty]),
         "black",
@@ -62,17 +63,7 @@ export class DPLMovieAllocableLinkRenderer {
         linkPosition.yEnd,
         this._geometryConfig.zoomFactor
       );
-      this._linkIdToArrow.set(link.Id, line);
     }
-  }
-
-  /** reset the renderer by erasing all its creation.
-   */
-  reset() {
-    for (const [_, arrow] of this._linkIdToArrow) {
-      eraseArrow(this._canvasContext, arrow);
-    }
-    this._linkIdToArrow = new Map();
   }
 
   // -------
@@ -91,7 +82,7 @@ export class DPLMovieAllocableLinkRenderer {
         xStart: fromAllocableRect.X + fromAllocableRect.Width,
         yStart: fromAllocableRect.Y,
         xEnd: toAllocableRect.X,
-        yEnd: toAllocableRect.Y + toAllocableRect.Height,
+        yEnd: toAllocableRect.Y + toAllocableRect.Heigth,
       };
     }
 
@@ -101,7 +92,7 @@ export class DPLMovieAllocableLinkRenderer {
         xStart: fromAllocableRect.X,
         yStart: fromAllocableRect.Y,
         xEnd: toAllocableRect.X + toAllocableRect.Width,
-        yEnd: toAllocableRect.Y + toAllocableRect.Height,
+        yEnd: toAllocableRect.Y + toAllocableRect.Heigth,
       };
     }
 
@@ -122,7 +113,7 @@ export class DPLMovieAllocableLinkRenderer {
       xStart: straigthLineX,
       yStart: fromAllocableRect.Y,
       xEnd: straigthLineX,
-      yEnd: toAllocableRect.Y + toAllocableRect.Height,
+      yEnd: toAllocableRect.Y + toAllocableRect.Heigth,
     };
   }
 }

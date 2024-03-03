@@ -1,6 +1,7 @@
 "use strict";
 
-import { ASSERT } from "../../../../../../model/utility/assert/assert";
+import { ASSERT, ASSERT_TYPE } from "../../../../../../model/utility/assert/assert";
+import { DPLMovieRectangle } from "./dplmovierectangle";
 
 /* values are in pixels  */
 /* --------------------- */
@@ -77,18 +78,19 @@ export const getAllocaleDimension = function (zoomFactor) {
 
 /** erase this rectangle from the canvas.
  * @param {CanvasRenderingContext2D} canvasContext canvas context on which to erase.
- * @param {Object} rectangle object having a X, Y, Width, Height and LineWidth property.
+ * @param {DPLMovieRectangle} rectangle
  */
 export const eraseRectangle = function (canvasContext, rectangle) {
+  ASSERT_TYPE(rectangle, DPLMovieRectangle);
   canvasContext.clearRect(
     rectangle.X - rectangle.LineWidth,
     rectangle.Y - rectangle.LineWidth,
     rectangle.Width + 4 * rectangle.LineWidth,
-    rectangle.Height + 4 * rectangle.LineWidth
+    rectangle.Heigth + 4 * rectangle.LineWidth
   );
 };
 
-/** draw a cell with a text inside.
+/** draw a column header as a cell, with a text inside.
  * @param {CanvasRenderingContext2D} canvasContext canvas context on which to draw.
  * @param {String} text text to write
  * @param {String} backgroundColor background color of the cell
@@ -96,7 +98,7 @@ export const eraseRectangle = function (canvasContext, rectangle) {
  * @param {Integer} y top-left corner y (without zoom factor)
  * @param {Integer} zoomFactor zoom factor.
  * @param {Object} coordReference optional object giving the x-y reference
- * @returns a rectangle object with X, Y, Width, LineWidth and Heigth properties.
+ * @returns {DPLMovieRectangle} a rectangle object with X, Y, Width, LineWidth and Heigth properties.
  */
 export const drawHeaderCell = function (canvasContext, text, backgroundColor, x, y, zoomFactor, coordReference = null) {
   const finalX = coordReference === null ? x : x - coordReference.xRef;
@@ -121,13 +123,7 @@ export const drawHeaderCell = function (canvasContext, text, backgroundColor, x,
   _drawText(canvasContext, text, finalX + finalWidth / 2, finalY + finalHeight / 2, zoomFactor);
 
   // return the positions.
-  return {
-    X: finalX,
-    Y: finalY,
-    Width: finalWidth,
-    Height: finalHeight,
-    LineWidth: finalLineWidth,
-  };
+  return new DPLMovieRectangle(finalX, finalY, finalWidth, finalHeight, finalLineWidth);
 };
 
 /** draw a line header with a text inside.
@@ -138,7 +134,7 @@ export const drawHeaderCell = function (canvasContext, text, backgroundColor, x,
  * @param {Integer} y top-left corner y (without zoom factor)
  * @param {Integer} zoomFactor zoom factor.
  * @param {Integer} maxNumberOfElt max number of elements in the line
- * @returns a rectangle object with X, Y, Width, LineWidth and Heigth properties.
+ * @returns {DPLMovieRectangle} the rectangle of this line header
  */
 export const drawLineHeader = function (canvasContext, text, backgroundColor, x, y, zoomFactor, maxNumberOfElt) {
   const finalHeight = getLineHeaderHeight(maxNumberOfElt, zoomFactor);
@@ -161,13 +157,7 @@ export const drawLineHeader = function (canvasContext, text, backgroundColor, x,
   _drawText(canvasContext, text, x + finalWidth / 2, y + finalHeight / 2, zoomFactor);
 
   // return the positions.
-  return {
-    X: x,
-    Y: y,
-    Width: finalWidth,
-    Height: finalHeight,
-    LineWidth: finalLineWidth,
-  };
+  return new DPLMovieRectangle(x, y, finalWidth, finalHeight, finalLineWidth);
 };
 
 /** draw an allocable with a text inside.
@@ -178,7 +168,7 @@ export const drawLineHeader = function (canvasContext, text, backgroundColor, x,
  * @param {Integer} xEnd top-left corner x (relative)
  * @param {Integer} y top-left corner y (relative)
  * @param {Integer} zoomFactor zoom factor.
- * @returns a rectangle object with X, Y, Width, LineWidth and Heigth properties.
+ * @returns {DPLMovieRectangle} the rectangle drawn for this allocable
  */
 export const drawAllocable = function (canvasContext, text, backgroundColor, xStart, xEnd, y, zoomFactor) {
   ASSERT(xStart < xEnd, `the x positions are not respected : xStart:${xStart} - xEnd:${xEnd}`);
@@ -203,13 +193,7 @@ export const drawAllocable = function (canvasContext, text, backgroundColor, xSt
   _drawText(canvasContext, text, xStart + finalWidth / 2, y + finalHeight / 2, zoomFactor);
 
   // return the positions.
-  return {
-    X: xStart,
-    Y: y,
-    Width: finalWidth,
-    Height: finalHeight,
-    LineWidth: finalLineWidth,
-  };
+  return new DPLMovieRectangle(xStart, y, finalWidth, finalHeight, finalLineWidth);
 };
 
 /** draw an arrow with a text aside, from (xStart;yStart) to (xEnd;yEnd).
@@ -256,20 +240,6 @@ export const drawArrow = function (canvasContext, text, color, xStart, yStart, x
   _drawText(canvasContext, text, textXcenter, textYcenter, zoomFactor);
 
   return { pointerLength: pointingEndLineLength, thickness: arrowThickness, xStart: xStart, yStart: yStart, xEnd: xEnd, yEnd: yEnd };
-};
-
-/** erase an arrow .
- * @param {CanvasRenderingContext2D} canvasContext canvas context on which to erase.
- * @param {Object} arrow characteristics of the arrow to erase
- */
-export const eraseArrow = function (canvasContext, arrow) {
-  const rectX = Math.min(arrow.xStart, arrow.xEnd) - arrow.pointerLength;
-  const rectY = Math.min(arrow.yStart, arrow.yEnd) - arrow.pointerLength;
-  const rectWidth = Math.max(arrow.xStart, arrow.xEnd) - rectX + arrow.pointerLength;
-  const rectHeigth = Math.max(arrow.yStart, arrow.yEnd) - rectY + arrow.pointerLength;
-  ASSERT(rectWidth > 0, `negative width computed with the arrow: rectX=${rectX}, xStart=${arrow.xStart}, xEnd=${arrow.xEnd}`);
-  ASSERT(rectHeigth > 0, `negative heigth computed with the arrow: rectX=${rectY}, yStart=${arrow.yStart}, yEnd=${arrow.yEnd}`);
-  canvasContext.clearRect(rectX, rectY, rectWidth, rectHeigth);
 };
 
 const _drawText = function (canvasContext, text, x, y, zoomFactor) {

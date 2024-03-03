@@ -1,12 +1,18 @@
-import { ASSERT, ASSERT_EXIST } from "../../../../../model/utility/assert/assert";
-import { drawHeaderCell, eraseRectangle, getHeaderCellHeigth, getLineWidth } from "./src/dplmovierendererhelper";
+"use strict";
+
+import { ASSERT, ASSERT_EXIST, ASSERT_ISSTRING } from "../../../../../model/utility/assert/assert";
+import { DPLMovieAllocableLinkRenderer } from "./dplmovieallocablelinkrenderer";
+import { DPLMovieAllocableRenderer } from "./dplmovieallocablerenderer";
+import { DPLMovieBucketRenderer } from "./dplmoviebucketrenderer";
+import { mergeRectangles } from "./src/dplmovierectangle";
+import { drawHeaderCell, eraseRectangle } from "./src/dplmovierendererhelper";
 
 const OBJECTLASS_HANDLEDTYPE = "ProductLocation";
 
 /* values are in pixels */
 const PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X = 30;
 const PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y = 40;
-const PRODUCTLOCATION_CELL_BASE_Y_INCREMENT = 5;
+const PRODUCTLOCATION_CELL_BASE_Y_INCREMENT = 80;
 
 /*color*/
 const PRODUCTLOCATION_CELL_BACKGROUNDCOLOR = "#228be6";
@@ -21,7 +27,44 @@ export class DPLMovieProductLocationRenderer {
     ASSERT_EXIST(geometryConfig);
     this._canvasContext = canvasContext;
     this._geometryConfig = geometryConfig;
-    this._intialize();
+    this._productLocationTotalRects = new Map(); /*holds a productLocationId->Rectangle map which gives the total rectangle for this id */
+    this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
+    this._currentY = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y;
+    this._bucketRenderer = new DPLMovieBucketRenderer(this._canvasContext, this, this._geometryConfig);
+    this._icdRenderer = new DPLMovieAllocableRenderer(
+      this._canvasContext,
+      this,
+      this._bucketRenderer,
+      this._geometryConfig,
+      "InventoryConsumerDetail",
+      "ICD"
+    );
+    this._ipdRenderer = new DPLMovieAllocableRenderer(
+      this._canvasContext,
+      this,
+      this._bucketRenderer,
+      this._geometryConfig,
+      "InventoryProducerDetail",
+      "IPD"
+    );
+    this._openInternalAllocationRenderer = new DPLMovieAllocableRenderer(
+      this._canvasContext,
+      this,
+      this._bucketRenderer,
+      this._geometryConfig,
+      "DPLOpenInternalAllocation",
+      "opened"
+    );
+    this._internalAllocationRenderer = new DPLMovieAllocableLinkRenderer(
+      this._canvasContext,
+      this._ipdRenderer,
+      this._icdRenderer,
+      this._geometryConfig,
+      "DPLInternalAllocation",
+      "InventoryProducerDetailId",
+      "InventoryConsumerDetailId",
+      "Quantity"
+    );
   }
 
   // ------
@@ -36,79 +79,56 @@ export class DPLMovieProductLocationRenderer {
     ASSERT_EXIST(dplMovieRuntime);
     const productLocationTrackedObjects = dplMovieRuntime.getTrackedObjects(OBJECTLASS_HANDLEDTYPE);
     for (const productLocation of productLocationTrackedObjects) {
-      this._drawOneProductLocation(productLocation);
+      this._drawOneProductLocation(productLocation, dplMovieRuntime);
       this._incrementPosition(productLocation.Id);
     }
+
+    /*draw the allocations*/
+    // these are drawn once all allocables have been drawn.
+    this._internalAllocationRenderer.render(dplMovieRuntime);
   }
 
   /** reset the renderer by erasing all its creation.
    */
   reset() {
-    for (const [_, rect] of this._productLocationPositions) {
+    for (const [productLocationId, rect] of this._productLocationTotalRects) {
       eraseRectangle(this._canvasContext, rect);
+      this._bucketRenderer.reset(productLocationId);
     }
-    this._productLocationPositions = new Map();
+    this._icdRenderer.reset();
+    this._productLocationTotalRects = new Map();
     this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X - this._geometryConfig.xRef;
     this._currentY = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y - this._geometryConfig.yRef;
-    this._reservedVerticalSpaces = new Map();
   }
 
-  /** return the positions of the ProductLocations
-   * @returns map of productLocationId and rectangle of those ProductLocation
+  /** returns the rectangle that this productLocation is currently occupying in total.
+   * @param {String} productLocationId id of the ProductLocation
+   * @returns {DPLMovieRectangle} rectangle occupied by this ProductLocation
    */
-  getProductLocationPositions() {
-    return this._productLocationPositions;
-  }
-
-  /** get the reserved space for this product-location id up to now.
-   *  The returned value is without zooming factor.
-   * @param {String} productLocationId
-   */
-  getReservedSpace(productLocationId) {
-    if (!this._reservedVerticalSpaces.has(productLocationId)) return 0;
-    return this._reservedVerticalSpaces.get(productLocationId);
-  }
-
-  /** reserve space for this product-location id.
-   *  The given value is without zooming factor.
-   * @param {String} productLocationId
-   * @param {Integer} heigthToReserve
-   */
-  reserveSpace(productLocationId, heigthToReserve) {
-    if (!this._reservedVerticalSpaces.has(productLocationId)) {
-      this._reservedVerticalSpaces.set(productLocationId, heigthToReserve);
-      return;
-    }
-    const spaceUpTonow = this._reservedVerticalSpaces.get(productLocationId);
-    this._reservedVerticalSpaces.set(productLocationId, spaceUpTonow + heigthToReserve);
+  getProductLocationCurrentTotalRectangle(productLocationId) {
+    ASSERT_ISSTRING(productLocationId);
+    ASSERT(this._productLocationTotalRects.has(productLocationId), `unknown '${productLocationId}' ProductLocation`);
+    return this._productLocationTotalRects.get(productLocationId);
   }
 
   // -------
   // PRIVATE
   // -------
 
-  /** intialize the renderer.
-   */
-  _intialize() {
-    this._productLocationPositions = new Map();
-    this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
-    this._currentY = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_Y;
-    this._reservedVerticalSpaces = new Map(); /* ProductLocationId->integer map, containing vertical spaces registered by other components */
-  }
-
   /** draw one product-location cell.
-   * @param {DPLMovieTrackedObject} ProductLocattionTrackedObject
+   * @param {DPLMovieTrackedObject} ProductLocationTrackedObject
    */
-  _drawOneProductLocation(ProductLocattionTrackedObject) {
+  _drawOneProductLocation(ProductLocationTrackedObject, dplMovieRuntime) {
     ASSERT(
-      ProductLocattionTrackedObject.Type === OBJECTLASS_HANDLEDTYPE,
-      `Tracked object with type '${ProductLocattionTrackedObject.Type}' and id '${ProductLocattionTrackedObject.Id}' is not expected type '${OBJECTLASS_HANDLEDTYPE}'`
+      ProductLocationTrackedObject.Type === OBJECTLASS_HANDLEDTYPE,
+      `Tracked object with type '${ProductLocationTrackedObject.Type}' and id '${ProductLocationTrackedObject.Id}' is not expected type '${OBJECTLASS_HANDLEDTYPE}'`
     );
     const context = this._canvasContext;
 
-    const createdRect = drawHeaderCell(
+    /*draw the product-location header cell*/
+    const productLocationRect = drawHeaderCell(
       context,
-      ProductLocattionTrackedObject.Id,
+      ProductLocationTrackedObject.Id,
       PRODUCTLOCATION_CELL_BACKGROUNDCOLOR,
       this._currentX,
       this._currentY,
@@ -116,18 +136,32 @@ export class DPLMovieProductLocationRenderer {
       this._geometryConfig
     );
 
-    this._productLocationPositions.set(ProductLocattionTrackedObject.Id, createdRect);
+    /*draw the Buckets*/
+    const globalBucketRect = this._bucketRenderer.render(dplMovieRuntime, ProductLocationTrackedObject, productLocationRect);
+    const totalAfterBucketDrawingRect = mergeRectangles(productLocationRect, globalBucketRect);
+    this._productLocationTotalRects.set(ProductLocationTrackedObject.Id, totalAfterBucketDrawingRect);
+
+    /*draw the inventory consumer details*/
+    const globalICDRect = this._icdRenderer.render(dplMovieRuntime, ProductLocationTrackedObject, productLocationRect);
+    const totalAfterICDDrawingRect = mergeRectangles(totalAfterBucketDrawingRect, globalICDRect);
+    this._productLocationTotalRects.set(ProductLocationTrackedObject.Id, totalAfterICDDrawingRect);
+
+    /*draw the inventory producer details*/
+    const globalIPDRect = this._ipdRenderer.render(dplMovieRuntime, ProductLocationTrackedObject, productLocationRect);
+    const totalAfterIPDDrawingRect = mergeRectangles(totalAfterICDDrawingRect, globalIPDRect);
+    this._productLocationTotalRects.set(ProductLocationTrackedObject.Id, totalAfterIPDDrawingRect);
+
+    /*draw the open allocations*/
+    const globalOpenAllocationRect = this._openInternalAllocationRenderer.render(dplMovieRuntime, ProductLocationTrackedObject, productLocationRect);
+    const totalAfterOpenDrawingRect = mergeRectangles(totalAfterIPDDrawingRect, globalOpenAllocationRect);
+    this._productLocationTotalRects.set(ProductLocationTrackedObject.Id, totalAfterOpenDrawingRect);
   }
 
   /** increment the positionning to render the next Product-Location
    *  @param {String} productLocationId previous product-Location Id
    */
   _incrementPosition(productLocationId) {
-    this._currentX = PRODUCTLOCATION_CELL_BASE_STARTPOSITION_X;
     this._currentY +=
-      PRODUCTLOCATION_CELL_BASE_Y_INCREMENT * this._geometryConfig.zoomFactor +
-      this.getReservedSpace(productLocationId) * this._geometryConfig.zoomFactor +
-      getLineWidth(this._geometryConfig.zoomFactor) +
-      getHeaderCellHeigth(this._geometryConfig.zoomFactor);
+      PRODUCTLOCATION_CELL_BASE_Y_INCREMENT * this._geometryConfig.zoomFactor + this._productLocationTotalRects.get(productLocationId).Heigth;
   }
 }

@@ -1,9 +1,6 @@
 "use strict";
 
 import { ASSERT_EXIST } from "../../../model/utility/assert/assert";
-import { DPLMovieAllocableLinkRenderer } from "./src/renderer/dplmovieallocablelinkrenderer";
-import { DPLMovieAllocableRenderer } from "./src/renderer/dplmovieallocablerenderer";
-import { DPLMovieBucketRenderer } from "./src/renderer/dplmoviebucketrenderer";
 import { DPLMovieProductLocationRenderer } from "./src/renderer/dplmovieproductlocationrenderer";
 import { DPLMovieGeometryConfig } from "./src/renderer/src/dplmoviegeometryconfig";
 
@@ -21,7 +18,7 @@ export class DPLMovieCanvasView {
     this._dplMovieRuntimeToPlay = null;
     dplMovieRuntimeView.registerObserver(this);
     this._inializeCanvas();
-    this._createRenderers();
+    this._productLocationRenderer = new DPLMovieProductLocationRenderer(this._canvasContext, this._geometryConfig);
     dplMoviePlayerView.registerObserver(this);
   }
 
@@ -42,6 +39,7 @@ export class DPLMovieCanvasView {
 
   // implement observer pattern with DPLMoviePlayerView (forward, backward, reset)
   notifyOnPlayerPressed() {
+    console.log("========== event");
     this._eraseCanvas();
     this._displayOnCanvas();
   }
@@ -99,9 +97,7 @@ export class DPLMovieCanvasView {
   /** erase the entire canvas.
    */
   _eraseCanvas() {
-    this._renderers.forEach(function (renderer) {
-      renderer.reset();
-    });
+    this._productLocationRenderer.reset();
   }
 
   /** display the DPLMovie state on the canvas.
@@ -110,67 +106,7 @@ export class DPLMovieCanvasView {
     ASSERT_EXIST(this._canvasContext);
     /*no rendering if there are no runtime to display */
     if (!this._dplMovieRuntimeToPlay) return;
-    const self = this;
-    this._renderers.forEach(function (renderer) {
-      renderer.render(self._dplMovieRuntimeToPlay);
-    });
-  }
-
-  /** create all renders for each tracked object type to display
-   */
-  _createRenderers() {
-    this._renderers = [];
-    const productLocationRenderer = new DPLMovieProductLocationRenderer(this._canvasContext, this._geometryConfig);
-    const bucketRenderer = new DPLMovieBucketRenderer(this._canvasContext, productLocationRenderer, this._geometryConfig);
-    const icdRenderer = new DPLMovieAllocableRenderer(
-      this._canvasContext,
-      productLocationRenderer,
-      bucketRenderer,
-      this._geometryConfig,
-      "InventoryConsumerDetail",
-      "ICD"
-    );
-    const ipdRenderer = new DPLMovieAllocableRenderer(
-      this._canvasContext,
-      productLocationRenderer,
-      bucketRenderer,
-      this._geometryConfig,
-      "InventoryProducerDetail",
-      "IPD"
-    );
-    const openAllocationRenderer = new DPLMovieAllocableRenderer(
-      this._canvasContext,
-      productLocationRenderer,
-      bucketRenderer,
-      this._geometryConfig,
-      "DPLOpenInternalAllocation",
-      "Opened"
-    );
-    const internalAllocationRenderer = new DPLMovieAllocableLinkRenderer(
-      this._canvasContext,
-      ipdRenderer,
-      icdRenderer,
-      this._geometryConfig,
-      "DPLInternalAllocation",
-      "InventoryProducerDetailId",
-      "InventoryConsumerDetailId",
-      "Quantity"
-    );
-    this._renderers.push(productLocationRenderer);
-    this._renderers.push(bucketRenderer);
-    this._renderers.push(icdRenderer);
-    this._renderers.push(ipdRenderer);
-    this._renderers.push(openAllocationRenderer);
-    this._renderers.push(internalAllocationRenderer);
-
-    /*TODO: this system of renderer registered linerly will not work 
-      because if the line header grow, the second productlocation 
-      cell is already drawn. A better architecture is to chain the renderer:
-      when a productlocation is done, we can draw it buckets.
-      when the bucket are done, we can draw its lines.
-      the productlocation renderer should have a registerAfterProductLocationDrawnObserver,
-      which is the bucket, and the allocable headers
-     */
+    this._productLocationRenderer.render(this._dplMovieRuntimeToPlay);
   }
 
   /** given a previous factor and an input (a positive or negative value),

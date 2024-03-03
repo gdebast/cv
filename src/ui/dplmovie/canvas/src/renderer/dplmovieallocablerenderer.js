@@ -1,14 +1,8 @@
 "use strict";
 
 import { ASSERT, ASSERT_EXIST, ASSERT_ISSTRING, ASSERT_SWITCHDEFAULT } from "../../../../../model/utility/assert/assert";
-import {
-  drawAllocable,
-  drawLineHeader,
-  eraseRectangle,
-  getAllocableMinimalXSpacing,
-  getAllocaleDimension,
-  getLineHeaderHeight,
-} from "./src/dplmovierendererhelper";
+import { mergeRectangles } from "./src/dplmovierectangle";
+import { drawAllocable, drawLineHeader, getAllocableMinimalXSpacing, getAllocaleDimension } from "./src/dplmovierendererhelper";
 
 const ALLOCABLE_BASE_LINE_INCREMENT = 10;
 
@@ -31,7 +25,7 @@ const BUCKETPART_END = "end";
 export class DPLMovieAllocableRenderer {
   /** class responsible for displaying the object that can be allocated.
    * @param canvasContext canvas on which to draw.
-   * @param dplMovieProductLocationRenderer renderer of the Product-Locations
+   * @param dplMovieProductLocationRenderer renderer of the productLocations
    * @param dplMovieBucketRenderer renderer of the Buckets
    * @param geometryConfig configuration of the geometry.
    * @param {String} objectClassId object class to display
@@ -40,6 +34,7 @@ export class DPLMovieAllocableRenderer {
   constructor(canvasContext, dplMovieProductLocationRenderer, dplMovieBucketRenderer, geometryConfig, objectClassId, lineCellText) {
     ASSERT_EXIST(canvasContext);
     ASSERT_EXIST(dplMovieProductLocationRenderer);
+    ASSERT_EXIST(dplMovieBucketRenderer);
     ASSERT_EXIST(geometryConfig);
     ASSERT_ISSTRING(objectClassId);
     ASSERT_ISSTRING(lineCellText);
@@ -49,171 +44,163 @@ export class DPLMovieAllocableRenderer {
     this._geometryConfig = geometryConfig;
     this._objectClassId = objectClassId;
     this._lineCellText = lineCellText;
-    this._lineHeaderRect = [];
     this._allocableRects = new Map();
   }
 
   /** render the allocable object of the given DPLMovieRuntime.
    *  @param {DPLMovieRuntime} dplMovieRuntime DPLMovie runtime.
+   *  @param {DPLMovieTrackedObject} productLocationTrackedObject the product-location for which to rendering the allocables
+   *  @param {DPLMovieRectangle} productLocationRectangle rectangle giving the position of the header of this Product-Location
+   *  @returns {DPLMovieRectangle} extended rectangle of all drawn lines and allocables.
    */
-  render(dplMovieRuntime) {
+  render(dplMovieRuntime, productLocationTrackedObject, productLocationRectangle) {
     ASSERT_EXIST(this._canvasContext);
     ASSERT_EXIST(dplMovieRuntime);
+    ASSERT_EXIST(productLocationTrackedObject);
+    ASSERT_EXIST(productLocationRectangle);
 
     const minimalAllocableSpacing = getAllocableMinimalXSpacing(this._geometryConfig.zoomFactor);
-    const productLocationId_Rect = this._productLocationRenderer.getProductLocationPositions();
-    for (const [prodLocId, prodlocrRect] of productLocationId_Rect) {
-      /*find in which buckets the allocables are*/
-      const bucketToAllocableMap = new Map();
-      const allocableToBucketsMap = new Map();
-      // it is import to sort the allocable base on their date such that the drawing is deterministic
-      const allocableObjects = this._sortAllocableBaseOnDates(dplMovieRuntime.getTrackedObjects(this._objectClassId));
-      for (const allocableObject of allocableObjects) {
-        const allocableProductLocationId = this._getProductLocationId(allocableObject);
-        if (allocableProductLocationId !== prodLocId) continue;
-        const buckets_parts = this._getBuckets(allocableObject, dplMovieRuntime);
-        allocableToBucketsMap.set(allocableObject, buckets_parts);
-        for (const bucket_part of buckets_parts) {
-          const key = this._makeBucketPartKey(bucket_part.bucket, bucket_part.part);
-          if (!bucketToAllocableMap.has(key)) {
-            bucketToAllocableMap.set(key, [allocableObject]);
-            continue;
-          }
-          bucketToAllocableMap.get(key).push(allocableObject);
+
+    /*find in which buckets the allocables are*/
+    /*----------------------------------------*/
+    const bucketToAllocableMap = new Map();
+    const allocableToBucketsMap = new Map();
+    // it is import to sort the allocable base on their date such that the drawing is deterministic
+    const allocableObjects = this._sortAllocableBaseOnDates(dplMovieRuntime.getTrackedObjects(this._objectClassId));
+    console.log(this._objectClassId, allocableObjects);
+    for (const allocableObject of allocableObjects) {
+      const allocableProductLocationId = this._getProductLocationId(allocableObject);
+      if (allocableProductLocationId !== productLocationTrackedObject.Id) continue;
+      const buckets_parts = this._getBuckets(allocableObject, dplMovieRuntime);
+      allocableToBucketsMap.set(allocableObject, buckets_parts);
+      for (const bucket_part of buckets_parts) {
+        const key = this._makeBucketPartKey(bucket_part.bucket, bucket_part.part);
+        if (!bucketToAllocableMap.has(key)) {
+          bucketToAllocableMap.set(key, [allocableObject]);
+          continue;
         }
+        bucketToAllocableMap.get(key).push(allocableObject);
       }
+    }
 
-      /*compute the largest number of allocable in one bucket part */
-      let maxNumberOfAllocableInBucketPart = 0;
-      for (const [_, allocables] of bucketToAllocableMap) {
-        maxNumberOfAllocableInBucketPart = Math.max(maxNumberOfAllocableInBucketPart, allocables.length);
-      }
+    /*draw the line header */
+    /*---------------------*/
+    //compute the largest number of allocable in one bucket part
+    let maxNumberOfAllocableInBucketPart = 0;
+    for (const [_, allocables] of bucketToAllocableMap) {
+      maxNumberOfAllocableInBucketPart = Math.max(maxNumberOfAllocableInBucketPart, allocables.length);
+    }
+    // the heigh of the line depends on the maximum number of allocable in the buckets.
+    const prdTotalRect = this._productLocationRenderer.getProductLocationCurrentTotalRectangle(productLocationTrackedObject.Id);
+    const lineYStart = prdTotalRect.Y + prdTotalRect.Heigth + ALLOCABLE_BASE_LINE_INCREMENT * this._geometryConfig.zoomFactor;
+    const lineRect = drawLineHeader(
+      this._canvasContext,
+      this._lineCellText,
+      ALLOCABLE_CELLHEADER_BACKGROUNDCOLOR,
+      productLocationRectangle.X,
+      lineYStart,
+      this._geometryConfig.zoomFactor,
+      maxNumberOfAllocableInBucketPart
+    );
+    let totalRect = lineRect;
 
-      /*draw the line header */
-      // the heigh of the line depends on the maximum number of allocable in the buckets.
-      const alreadyReservedVerticalSpace = this._productLocationRenderer.getReservedSpace(prodLocId);
-      const lineYStart =
-        prodlocrRect.Y +
-        prodlocrRect.Height +
-        ALLOCABLE_BASE_LINE_INCREMENT * this._geometryConfig.zoomFactor +
-        alreadyReservedVerticalSpace * this._geometryConfig.zoomFactor;
-      const heigthToReserve = getLineHeaderHeight(maxNumberOfAllocableInBucketPart, 1) + ALLOCABLE_BASE_LINE_INCREMENT;
-      this._productLocationRenderer.reserveSpace(prodLocId, heigthToReserve);
-      const lineRect = drawLineHeader(
-        this._canvasContext,
-        this._lineCellText,
-        ALLOCABLE_CELLHEADER_BACKGROUNDCOLOR,
-        prodlocrRect.X,
-        lineYStart,
-        this._geometryConfig.zoomFactor,
-        maxNumberOfAllocableInBucketPart
-      );
-      this._lineHeaderRect.push(lineRect);
-
-      /*draw the allocables */
-      const bucketPartPosition = new Set(); /*holds the bucket-part-position's where we already drawn an allocable in a bucket-part.*/
-      for (const [allocable, buckets_parts] of allocableToBucketsMap) {
-        /*find the start and end of the X position.*/
-        let allocableXstart = null; /*hold the start of the x coordinates */
-        let allocableXend = null; /*hold the end of the x coordinates */
-        for (const { bucket, part } of buckets_parts) {
-          const bucketRect = this._dplMovieBucketRenderer.getProductLocationBucketPosition(prodLocId, bucket.Id);
-          ASSERT_EXIST(bucketRect);
-          let newXstart = 0;
-          let newXend = 0;
-          switch (part) {
-            case BUCKETPART_START:
-              {
-                const middleBucketX = bucketRect.X + bucketRect.Width / 2;
-                newXstart = bucketRect.X;
-                newXend = middleBucketX - minimalAllocableSpacing / 2;
-              }
-              break;
-            case BUCKETPART_END:
-              {
-                const middleBucketX = bucketRect.X + bucketRect.Width / 2;
-                newXstart = middleBucketX + minimalAllocableSpacing / 2;
-                newXend = bucketRect.X + bucketRect.Width;
-              }
-              break;
-            default:
-              ASSERT_SWITCHDEFAULT(part);
-          }
-          newXstart = Math.floor(newXstart);
-          newXend = Math.floor(newXend);
-          allocableXstart = allocableXstart !== null ? Math.min(allocableXstart, newXstart) : newXstart;
-          allocableXend = allocableXend !== null ? Math.max(allocableXend, newXend) : newXend;
+    /*draw the allocables */
+    /*--------------------*/
+    const bucketPartPosition = new Set(); /*holds the bucket-part-position's where we already drawn an allocable in a bucket-part.*/
+    for (const [allocable, buckets_parts] of allocableToBucketsMap) {
+      /*find the start and end of the X position.*/
+      let allocableXstart = null; /*hold the start of the x coordinates */
+      let allocableXend = null; /*hold the end of the x coordinates */
+      for (const { bucket, part } of buckets_parts) {
+        const bucketRect = this._dplMovieBucketRenderer.getProductLocationBucketPosition(productLocationTrackedObject.Id, bucket.Id);
+        ASSERT_EXIST(bucketRect);
+        let newXstart = 0;
+        let newXend = 0;
+        switch (part) {
+          case BUCKETPART_START:
+            {
+              const middleBucketX = bucketRect.X + bucketRect.Width / 2;
+              newXstart = bucketRect.X;
+              newXend = middleBucketX - minimalAllocableSpacing / 2;
+            }
+            break;
+          case BUCKETPART_END:
+            {
+              const middleBucketX = bucketRect.X + bucketRect.Width / 2;
+              newXstart = middleBucketX + minimalAllocableSpacing / 2;
+              newXend = bucketRect.X + bucketRect.Width;
+            }
+            break;
+          default:
+            ASSERT_SWITCHDEFAULT(part);
         }
-        ASSERT(allocableXstart !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any start x position`);
-        ASSERT(allocableXend !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any end x position`);
+        newXstart = Math.floor(newXstart);
+        newXend = Math.floor(newXend);
+        allocableXstart = allocableXstart !== null ? Math.min(allocableXstart, newXstart) : newXstart;
+        allocableXend = allocableXend !== null ? Math.max(allocableXend, newXend) : newXend;
+      }
+      ASSERT(allocableXstart !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any start x position`);
+      ASSERT(allocableXend !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any end x position`);
 
-        /*find the start of the y position */
-        /* The logic here loops over a possible position (integer representing a y positionning).
+      /*find the start of the y position */
+      /* The logic here loops over a possible position (integer representing a y positionning).
            if the possible position is not already taken by all bucket-part's (x positionning),
            we use this position (= fill foundPosition).
         */
-        let foundPosition = null;
-        let tentativePosition = 0;
-        while (foundPosition == null) {
-          // check if all bucket-part are free for this position
-          let isTentativePositionFree = true;
-          for (const { bucket, part } of buckets_parts) {
-            const key = this._makeBucketPartPositionKey(bucket, part, tentativePosition);
-            if (bucketPartPosition.has(key)) {
-              isTentativePositionFree = false;
-              break;
-            }
-          }
-          // stop if the position is free; continue otherwise with the next position
-          if (isTentativePositionFree) foundPosition = tentativePosition;
-          else tentativePosition++;
-        }
-        ASSERT(foundPosition !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any y position`);
-        const allocableY = lineRect.Y + foundPosition * (minimalAllocableSpacing + getAllocaleDimension(this._geometryConfig.zoomFactor));
-
-        const allocableRect = drawAllocable(
-          this._canvasContext,
-          String(this._getQuantity(allocable)),
-          ALLOCABLE_BACKGROUNDCOLOR,
-          allocableXstart,
-          allocableXend,
-          allocableY,
-          this._geometryConfig.zoomFactor
-        );
-        this._allocableRects.set(allocable.Id, allocableRect);
-
-        // remember that this allocable occupies these bucket-part-position's.
+      let foundPosition = null;
+      let tentativePosition = 0;
+      while (foundPosition == null) {
+        // check if all bucket-part are free for this position
+        let isTentativePositionFree = true;
         for (const { bucket, part } of buckets_parts) {
-          const key = this._makeBucketPartPositionKey(bucket, part, foundPosition);
-          ASSERT(
-            !bucketPartPosition.has(key),
-            `the bucket-part-position '${key}' has been taken by a '${this._objectClassId}' with id '${allocable.Id}', but it was already taken`
-          );
-          bucketPartPosition.add(key);
+          const key = this._makeBucketPartPositionKey(bucket, part, tentativePosition);
+          if (bucketPartPosition.has(key)) {
+            isTentativePositionFree = false;
+            break;
+          }
         }
+        // stop if the position is free; continue otherwise with the next position
+        if (isTentativePositionFree) foundPosition = tentativePosition;
+        else tentativePosition++;
+      }
+      ASSERT(foundPosition !== null, `for a '${this._objectClassId}' with id '${allocable.Id}', we did not find any y position`);
+      const allocableY = lineRect.Y + foundPosition * (minimalAllocableSpacing + getAllocaleDimension(this._geometryConfig.zoomFactor));
+
+      const allocableRect = drawAllocable(
+        this._canvasContext,
+        String(this._getQuantity(allocable)),
+        ALLOCABLE_BACKGROUNDCOLOR,
+        allocableXstart,
+        allocableXend,
+        allocableY,
+        this._geometryConfig.zoomFactor
+      );
+      this._allocableRects.set(allocable.Id, allocableRect);
+      totalRect = mergeRectangles(totalRect, allocableRect);
+
+      // remember that this allocable occupies these bucket-part-position's.
+      for (const { bucket, part } of buckets_parts) {
+        const key = this._makeBucketPartPositionKey(bucket, part, foundPosition);
+        ASSERT(
+          !bucketPartPosition.has(key),
+          `the bucket-part-position '${key}' has been taken by a '${this._objectClassId}' with id '${allocable.Id}', but it was already taken`
+        );
+        bucketPartPosition.add(key);
       }
     }
+    console.log(this._objectClassId, this._allocableRects);
+    return totalRect;
   }
 
   /** reset the renderer by erasing all its creation.
    */
   reset() {
-    // erase the line-header rectangles
-    for (const rect of this._lineHeaderRect) {
-      eraseRectangle(this._canvasContext, rect);
-    }
-    this._lineHeaderRect = [];
-
-    // erase the allocables
-    for (const [_, rect] of this._allocableRects) {
-      eraseRectangle(this._canvasContext, rect);
-    }
     this._allocableRects = new Map();
   }
 
   /** return the rectangle drawn for an allocable.
    * @param {String} allocableId allocable id
-   * @returns a rectangle
+   * @returns {DPLMovieRectangle} a rectangle
    */
   getAllocablePosition(allocableId) {
     ASSERT(this._allocableRects.has(allocableId), `the allocable with type '${this._objectClassId}' and Id '${allocableId}' was not drawn.`);
