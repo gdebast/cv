@@ -1,0 +1,135 @@
+/********************************/
+/*BIG BUTTONS to get to the apps*/
+/********************************/
+
+.app-container {
+  /*text properties*/
+  font-size: 3.6rem;
+  font-weight: 600;
+  text-align: center;
+
+  /*shape*/
+  border: none;
+  border-radius: 2.4rem;
+  background-color: #a7d1f5;
+  padding: 0 3.2rem;
+
+  box-shadow: 0 1rem 4.8rem rgba(10, 43, 69, 0.25);
+
+  /*display of children*/
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+/*classes animating the app buttons to make them a little bit bigger when hovered*/
+.app-container-hover-transition {
+  transition: transform 0.3s;
+}
+.app-container-hover {
+  cursor: pointer;
+  transform: scale(1.05);
+}
+
+/*classes animating the app buttons to make them go*/
+.app-container-go {
+  transform: translateY(1000px);
+}
+.app-container-go-transition {
+  transition: transform 1s;
+}
+
+/***************/
+/*PORTAL LAYOUT*/
+/***************/
+
+.portal {
+  padding: 9.6rem 22rem;
+  background-color: #d3e8fa;
+
+  overflow: hidden; /*this make sure that the button can translate outside the frame*/
+}
+
+.app-grid {
+  margin: 0 auto;
+
+  max-width: 100rem;
+  display: grid;
+  gap: 3.2rem;
+  grid-template-columns: repeat(2, 1fr);
+  grid-template-rows: repeat(6, 0.5fr);
+  justify-content: center;
+  align-content: center;
+  padding: 3.2rem 1.6rem;
+}
+
+/***************/
+/*PHOTO SECTION*/
+/***************/
+.photo-section {
+  overflow: hidden;
+  background-color: #a7d1f5;
+  border-radius: 2.4rem 0rem 2.4rem 2.4rem;
+  grid-column: 1;
+  grid-row: 1/3;
+}
+.gdb-photo {
+  width: 100%;
+}
+
+.description-section {
+  /*grid properties*/
+  grid-column: 1/3;
+  grid-row: 1;
+
+  /*shape*/
+  border-radius: 2.4rem;
+  background-color: #a7d1f5;
+  padding: 6.3rem 6.3rem;
+
+  /*display of children*/
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  justify-content: center;
+  align-content: center;
+}
+.description-text {
+  padding: 0rem 6.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+}
+.description-name {
+  font-size: 3.6rem;
+  font-weight: 600;
+}
+.description-jobtitle {
+  font-size: 3rem;
+  font-weight: 500;
+  color: #114673;
+}
+
+/***************/
+/* APP BUTTONS*/
+/***************/
+
+/*about the author*/
+.about-section {
+  /*grid properties*/
+  grid-column: 2;
+  grid-row: 2/4;
+}
+
+/*dpl movie*/
+.dplmovie-section {
+  /*grid properties*/
+  grid-column: 1;
+  grid-row: 3/5;
+}
+
+/*graph expert*/
+.graph-section {
+  /*grid properties*/
+  grid-column: 2;
+  grid-row: 4/6;
+}

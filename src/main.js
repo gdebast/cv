@@ -1,5 +1,3 @@
-import { PortalAppLinker } from "./ui/portal/portalapplinker";
-import { createBouncingCircles } from "./ui/dplmovie/canvasTest";
 import { DPLMovieJsonInputView } from "./ui/dplmovie/jsoninput/dplmoviejsoninputview";
 import { DPLMovieRuntimeView } from "./ui/dplmovie/runtimeview/dplmovieruntimeview";
 import { DPLMovieRuntimePool } from "./model/dplmovie/data/dplmovieruntimepool";
@@ -10,28 +8,21 @@ import { DirectedGraphVisualizer } from "./model/utility/directedgraph/directedg
 import { DirectedGraph } from "./model/utility/directedgraph/directedgraph";
 import { DPLMovieRuntimePlayerView } from "./ui/dplmovie/player/dplmovieruntimeplayerview";
 import { DPLMovieCanvasView } from "./ui/dplmovie/canvas/dplmoviecanvasview";
+import { PortalView } from "./ui/portal/portalview";
 
-const linker = new PortalAppLinker();
+const portal = new PortalView();
 
 // DPL movie
 const dplMovieRuntimePool = new DPLMovieRuntimePool();
 const dplMovieJsonInputView = new DPLMovieJsonInputView(dplMovieRuntimePool);
 const dplMovieRuntimeView = new DPLMovieRuntimeView(dplMovieRuntimePool);
-const dplMovieRuntimePlayerView = new DPLMovieRuntimePlayerView(
-  dplMovieRuntimeView
-);
-const dplMovieCavansView = new DPLMovieCanvasView(
-  dplMovieRuntimeView,
-  dplMovieRuntimePlayerView
-);
+const dplMovieRuntimePlayerView = new DPLMovieRuntimePlayerView(dplMovieRuntimeView);
+const dplMovieCavansView = new DPLMovieCanvasView(dplMovieRuntimeView, dplMovieRuntimePlayerView);
 
 //Graph player
 const graphPool = new DirectedGraphWrapperPool();
 const graphCreationView = new GraphCreationView(graphPool);
 const graphSelectionView = new GraphSelectionView(graphPool);
-
-// canvas test
-//createBouncingCircles(0, 1, 5);
 
 /*
 const vis = new DirectedGraphVisualizer(true);

@@ -4,35 +4,18 @@
     <meta charset="UTF-8" />
     <meta http-equiv="X-UA-Compatible" content="IE=edge" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <link rel="stylesheet" href="css/common.css" />
     <link rel="stylesheet" href="src/ui/dplmovie/dplmovie.css" />
     <link rel="stylesheet" href="css/graphplayer.css" />
-    <link
-      rel="stylesheet"
-      href="src/ui/poolselectionview/poolselectionview.css"
-    />
-    <link
-      rel="stylesheet"
-      href="src/ui/dplmovie/jsoninput/dplmoviejsoninputview.css"
-    />
-    <link
-      rel="stylesheet"
-      href="src/ui/dplmovie/player/dplmovieruntimeplayerview.css"
-    />
-    <link
-      rel="stylesheet"
-      href="src/ui/dplmovie/canvas/dplmoviecanvasview.css"
-    />
-    <link
-      rel="stylesheet"
-      href="src/ui/dplmovie/runtimeview/dplmovieruntimeview.css"
-    />
+    <link rel="stylesheet" href="src/ui/poolselectionview/poolselectionview.css" />
+    <link rel="stylesheet" href="src/ui/dplmovie/jsoninput/dplmoviejsoninputview.css" />
+    <link rel="stylesheet" href="src/ui/dplmovie/player/dplmovieruntimeplayerview.css" />
+    <link rel="stylesheet" href="src/ui/dplmovie/canvas/dplmoviecanvasview.css" />
+    <link rel="stylesheet" href="src/ui/dplmovie/runtimeview/dplmovieruntimeview.css" />
+    <link rel="stylesheet" href="src/ui/portal/portal.css" />
+    <link rel="stylesheet" href="css/common.css" />
     <title>Gatien De Bast</title>
     <link rel="preconnect" href="https://fonts.gstatic.com" />
-    <link
-      href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Rubik:wght@400;500;600;700&display=swap" rel="stylesheet" />
     <script type="module" src="src/main.js"></script>
   </head>
   <body>
@@ -45,9 +28,7 @@
           <div></div>
           <div class="description-text">
             <div class="description-name">Gatien De Bast</div>
-            <div class="description-jobtitle">
-              Passionate Software Architect
-            </div>
+            <div class="description-jobtitle">Passionate Software Engineer</div>
           </div>
         </section>
         <section class="photo-section">
@@ -72,11 +53,7 @@
     <!-- -------------- -->
     <nav class="app-menu hidden">
       <button class="portal-app-btn app-btn">
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="app-btn-icon-medium"
-          viewBox="0 0 512 512"
-        >
+        <svg xmlns="http://www.w3.org/2000/svg" class="app-btn-icon-medium" viewBox="0 0 512 512">
           <path
             fill="none"
             stroke="currentColor"
@@ -90,16 +67,9 @@
 
       <!-- DPL Movie navigation -->
       <!-- --- Upload button --- -->
-      <button
-        class="dplmovie-upload-btn app-btn app-specific-btn hidden"
-        for="dplmovie-button"
-      >
+      <button class="dplmovie-upload-btn app-btn app-specific-btn hidden" for="dplmovie-button">
         <label class="dpl-movie-fileItem-label" for="dpl-movie-fileItem">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="app-btn-icon-medium"
-            viewBox="0 0 512 512"
-          >
+          <svg xmlns="http://www.w3.org/2000/svg" class="app-btn-icon-medium" viewBox="0 0 512 512">
             <path
               d="M320 367.79h76c55 0 100-29.21 100-83.6s-53-81.47-96-83.6c-8.89-85.06-71-136.8-144-136.8-69 0-113.44 45.79-128 91.2-60 5.7-112 43.88-112 106.4s54 106.4 120 106.4h56"
               fill="none"
@@ -122,15 +92,8 @@
       </button>
 
       <!-- --- Previous Event button --- -->
-      <button
-        class="dplmovie-previous-event-btn app-btn app-specific-btn hidden"
-        for="dplmovie-button"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="app-btn-icon-medium"
-          viewBox="0 0 512 512"
-        >
+      <button class="dplmovie-previous-event-btn app-btn app-specific-btn hidden" for="dplmovie-button">
+        <svg xmlns="http://www.w3.org/2000/svg" class="app-btn-icon-medium" viewBox="0 0 512 512">
           <path
             d="M256 64C150 64 64 150 64 256s86 192 192 192 192-86 192-192S362 64 256 64z"
             fill="none"
@@ -138,27 +101,13 @@
             stroke-miterlimit="10"
             stroke-width="32"
           />
-          <path
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="32"
-            d="M296 352l-96-96 96-96"
-          />
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M296 352l-96-96 96-96" />
         </svg>
       </button>
 
       <!-- --- Restart button --- -->
-      <button
-        class="dplmovie-restart-btn app-btn app-specific-btn hidden"
-        for="dplmovie-button"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="app-btn-icon-medium"
-          viewBox="0 0 512 512"
-        >
+      <button class="dplmovie-restart-btn app-btn app-specific-btn hidden" for="dplmovie-button">
+        <svg xmlns="http://www.w3.org/2000/svg" class="app-btn-icon-medium" viewBox="0 0 512 512">
           <path
             d="M240 424v-96c116.4 0 159.39 33.76 208 96 0-119.23-39.57-240-208-240V88L64 256z"
             fill="none"
@@ -170,15 +119,8 @@
       </button>
 
       <!-- --- Next Event button --- -->
-      <button
-        class="dplmovie-next-event-btn app-btn app-specific-btn hidden"
-        for="dplmovie-button"
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          class="app-btn-icon-medium"
-          viewBox="0 0 512 512"
-        >
+      <button class="dplmovie-next-event-btn app-btn app-specific-btn hidden" for="dplmovie-button">
+        <svg xmlns="http://www.w3.org/2000/svg" class="app-btn-icon-medium" viewBox="0 0 512 512">
           <path
             d="M64 256c0 106 86 192 192 192s192-86 192-192S362 64 256 64 64 150 64 256z"
             fill="none"
@@ -186,33 +128,15 @@
             stroke-miterlimit="10"
             stroke-width="32"
           />
-          <path
-            fill="none"
-            stroke="currentColor"
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="32"
-            d="M216 352l96-96-96-96"
-          />
+          <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M216 352l96-96-96-96" />
         </svg>
       </button>
 
       <!-- Graph Player navigation -->
       <div class="app-specific-btn hidden" for="graphplayer-button">
         <div class="graphplayer-creategraph-btn app-btn">
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            class="app-btn-icon-medium"
-            viewBox="0 0 512 512"
-          >
-            <path
-              fill="none"
-              stroke="currentColor"
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="32"
-              d="M256 112v288M400 256H112"
-            />
+          <svg xmlns="http://www.w3.org/2000/svg" class="app-btn-icon-medium" viewBox="0 0 512 512">
+            <path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="32" d="M256 112v288M400 256H112" />
           </svg>
           <input class="graphplayer-graphnameinput" type="text" />
         </div>
