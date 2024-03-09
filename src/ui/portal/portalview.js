@@ -41,16 +41,29 @@ export class PortalView {
   /** setup the state where every app buttons are gone bottom.
    */
   _setupGoState() {
+    // wait function for delaying the go states
+    const wait = function (seconds) {
+      return new Promise(function (resolve) {
+        setTimeout(resolve, seconds * 1000);
+      });
+    };
+    // move a button
+    const moveButton = function (btn) {
+      btn.classList.add(CLASS_APPCONTAINER_GO_TRANSITION);
+      btn.classList.add(CLASS_APPCONTAINER_GO);
+    };
+
+    const chainedMove = async function () {
+      const totalNumberOfButtons = ALL_APP_BUTTONS.length;
+      for (let index = totalNumberOfButtons - 1; index >= 0; index--) {
+        moveButton(ALL_APP_BUTTONS[index]);
+        if (index !== 0) await wait(0.15);
+      }
+    };
+
     const AboutMeButton = document.querySelector(`.${CLASS_ABOUTME}`);
     AboutMeButton.addEventListener("click", function () {
-      ALL_APP_BUTTONS.forEach(function (appButton) {
-        appButton.classList.add(CLASS_APPCONTAINER_GO_TRANSITION);
-        appButton.classList.add(CLASS_APPCONTAINER_GO);
-      });
-    });
-    // TO REMOVE
-    AboutMeButton.addEventListener("transitionend", function (event) {
-      console.log(event.target.className);
+      chainedMove();
     });
   }
 
