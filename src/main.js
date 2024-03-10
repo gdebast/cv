@@ -9,6 +9,7 @@ import { DirectedGraph } from "./model/utility/directedgraph/directedgraph";
 import { DPLMovieRuntimePlayerView } from "./ui/dplmovie/player/dplmovieruntimeplayerview";
 import { DPLMovieCanvasView } from "./ui/dplmovie/canvas/dplmoviecanvasview";
 import { PortalView } from "./ui/portal/portalview";
+import { CVView } from "./ui/cv/cvview";
 
 const portal = new PortalView();
 
@@ -23,6 +24,9 @@ const dplMovieCavansView = new DPLMovieCanvasView(dplMovieRuntimeView, dplMovieR
 const graphPool = new DirectedGraphWrapperPool();
 const graphCreationView = new GraphCreationView(graphPool);
 const graphSelectionView = new GraphSelectionView(graphPool);
+
+// CV
+const cvView = new CVView(portal);
 
 /*
 const vis = new DirectedGraphVisualizer(true);

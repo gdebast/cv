@@ -1,5 +1,7 @@
+import { ASSERT_EXIST } from "../../model/utility/assert/assert";
 import { PortalAppLinker } from "./src/portalapplinker";
 
+const CLASS_APP_GRID = "app-grid";
 const CLASS_APPCONTAINER = "app-container";
 const CLASS_ABOUTME = "about-section";
 
@@ -11,13 +13,28 @@ const CLASS_APPCONTAINER_HOVER_TRANSITION = "app-container-hover-transition";
 const CLASS_APPCONTAINER_GO = "app-container-go";
 const CLASS_APPCONTAINER_GO_TRANSITION = "app-container-go-transition";
 
+/*Insert animation */
+const CLASS_INSERT_HEADER = "insert-header";
+const CLASS_INSERT_HEADER_GO = "insert-header-go";
+const CLASS_INSERT_HEADER_GO_TRANSITION = "insert-header-go-transition";
+
 const ALL_APP_BUTTONS = document.querySelectorAll(`.${CLASS_APPCONTAINER}`);
+const APP_GRID = document.querySelector(`.${CLASS_APP_GRID}`);
 
 export class PortalView {
   constructor() {
     this._portalAppLinker = new PortalAppLinker();
     this._setupHoveredState();
     this._setupGoState();
+    this._insertProvider = null;
+  }
+
+  /** refister an object able to provide the insert.
+   *  An insert is the set of html elements replacing the app buttons when clicking on the about-me button.
+   */
+  registerInsertProvider(insertProvider) {
+    ASSERT_EXIST(insertProvider);
+    this._insertProvider = insertProvider;
   }
 
   /** setup the mouse over/out state of the app-buttons
@@ -41,6 +58,8 @@ export class PortalView {
   /** setup the state where every app buttons are gone bottom.
    */
   _setupGoState() {
+    const self = this;
+
     // wait function for delaying the go states
     const wait = function (seconds) {
       return new Promise(function (resolve) {
@@ -54,10 +73,22 @@ export class PortalView {
     };
 
     const chainedMove = async function () {
+      // the buttons are disapearing
       const totalNumberOfButtons = ALL_APP_BUTTONS.length;
       for (let index = totalNumberOfButtons - 1; index >= 0; index--) {
         moveButton(ALL_APP_BUTTONS[index]);
         if (index !== 0) await wait(0.15);
+      }
+
+      // the insert is appearing
+      if (self._insertProvider != null) {
+        const insertHeaderHTMLElement = self._insertProvider.getInsertHeader();
+        insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER);
+        insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER_GO);
+        insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER_GO_TRANSITION);
+        APP_GRID.append(insertHeaderHTMLElement);
+        await wait(0.001);
+        insertHeaderHTMLElement.classList.remove(CLASS_INSERT_HEADER_GO);
       }
     };
 
@@ -72,7 +103,7 @@ export class PortalView {
    */
 
   _removeAnyTransitionCSSClasses(element) {
-    [CLASS_APPCONTAINER_HOVER_TRANSITION, CLASS_APPCONTAINER_GO_TRANSITION].forEach((className) => {
+    [CLASS_APPCONTAINER_HOVER_TRANSITION, CLASS_APPCONTAINER_GO_TRANSITION, CLASS_INSERT_HEADER_GO_TRANSITION].forEach((className) => {
       element.classList.remove(className);
     });
   }

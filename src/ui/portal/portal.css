@@ -133,3 +133,26 @@
   grid-column: 2;
   grid-row: 4/6;
 }
+
+/***************/
+/*   INSERT    */
+/***************/
+/*The insert is the set of elements which inserts themselves in-place of the big buttons.
+  Specifically:
+    - the "insert-header" is the contact element of the CV
+*/
+
+/*insert-header*/
+/*-------------*/
+/*used to place the header of the insert*/
+.insert-header {
+  grid-column: 2;
+  grid-row: 2;
+}
+
+.insert-header-go {
+  transform: translateX(2000px);
+}
+.insert-header-go-transition {
+  transition: transform 1s;
+}

@@ -1,0 +1,40 @@
+/**************/
+/*   CONTACT  */
+/**************/
+.cv-address-backToMenu {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+
+  /*shape*/
+  border: none;
+  border-radius: 2.4rem;
+  background-color: #a7d1f5;
+  padding: 0rem 3.2rem;
+
+  box-shadow: 0 1rem 4.8rem rgba(10, 43, 69, 0.25);
+}
+
+/*contact info*/
+/*------------*/
+.cv-address {
+  /*allignement of the contact info*/
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+
+  /*text properties*/
+  font-style: normal;
+  font-size: 1.6rem;
+  font-weight: 450;
+}
+
+/*right icon*/
+/*----------*/
+#cv-backToMenu {
+  border: none;
+  background-color: #a7d1f5;
+}
+.cv-backToMenu-icon {
+  height: 8.6rem;
+}
