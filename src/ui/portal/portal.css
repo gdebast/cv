@@ -38,6 +38,9 @@
 .app-container-go-transition {
   transition: transform 2s;
 }
+.app-container-comeback-transition {
+  transition: transform 1s;
+}
 
 /***************/
 /*PORTAL LAYOUT*/

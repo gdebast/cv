@@ -20,6 +20,10 @@ export class CVView {
     return contactElt;
   }
 
+  getInsertHeaderBackButtonId() {
+    return "cv-backToMenu";
+  }
+
   // -------
   // PRIVATE
   // -------
@@ -32,7 +36,7 @@ export class CVView {
                         <div>${CVCONTACT_PHONE}</div>
                         <div>${CVCONTACT_ADDRESS}</div>
                   </address> 
-                  <button id="cv-backToMenu">
+                  <button id="${this.getInsertHeaderBackButtonId()}">
                     <svg xmlns="http://www.w3.org/2000/svg" class="cv-backToMenu-icon" viewBox="0 0 512 512">
                         <path fill="none" 
                               stroke="currentColor" 

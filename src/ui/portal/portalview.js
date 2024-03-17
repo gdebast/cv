@@ -9,9 +9,10 @@ const CLASS_ABOUTME = "about-section";
 const CLASS_APPCONTAINER_HOVER = "app-container-hover";
 const CLASS_APPCONTAINER_HOVER_TRANSITION = "app-container-hover-transition";
 
-/*Go animation */
+/*app-buttons Go/come-back animation */
 const CLASS_APPCONTAINER_GO = "app-container-go";
 const CLASS_APPCONTAINER_GO_TRANSITION = "app-container-go-transition";
+const CLASS_APPCONTAINER_COMEBACK_TRANSITION = "app-container-comeback-transition";
 
 /*Insert animation */
 const CLASS_INSERT_HEADER = "insert-header";
@@ -27,10 +28,12 @@ export class PortalView {
     this._setupHoveredState();
     this._setupGoState();
     this._insertProvider = null;
+    this._insertHeaderHTMLElement = null;
   }
 
-  /** refister an object able to provide the insert.
+  /** register an object able to provide the insert.
    *  An insert is the set of html elements replacing the app buttons when clicking on the about-me button.
+   *  the insert-provider must provide the method getInsertHeader(), getInsertHeaderBackButtonId()
    */
   registerInsertProvider(insertProvider) {
     ASSERT_EXIST(insertProvider);
@@ -66,35 +69,71 @@ export class PortalView {
         setTimeout(resolve, seconds * 1000);
       });
     };
-    // move a button
-    const moveButton = function (btn) {
+
+    // remove/recover a button
+    const removeButton = function (btn) {
       btn.classList.add(CLASS_APPCONTAINER_GO_TRANSITION);
       btn.classList.add(CLASS_APPCONTAINER_GO);
     };
+    const recoverButton = function (btn) {
+      btn.classList.add(CLASS_APPCONTAINER_COMEBACK_TRANSITION);
+      btn.classList.remove(CLASS_APPCONTAINER_GO);
+    };
 
-    const chainedMove = async function () {
+    // add/remove the header of the insert.
+    const recoverInsertHeader = function () {
+      if (self._insertHeaderHTMLElement != null) return;
+      const insertHeaderHTMLElement = self._insertProvider.getInsertHeader();
+      insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER);
+      insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER_GO);
+      insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER_GO_TRANSITION);
+      APP_GRID.append(insertHeaderHTMLElement);
+      self._insertHeaderHTMLElement = insertHeaderHTMLElement;
+      const backButton = self._insertHeaderHTMLElement.querySelector(`#${self._insertProvider.getInsertHeaderBackButtonId()}`);
+      ASSERT_EXIST(backButton);
+      backButton.addEventListener("click", function () {
+        makeInsertDisappear();
+      });
+    };
+    const removeInsertHeader = function () {
+      ASSERT_EXIST(self._insertHeaderHTMLElement);
+      self._insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER_GO);
+    };
+
+    const makeInsertAppear = async function () {
       // the buttons are disapearing
       const totalNumberOfButtons = ALL_APP_BUTTONS.length;
       for (let index = totalNumberOfButtons - 1; index >= 0; index--) {
-        moveButton(ALL_APP_BUTTONS[index]);
+        const btn = ALL_APP_BUTTONS[index];
+        removeButton(btn);
         if (index !== 0) await wait(0.15);
       }
 
       // the insert is appearing
       if (self._insertProvider != null) {
-        const insertHeaderHTMLElement = self._insertProvider.getInsertHeader();
-        insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER);
-        insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER_GO);
-        insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER_GO_TRANSITION);
-        APP_GRID.append(insertHeaderHTMLElement);
+        recoverInsertHeader();
         await wait(0.001);
-        insertHeaderHTMLElement.classList.remove(CLASS_INSERT_HEADER_GO);
+        self._insertHeaderHTMLElement.classList.remove(CLASS_INSERT_HEADER_GO); /*this needs to be after a wait function call */
       }
+      await wait(0.1);
+      for (const btn of ALL_APP_BUTTONS) self._removeAnyTransitionCSSClasses(btn);
+    };
+
+    const makeInsertDisappear = async function () {
+      removeInsertHeader();
+      const totalNumberOfButtons = ALL_APP_BUTTONS.length;
+      for (let index = 0; index < totalNumberOfButtons; index++) {
+        const btn = ALL_APP_BUTTONS[index];
+        recoverButton(btn);
+        await wait(0.15);
+      }
+      await wait(0.001);
+      for (const btn of ALL_APP_BUTTONS) self._removeAnyTransitionCSSClasses(btn);
     };
 
     const AboutMeButton = document.querySelector(`.${CLASS_ABOUTME}`);
     AboutMeButton.addEventListener("click", function () {
-      chainedMove();
+      makeInsertAppear();
     });
   }
 
@@ -103,7 +142,12 @@ export class PortalView {
    */
 
   _removeAnyTransitionCSSClasses(element) {
-    [CLASS_APPCONTAINER_HOVER_TRANSITION, CLASS_APPCONTAINER_GO_TRANSITION, CLASS_INSERT_HEADER_GO_TRANSITION].forEach((className) => {
+    [
+      CLASS_APPCONTAINER_HOVER_TRANSITION,
+      CLASS_APPCONTAINER_GO_TRANSITION,
+      CLASS_INSERT_HEADER_GO_TRANSITION,
+      CLASS_APPCONTAINER_COMEBACK_TRANSITION,
+    ].forEach((className) => {
       element.classList.remove(className);
     });
   }
