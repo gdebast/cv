@@ -1,18 +1,24 @@
 /**************/
-/*   CONTACT  */
+/*   GENERIC  */
 /**************/
-.cv-address-backToMenu {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-
+.cv-box {
   /*shape*/
   border: none;
   border-radius: 2.4rem;
   background-color: #a7d1f5;
-  padding: 0rem 3.2rem;
 
   box-shadow: 0 1rem 4.8rem rgba(10, 43, 69, 0.25);
+}
+
+/**************/
+/*   CONTACT  */
+/**************/
+.cv-address-backToMenu {
+  padding: 0rem 3.2rem;
+
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
 }
 
 /*contact info*/
@@ -29,12 +35,79 @@
   font-weight: 450;
 }
 
-/*right icon*/
-/*----------*/
+/*back to menu*/
+/*------------*/
 #cv-backToMenu {
   border: none;
   background-color: #a7d1f5;
+  cursor: pointer;
 }
 .cv-backToMenu-icon {
   height: 8.6rem;
+}
+
+/*****************/
+/*   EXPERIENCE  */
+/*****************/
+/*class specific to the entire block of experience*/
+.cv-experience {
+  padding: 3.2rem 3.2rem;
+}
+
+/*class for the main title of the experience section*/
+.cv-experience-title {
+  font-size: 3.6rem;
+  font-weight: 600;
+  padding-bottom: 1.8rem;
+}
+
+/*class for the element containing the list of experiences*/
+.cv-experience-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+/*class for one experience item*/
+.cv-experience-list-element {
+  list-style-type: none;
+  padding: 1.2rem 1.2rem;
+  border-style: solid;
+  box-shadow: 0 1rem 4.8rem #d3e8fa;
+  border-width: 0.01rem;
+  border-radius: 2.4rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+/*class for the line with the date range, job title and button, of each experience*/
+.cv-experience-list-element-date-title-button {
+  /*make sure it is a line*/
+  display: flex;
+  justify-content: space-between;
+
+  /*font*/
+  font-size: 1.8rem;
+  font-weight: 450;
+}
+
+/*text content of the experience*/
+.cv-experience-list-element-content {
+  font-size: 1.2rem;
+
+  /*organize the paragraph*/
+  display: flex;
+  flex-direction: column;
+  gap: 1.2rem;
+}
+
+/*button (and its icon) that controls the opening and closure of the experience content*/
+.cv-experience-list-element-button {
+  border: none;
+  background-color: #a7d1f5;
+  cursor: pointer;
+}
+.cv-experience-list-element-button-icon {
+  height: 1.8rem;
 }

@@ -60,7 +60,7 @@
   display: grid;
   gap: 3.2rem;
   grid-template-columns: repeat(2, 1fr);
-  grid-template-rows: repeat(6, 0.5fr);
+  grid-template-rows: auto;
   justify-content: center;
   align-content: center;
   padding: 3.2rem 1.6rem;
@@ -119,22 +119,23 @@
 /*about the author*/
 .about-section {
   /*grid properties*/
+
   grid-column: 2;
-  grid-row: 2/4;
+  grid-row: 2/6;
 }
 
 /*dpl movie*/
 .dplmovie-section {
   /*grid properties*/
   grid-column: 1;
-  grid-row: 3/5;
+  grid-row: 3/9;
 }
 
 /*graph expert*/
 .graph-section {
   /*grid properties*/
   grid-column: 2;
-  grid-row: 4/6;
+  grid-row: 6/12;
 }
 
 /***************/
@@ -143,6 +144,7 @@
 /*The insert is the set of elements which inserts themselves in-place of the big buttons.
   Specifically:
     - the "insert-header" is the contact element of the CV
+    - the "insert-paragraph" are the Experiences, the Educations and Langages paragraph of the cv
 */
 
 /*insert-header*/
@@ -152,10 +154,20 @@
   grid-column: 2;
   grid-row: 2;
 }
-
+/*used to make the transition of the header*/
 .insert-header-go {
   transform: translateX(2000px);
 }
 .insert-header-go-transition {
+  transition: transform 1s;
+}
+/*used to make the transition of the paragraphs*/
+.insert-paragraph-go-left {
+  transform: translateX(-2000px);
+}
+.insert-paragraph-go-rigth {
+  transform: translateX(2000px);
+}
+.insert-paragraph-go-transition {
   transition: transform 1s;
 }

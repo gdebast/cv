@@ -10,7 +10,9 @@ import { DPLMovieRuntimePlayerView } from "./ui/dplmovie/player/dplmovieruntimep
 import { DPLMovieCanvasView } from "./ui/dplmovie/canvas/dplmoviecanvasview";
 import { PortalView } from "./ui/portal/portalview";
 import { CVView } from "./ui/cv/cvview";
+import { ViewTranslator } from "./ui/translator/viewtranslator";
 
+const translator = new ViewTranslator();
 const portal = new PortalView();
 
 // DPL movie
@@ -26,7 +28,7 @@ const graphCreationView = new GraphCreationView(graphPool);
 const graphSelectionView = new GraphSelectionView(graphPool);
 
 // CV
-const cvView = new CVView(portal);
+const cvView = new CVView(portal, translator);
 
 /*
 const vis = new DirectedGraphVisualizer(true);

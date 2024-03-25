@@ -1,4 +1,4 @@
-import { ASSERT_EXIST } from "../../model/utility/assert/assert";
+import { ASSERT, ASSERT_EXIST } from "../../model/utility/assert/assert";
 import { PortalAppLinker } from "./src/portalapplinker";
 
 const CLASS_APP_GRID = "app-grid";
@@ -18,9 +18,20 @@ const CLASS_APPCONTAINER_COMEBACK_TRANSITION = "app-container-comeback-transitio
 const CLASS_INSERT_HEADER = "insert-header";
 const CLASS_INSERT_HEADER_GO = "insert-header-go";
 const CLASS_INSERT_HEADER_GO_TRANSITION = "insert-header-go-transition";
+const CLASS_INSERT_PARAGRAPH_GO_TRANSITION = "insert-paragraph-go-transition";
+const CLASS_INSERT_PARAGRAPH_GO_LEFT = "insert-paragraph-go-left";
+const CLASS_INSERT_PARAGRAPH_GO_RIGHT = "insert-paragraph-go-rigth";
 
 const ALL_APP_BUTTONS = document.querySelectorAll(`.${CLASS_APPCONTAINER}`);
 const APP_GRID = document.querySelector(`.${CLASS_APP_GRID}`);
+
+const ALL_TRANSITION_CLASS = [
+  CLASS_APPCONTAINER_HOVER_TRANSITION,
+  CLASS_APPCONTAINER_GO_TRANSITION,
+  CLASS_INSERT_HEADER_GO_TRANSITION,
+  CLASS_APPCONTAINER_COMEBACK_TRANSITION,
+  CLASS_INSERT_PARAGRAPH_GO_TRANSITION,
+];
 
 export class PortalView {
   constructor() {
@@ -33,7 +44,7 @@ export class PortalView {
 
   /** register an object able to provide the insert.
    *  An insert is the set of html elements replacing the app buttons when clicking on the about-me button.
-   *  the insert-provider must provide the method getInsertHeader(), getInsertHeaderBackButtonId()
+   *  the insert-provider must provide the method getInsertHeader(), getInsertHeaderBackButtonId() and getInsertParagraphs()
    */
   registerInsertProvider(insertProvider) {
     ASSERT_EXIST(insertProvider);
@@ -82,6 +93,7 @@ export class PortalView {
 
     // add/remove the header of the insert.
     const recoverInsertHeader = function () {
+      // lazy creation.
       if (self._insertHeaderHTMLElement != null) return;
       const insertHeaderHTMLElement = self._insertProvider.getInsertHeader();
       insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER);
@@ -114,13 +126,48 @@ export class PortalView {
         recoverInsertHeader();
         await wait(0.001);
         self._insertHeaderHTMLElement.classList.remove(CLASS_INSERT_HEADER_GO); /*this needs to be after a wait function call */
+        // make the paragraph appearing
+        const insertParagraphs = self._insertProvider.getInsertParagraphs();
+        const startGridRow = 3; /*this is the first row available after the insert header */
+        let currentTransitionDirection = CLASS_INSERT_PARAGRAPH_GO_LEFT;
+        for (const insertParagraph of insertParagraphs) {
+          await wait(0.5);
+          insertParagraph.style.gridColumn = "1/3";
+          insertParagraph.style.gridRow = String(startGridRow);
+          insertParagraph.classList.add(currentTransitionDirection);
+          insertParagraph.classList.add(CLASS_INSERT_PARAGRAPH_GO_TRANSITION);
+          APP_GRID.append(insertParagraph);
+          await wait(0.001);
+          insertParagraph.classList.remove(currentTransitionDirection); /*appearing */
+          // increment
+          currentTransitionDirection =
+            currentTransitionDirection === CLASS_INSERT_PARAGRAPH_GO_LEFT ? CLASS_INSERT_PARAGRAPH_GO_RIGHT : CLASS_INSERT_PARAGRAPH_GO_LEFT;
+          startGridRow++;
+        }
+        await wait(0.1);
+        for (const insertParagraph of insertParagraphs) self._removeAnyTransitionCSSClasses(insertParagraph);
       }
       await wait(0.1);
       for (const btn of ALL_APP_BUTTONS) self._removeAnyTransitionCSSClasses(btn);
     };
 
     const makeInsertDisappear = async function () {
+      /*remove the header */
       removeInsertHeader();
+      ASSERT_EXIST(self._insertProvider);
+      await wait(0.15);
+      /* remove the insert paragraphs */
+      const insertParagraphs = self._insertProvider.getInsertParagraphs();
+      let currentTransitionDirection = CLASS_INSERT_PARAGRAPH_GO_LEFT;
+      for (const insertParagraph of insertParagraphs) {
+        insertParagraph.classList.add(currentTransitionDirection);
+        insertParagraph.classList.add(CLASS_INSERT_PARAGRAPH_GO_TRANSITION);
+        await wait(0.3);
+        insertParagraph.remove();
+        // increment
+        currentTransitionDirection =
+          currentTransitionDirection === CLASS_INSERT_PARAGRAPH_GO_LEFT ? CLASS_INSERT_PARAGRAPH_GO_RIGHT : CLASS_INSERT_PARAGRAPH_GO_LEFT;
+      }
       const totalNumberOfButtons = ALL_APP_BUTTONS.length;
       for (let index = 0; index < totalNumberOfButtons; index++) {
         const btn = ALL_APP_BUTTONS[index];
@@ -142,12 +189,7 @@ export class PortalView {
    */
 
   _removeAnyTransitionCSSClasses(element) {
-    [
-      CLASS_APPCONTAINER_HOVER_TRANSITION,
-      CLASS_APPCONTAINER_GO_TRANSITION,
-      CLASS_INSERT_HEADER_GO_TRANSITION,
-      CLASS_APPCONTAINER_COMEBACK_TRANSITION,
-    ].forEach((className) => {
+    ALL_TRANSITION_CLASS.forEach((className) => {
       element.classList.remove(className);
     });
   }
