@@ -72,7 +72,7 @@ export class PortalView {
   /** setup the state where every app buttons are gone bottom.
    */
   _setupGoState() {
-    let self = this;
+    const self = this;
 
     // wait function for delaying the go states
     const wait = function (seconds) {
@@ -128,7 +128,7 @@ export class PortalView {
         self._insertHeaderHTMLElement.classList.remove(CLASS_INSERT_HEADER_GO); /*this needs to be after a wait function call */
         // make the paragraph appearing
         const insertParagraphs = self._insertProvider.getInsertParagraphs();
-        const startGridRow = 3; /*this is the first row available after the insert header */
+        let startGridRow = 3;
         let currentTransitionDirection = CLASS_INSERT_PARAGRAPH_GO_LEFT;
         for (const insertParagraph of insertParagraphs) {
           await wait(0.5);
