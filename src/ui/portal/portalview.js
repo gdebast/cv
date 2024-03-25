@@ -72,7 +72,7 @@ export class PortalView {
   /** setup the state where every app buttons are gone bottom.
    */
   _setupGoState() {
-    const self = this;
+    let self = this;
 
     // wait function for delaying the go states
     const wait = function (seconds) {
