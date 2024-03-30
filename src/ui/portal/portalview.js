@@ -152,13 +152,12 @@ export class PortalView {
     };
 
     const makeInsertDisappear = async function () {
-      /*remove the header */
-      removeInsertHeader();
       ASSERT_EXIST(self._insertProvider);
-      await wait(0.15);
+
       /* remove the insert paragraphs */
-      const insertParagraphs = self._insertProvider.getInsertParagraphs();
-      let currentTransitionDirection = CLASS_INSERT_PARAGRAPH_GO_LEFT;
+      const insertParagraphs = self._insertProvider.getInsertParagraphs().reverse();
+      // if the number of insert paragraphs is a multiple of two, the first one should go to the right, because the first one comes from the left.
+      let currentTransitionDirection = insertParagraphs.length % 2 === 0 ? CLASS_INSERT_PARAGRAPH_GO_RIGHT : CLASS_INSERT_PARAGRAPH_GO_LEFT;
       for (const insertParagraph of insertParagraphs) {
         insertParagraph.classList.add(currentTransitionDirection);
         insertParagraph.classList.add(CLASS_INSERT_PARAGRAPH_GO_TRANSITION);
@@ -168,6 +167,12 @@ export class PortalView {
         currentTransitionDirection =
           currentTransitionDirection === CLASS_INSERT_PARAGRAPH_GO_LEFT ? CLASS_INSERT_PARAGRAPH_GO_RIGHT : CLASS_INSERT_PARAGRAPH_GO_LEFT;
       }
+
+      /*remove the header */
+      removeInsertHeader();
+      await wait(0.15);
+
+      /*recover the buttons */
       const totalNumberOfButtons = ALL_APP_BUTTONS.length;
       for (let index = 0; index < totalNumberOfButtons; index++) {
         const btn = ALL_APP_BUTTONS[index];

@@ -1,10 +1,22 @@
+"use strict";
+
 import { ASSERT, ASSERT_EXIST, ASSERT_ISSTRING } from "../../model/utility/assert/assert";
-import { ENG, TranslatableString } from "../../model/utility/translatable/translatablestring";
+import { ENG, FR, TranslatableString } from "../../model/utility/translatable/translatablestring";
 
 export class ViewTranslator {
   constructor() {
     this._id_to_translatableString_map = new Map();
     this._currentLanguage = ENG;
+
+    // register the predefined languages
+    this.registerTranslatable(ENG, {
+      ENG: "English",
+      FR: "Anglais",
+    });
+    this.registerTranslatable(FR, {
+      ENG: "French",
+      FR: "Français",
+    });
   }
 
   getTranslatedString(id) {
@@ -25,6 +37,7 @@ export class ViewTranslator {
    * @param {HTMLElement} htmlElement
    */
   translate(htmlElement) {
+    ASSERT_EXIST(htmlElement);
     const self = this;
     this._id_to_translatableString_map.forEach(function (translatableString, id) {
       const elementTotranslate = htmlElement.querySelector(`#${id}`);
@@ -36,6 +49,6 @@ export class ViewTranslator {
   setLanguage(newLanguage) {
     if (newLanguage === this._currentLanguage) return;
     this._currentLanguage = newLanguage;
-    this.translate();
+    this.translate(document);
   }
 }

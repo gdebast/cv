@@ -1,6 +1,7 @@
 /**************/
 /*   GENERIC  */
 /**************/
+/*charateristics for any cv boxes/inserts*/
 .cv-box {
   /*shape*/
   border: none;
@@ -8,6 +9,46 @@
   background-color: #a7d1f5;
 
   box-shadow: 0 1rem 4.8rem rgba(10, 43, 69, 0.25);
+}
+
+/*class for any paragraph/insert a cv*/
+.cv-paragraph {
+  padding: 3.2rem 3.2rem;
+}
+
+/*class for any main title of a paragraph cv insert (like the experience, languages, ...)*/
+.cv-paragraph-title {
+  font-size: 3.6rem;
+  font-weight: 600;
+  padding-bottom: 1.8rem;
+}
+
+/*class for the list of items (list of languages type, list of experiences,...)*/
+.cv-paragraph-list {
+  display: flex;
+  flex-direction: column;
+  gap: 1.6rem;
+}
+
+/*class for the list items in a paragraph of the cv*/
+.cv-paragraph-list-element {
+  list-style-type: none;
+  padding: 1.2rem 1.2rem;
+  border-style: solid;
+  box-shadow: 0 1rem 4.8rem #d3e8fa;
+  border-width: 0.01rem;
+  border-radius: 2.4rem;
+
+  display: flex;
+  flex-direction: column;
+  gap: 1.4rem;
+}
+
+/*class for the title of the element in a paragraph of the cv*/
+.cv-paragraph-list-element-title {
+  /*font*/
+  font-size: 1.8rem;
+  font-weight: 450;
 }
 
 /**************/
@@ -49,47 +90,12 @@
 /*****************/
 /*   EXPERIENCE  */
 /*****************/
-/*class specific to the entire block of experience*/
-.cv-experience {
-  padding: 3.2rem 3.2rem;
-}
 
-/*class for the main title of the experience section*/
-.cv-experience-title {
-  font-size: 3.6rem;
-  font-weight: 600;
-  padding-bottom: 1.8rem;
-}
-
-/*class for the element containing the list of experiences*/
-.cv-experience-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.6rem;
-}
-
-/*class for one experience item*/
-.cv-experience-list-element {
-  list-style-type: none;
-  padding: 1.2rem 1.2rem;
-  border-style: solid;
-  box-shadow: 0 1rem 4.8rem #d3e8fa;
-  border-width: 0.01rem;
-  border-radius: 2.4rem;
-
-  display: flex;
-  flex-direction: column;
-  gap: 1.4rem;
-}
 /*class for the line with the date range, job title and button, of each experience*/
 .cv-experience-list-element-date-title-button {
   /*make sure it is a line*/
   display: flex;
   justify-content: space-between;
-
-  /*font*/
-  font-size: 1.8rem;
-  font-weight: 450;
 }
 
 /*text content of the experience*/
@@ -110,4 +116,25 @@
 }
 .cv-experience-list-element-button-icon {
   height: 1.8rem;
+}
+
+/*****************/
+/*   Languages   */
+/*****************/
+/*control the grid of the human languages*/
+.cv-language-human-grid {
+  display: grid;
+  grid-template-columns: 0.2fr 0.5fr 4fr;
+  align-items: center;
+  row-gap: 1rem;
+}
+/*class for the language name*/
+.cv-language-human-name {
+  font-size: 1.2rem;
+  font-weight: 450;
+  cursor: pointer;
+}
+/*class for the language description*/
+.cv-language-human-desc {
+  font-size: 1.2rem;
 }

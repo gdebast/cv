@@ -1,4 +1,7 @@
+"use strict";
+
 import { ASSERT_EXIST } from "../../model/utility/assert/assert";
+import { ENG, FR } from "../../model/utility/translatable/translatablestring";
 
 /* contact info */
 const CVCONTACT_EMAIL = "gatien.debast@gmail.com";
@@ -18,6 +21,14 @@ const CVEXPERIENCE_ORCONSULTANT_3_ID = "cv-experience-or-consultant-3";
 const CLASS_CV_EXPERIENCE_LIST_ELEMENT_BUTTON = "cv-experience-list-element-button";
 const CLASS_CV_EXPERIENCE_LIST_ELEMENT_BUTTON_ICON = "cv-experience-list-element-button-icon";
 const CLASS_CV_EXPERIENCE_LIST_ELEMENT_CONTENT = "cv-experience-list-element-content";
+
+/*language*/
+const CVLANGUAGE_ID = "cv-language-title";
+const CVLANGUAGE_HUMAN_ID = "cv-language-list-element-title-human-language";
+const CVLANGUAGE_HUMAN_ENGLISH_DESC = "cv-language-list-element-english-description";
+const CVLANGUAGE_HUMAN_FRENCH_DESC = "cv-language-list-element-french-description";
+
+const CLASS_CV_LANGUAGE_HUMAN_RADIO = "cv-language-human-radio";
 
 /*icons*/
 const HTML_CLOSED_ICON = `<svg xmlns="http://www.w3.org/2000/svg" 
@@ -47,6 +58,7 @@ export class CVView {
 
     this._makeContactHtmlElement();
     this._makeExperienceParagraphHtmlElement();
+    this._makeLanguageParagraphHtmlElement();
   }
 
   /**  implement the oberser pattern with the PortalView.*/
@@ -59,7 +71,8 @@ export class CVView {
   }
   getInsertParagraphs() {
     this._translator.translate(this._experienceHtmlElement);
-    return [this._experienceHtmlElement];
+    this._translator.translate(this._languageHtmlElement);
+    return [this._experienceHtmlElement, this._languageHtmlElement];
   }
 
   // -------
@@ -129,10 +142,10 @@ export class CVView {
       FR: "L'autre principale réalisation alors que j'étais responsable de ce module, fut de mettre en place des tests automatique sur chaque composant disposant d'une interface publique. Les tests automatiques n'avaient jamais été mis en place sur ce module. La productivité de notre équipe, autant que la qualité du produit, fut améliorée étant donné que notre équipe pu se concentrer d'avantage sur les dévelopements que sur les bugs.",
     });
 
-    const html = `<h1 class = "cv-experience-title" id="${CVEXPERIENCE_ID}"></h1>
-                  <ol class = "cv-experience-list">
-                    <li class = "cv-experience-list-element">
-                      <h2 class = "cv-experience-list-element-date-title-button ">
+    const html = `<h1 class = "cv-paragraph-title" id="${CVEXPERIENCE_ID}"></h1>
+                  <ol class = "cv-paragraph-list">
+                    <li class = "cv-paragraph-list-element">
+                      <h2 class = "cv-paragraph-list-element-title cv-experience-list-element-date-title-button ">
                         <div class = "cv-experience-list-element-date">2015 - 2019</div>
                         <div class = "cv-experience-list-element-title" 
                              id="${CVEXPERIENCE_ORCONSULTANT_TITLE_ID}">
@@ -145,8 +158,8 @@ export class CVView {
                         <p id="${CVEXPERIENCE_ORCONSULTANT_3_ID}"></p>
                       </div>
                     </li>
-                    <li class = "cv-experience-list-element">
-                      <h2 class = "cv-experience-list-element-date-title-button">
+                    <li class = "cv-paragraph-list-element">
+                      <h2 class = "cv-paragraph-list-element-title cv-experience-list-element-date-title-button">
                         <div class = "cv-experience-list-element-date">2019 - 2024</div>
                         <div class = "cv-experience-list-element-title" 
                              id="${CVEXPERIENCE_SOFTWAREENGINEER_TITLE_ID}">
@@ -163,7 +176,7 @@ export class CVView {
     const expElt = document.createElement("section");
     expElt.innerHTML = html;
     expElt.classList.add("cv-box");
-    expElt.classList.add("cv-experience");
+    expElt.classList.add("cv-paragraph");
     this._experienceHtmlElement = expElt;
 
     /*connect the button to make the experience content appear and disappear */
@@ -181,20 +194,51 @@ export class CVView {
     });
   }
 
-  TODELETE() {
-    // in portal
-    const appGridElt = document.querySelector(".app-grid");
-    appGridElt.append(this._experienceHtmlElement);
-    this._experienceHtmlElement.style.gridColumn = "1/3";
-    this._experienceHtmlElement.style.gridRow = "12";
-  }
+  _makeLanguageParagraphHtmlElement() {
+    this._translator.registerTranslatable(CVLANGUAGE_ID, {
+      ENG: "Languages",
+      FR: "Langues",
+    });
+    this._translator.registerTranslatable(CVLANGUAGE_HUMAN_ID, {
+      ENG: "Human Languages",
+      FR: "Langues humaines",
+    });
+    this._translator.registerTranslatable(CVLANGUAGE_HUMAN_ENGLISH_DESC, {
+      ENG: "Profesional level",
+      FR: "Niveau profesionel",
+    });
+    this._translator.registerTranslatable(CVLANGUAGE_HUMAN_FRENCH_DESC, {
+      ENG: "Mother language",
+      FR: "Langue maternelle",
+    });
 
-  /**
-   * TODO:
-   * PortalView offers two registration mechanisms to trigger the appearance of the cv (one for the contact, one for the elements):
-   *  - PortalView add an event listener to this button:
-   *     * when hovered, the button slide to the right
-   *     * when clicked, the buttons goes right and the button moves up
-   * PortalView offers a registration mechanism to add elements in its grid
-   */
+    const html = `<h1 class = "cv-paragraph-title" id="${CVLANGUAGE_ID}"></h1>
+                  <ol class = "cv-paragraph-list">
+                    <li class = "cv-paragraph-list-element">
+                      <h2 class = "cv-paragraph-list-element-title" id="${CVLANGUAGE_HUMAN_ID}"></h2>
+                      <div class = "cv-language-human-grid">
+                        <input class="cv-language-human-radio" type="radio" id="__ENGLISH" name="language" value="${ENG}" checked></input>
+                        <label class="cv-language-human-name" for="__ENGLISH" id="${ENG}"></label>
+                        <p class="cv-language-human-desc" id=${CVLANGUAGE_HUMAN_ENGLISH_DESC}></p>
+                        <input class="cv-language-human-radio" type="radio" id="__FRENCH" name="language" value="${FR}"></input>
+                        <label class="cv-language-human-name" for="__FRENCH" id="${FR}"></label>
+                        <p class="cv-language-human-desc" id=${CVLANGUAGE_HUMAN_FRENCH_DESC}></p>
+                      </div>
+                    </li>
+                  </ol>`;
+
+    const langElt = document.createElement("section");
+    langElt.innerHTML = html;
+    langElt.classList.add("cv-box");
+    langElt.classList.add("cv-paragraph");
+    this._languageHtmlElement = langElt;
+
+    const self = this;
+    const languageSwitchRadioBtn = this._languageHtmlElement.querySelectorAll(`.${CLASS_CV_LANGUAGE_HUMAN_RADIO}`);
+    languageSwitchRadioBtn.forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        self._translator.setLanguage(btn.value);
+      });
+    });
+  }
 }
