@@ -5,6 +5,12 @@ const CLASS_APP_GRID = "app-grid";
 const CLASS_APPCONTAINER = "app-container";
 const CLASS_ABOUTME = "about-section";
 
+/*id of the text in the portal*/
+const JOB_DESCRIPTION_ID = "description-jobtitle";
+const ABOUTME_BUTTON_TEXT_ID = "about-me-button-text";
+const DPLMOVIE_BUTTON_TEXT_ID = "dplmovie-button-text";
+const GRAPHPLAYER_BUTTON_TEXT_ID = "graphplayer-button-text";
+
 /*Hovered animation */
 const CLASS_APPCONTAINER_HOVER = "app-container-hover";
 const CLASS_APPCONTAINER_HOVER_TRANSITION = "app-container-hover-transition";
@@ -34,10 +40,13 @@ const ALL_TRANSITION_CLASS = [
 ];
 
 export class PortalView {
-  constructor() {
+  constructor(translator) {
+    ASSERT_EXIST(translator);
     this._portalAppLinker = new PortalAppLinker();
+    this._translator = translator;
     this._setupHoveredState();
     this._setupGoState();
+    this._translatePortal();
     this._insertProvider = null;
     this._insertHeaderHTMLElement = null;
   }
@@ -50,6 +59,10 @@ export class PortalView {
     ASSERT_EXIST(insertProvider);
     this._insertProvider = insertProvider;
   }
+
+  // -------
+  // PRIVATE
+  // -------
 
   /** setup the mouse over/out state of the app-buttons
    */
@@ -67,6 +80,26 @@ export class PortalView {
         appButton.classList.remove(CLASS_APPCONTAINER_HOVER);
       });
     });
+  }
+
+  _translatePortal() {
+    this._translator.registerTranslatable(JOB_DESCRIPTION_ID, {
+      ENG: "Passionate Software Engineer",
+      FR: "Engénieur Software Passionné",
+    });
+    this._translator.registerTranslatable(ABOUTME_BUTTON_TEXT_ID, {
+      ENG: "About me",
+      FR: "A propos de moi",
+    });
+    this._translator.registerTranslatable(DPLMOVIE_BUTTON_TEXT_ID, {
+      ENG: "the XAI Expert ...",
+      FR: "l'expert XAI ...",
+    });
+    this._translator.registerTranslatable(GRAPHPLAYER_BUTTON_TEXT_ID, {
+      ENG: "... the graph Lover",
+      FR: "... le passionné des graphes",
+    });
+    this._translator.translate(APP_GRID);
   }
 
   /** setup the state where every app buttons are gone bottom.

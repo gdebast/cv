@@ -13,7 +13,7 @@ import { CVView } from "./ui/cv/cvview";
 import { ViewTranslator } from "./ui/translator/viewtranslator";
 
 const translator = new ViewTranslator();
-const portal = new PortalView();
+const portal = new PortalView(translator);
 
 // DPL movie
 const dplMovieRuntimePool = new DPLMovieRuntimePool();

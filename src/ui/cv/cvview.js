@@ -17,12 +17,14 @@ const CVEXPERIENCE_ORCONSULTANT_TITLE_ID = "cv-experience-or-consultant-title";
 const CVEXPERIENCE_ORCONSULTANT_1_ID = "cv-experience-or-consultant-1";
 const CVEXPERIENCE_ORCONSULTANT_2_ID = "cv-experience-or-consultant-2";
 const CVEXPERIENCE_ORCONSULTANT_3_ID = "cv-experience-or-consultant-3";
+const CVEXPERIENCE_SUPPLYCHAINCONSULTANT_TITLE_ID = "cv-experience-supply-chain-consultant-title";
+const CVEXPERIENCE_SUPPLYCHAINCONSULTANT_1_ID = "cv-experience-supply-chain-1-title";
 
 const CLASS_CV_EXPERIENCE_LIST_ELEMENT_BUTTON = "cv-experience-list-element-button";
 const CLASS_CV_EXPERIENCE_LIST_ELEMENT_BUTTON_ICON = "cv-experience-list-element-button-icon";
 const CLASS_CV_EXPERIENCE_LIST_ELEMENT_CONTENT = "cv-experience-list-element-content";
 
-/*language*/
+/*languages*/
 const CVLANGUAGE_ID = "cv-language-title";
 const CVLANGUAGE_HUMAN_ID = "cv-language-list-element-title-human-language";
 const CVLANGUAGE_HUMAN_ENGLISH_DESC = "cv-language-list-element-english-description";
@@ -113,13 +115,25 @@ export class CVView {
       ENG: "Experiences",
       FR: "Expériences",
     });
+
+    /* Supply Chain Consultant */
+    this._translator.registerTranslatable(CVEXPERIENCE_SUPPLYCHAINCONSULTANT_TITLE_ID, {
+      ENG: "Supply Chain Consultant, OMP, France, Paris",
+      FR: "Consultant en logistique et chaine d'approvisionnement, OMP, France, Paris",
+    });
+    this._translator.registerTranslatable(CVEXPERIENCE_SUPPLYCHAINCONSULTANT_1_ID, {
+      ENG: "I started my software career as a supply chain consultant in Paris. OMP is SaaS company which deliver planning and scheduling software used in industries involving production and distribution. Its consultancy team delivers and taylors this application. As a consultant, I had to taylor this application to customer needs. This was the start of my softaware engineering career as it gave me the opportunity to write code.",
+      FR: "J'ai démarré ma carrière dans les logiciels informatique en tant que consultant en logistique et chaine d'approvisionnement à Paris. OMP est un société SaaS qui fournit un logiciel pour des entreprises ayant besoin de plannifier et d'ordonnancer la distribution et la production de leurs produits. Son activité de consultance installe et personnalise cette application. En tant que consultant, je devais principalement personnaliser afin de répondre aux besoins clients. Ce fut mes débuts dans la programmation.",
+    });
+
+    /* Operational Research Consultant */
     this._translator.registerTranslatable(CVEXPERIENCE_ORCONSULTANT_TITLE_ID, {
       ENG: "Operational Research Consultant, OMP, Belgium, Antwerpen",
-      FR: "Consultant en recherche opéraionelle, OMP, Belgique, Anvers",
+      FR: "Consultant en recherche opérationelle, OMP, Belgique, Anvers",
     });
     this._translator.registerTranslatable(CVEXPERIENCE_ORCONSULTANT_1_ID, {
-      ENG: "After three years in Paris, I came back to Belgium to encorporate the Operational Research team. This team is responsible for maintaining, develloping and installing the algorithms automating the planning decisions for our customers. During those years, I maintained and customized the Mixed Integer Programming model of OMP.",
-      FR: "Après trois ans à Paris, je suis revenu en Belgique pour intégrer l'équipe de recherche opérationelle. Cette équipe maintient, dévellope et installe les algorithm capable de prendre des décisions de plannification pour nos clients. Durant ces années, j'ai maintenu et installé le modèle de programmation linéaire d'OMP.",
+      ENG: "After almost three years in Paris, I came back to Belgium to encorporate the Operational Research team. This team is responsible for maintaining, develloping and installing the algorithms automating the planning decisions for our customers. During those years, I maintained and customized the Mixed Integer Programming model of OMP.",
+      FR: "Après presque trois ans à Paris, je suis revenu en Belgique pour intégrer l'équipe de recherche opérationelle. Cette équipe maintient, dévellope et installe les algorithmes capables de prendre des décisions de plannification pour nos clients. Durant ces années, j'ai maintenu et installé le modèle de programmation linéaire d'OMP.",
     });
     this._translator.registerTranslatable(CVEXPERIENCE_ORCONSULTANT_2_ID, {
       ENG: "In parallel of my consulting activity, I was responsible for standardizing some of our planning algorithms which we made in the OPAL language for some customers and that could be useful for other customers. This side activity gave me the passion for software development and a solid knowledge in graph theory. Indeed most of the algorithm were solving supply chain network problems.",
@@ -129,6 +143,8 @@ export class CVView {
       ENG: "My passion for development made me learn C++ during the year 2018. This choice was made because of the need for C++ developers at OMP. It was the perfect opportunity to learn and practice this fundamental language. After learning C++, I integrated our C++ development team where I learnt about the code architecture principle and the importance of testing.",
       FR: "Ma passion pour le développement m'a conduit à apprendre le C++ durant l'année 2018. Le choix du C++ provient du besoin de dévellopeur C++ chez OMP, et de sa difficulté. C'était donc une opportunité d'apprendre et de pratiquer ce language fondamental. Après avoir appris ce language, j'ai intégrer une équipe de développement. Elle m'a appris les principes d'architecture et l'importance des tests.",
     });
+
+    /* Operational Research Software Engineer */
     this._translator.registerTranslatable(CVEXPERIENCE_SOFTWAREENGINEER_TITLE_ID, {
       ENG: "Operational Research Software Engineer, OMP, Belgium, Wavre",
       FR: "Ingénieur Software en recherche opéraionelle, OMP, Belgique, Wavre",
@@ -144,6 +160,18 @@ export class CVView {
 
     const html = `<h1 class = "cv-paragraph-title" id="${CVEXPERIENCE_ID}"></h1>
                   <ol class = "cv-paragraph-list">
+                    <li class = "cv-paragraph-list-element">
+                      <h2 class = "cv-paragraph-list-element-title cv-experience-list-element-date-title-button ">
+                        <div class = "cv-experience-list-element-date">2013 - 2015</div>
+                        <div class = "cv-experience-list-element-title" 
+                             id="${CVEXPERIENCE_SUPPLYCHAINCONSULTANT_TITLE_ID}">
+                        </div>
+                        <button class = "${CLASS_CV_EXPERIENCE_LIST_ELEMENT_BUTTON}">${HTML_CLOSED_ICON}</button>
+                      </h2>
+                      <div class = "cv-experience-list-element-content hidden">
+                        <p id="${CVEXPERIENCE_SUPPLYCHAINCONSULTANT_1_ID}"></p>
+                      </div>
+                    </li>
                     <li class = "cv-paragraph-list-element">
                       <h2 class = "cv-paragraph-list-element-title cv-experience-list-element-date-title-button ">
                         <div class = "cv-experience-list-element-date">2015 - 2019</div>
