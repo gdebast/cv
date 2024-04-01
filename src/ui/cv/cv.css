@@ -124,7 +124,7 @@
 /*control the grid of the human languages*/
 .cv-language-human-grid {
   display: grid;
-  grid-template-columns: 0.2fr 0.5fr 4fr;
+  grid-template-columns: 0.2fr 0.5fr 0.5fr 3fr;
   align-items: center;
   row-gap: 1rem;
 }
@@ -137,4 +137,19 @@
 /*class for the language description*/
 .cv-language-human-desc {
   font-size: 1.2rem;
+}
+
+.cv-language-human-btn {
+  display: inline-block;
+  height: 2.2rem;
+  border-radius: 1000rem;
+  border-style: solid;
+  border-width: 0.2rem;
+}
+.cv-language-human-btn-flag {
+  height: 1.8rem;
+  border-radius: 100rem;
+  border-color: aliceblue;
+  border-style: solid;
+  border-width: 0.3rem;
 }

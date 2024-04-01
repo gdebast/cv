@@ -2,6 +2,8 @@
 
 import { ASSERT_EXIST } from "../../model/utility/assert/assert";
 import { ENG, FR } from "../../model/utility/translatable/translatablestring";
+import ukImage from "../../../uk.png";
+import frImage from "../../../france.png";
 
 /* contact info */
 const CVCONTACT_EMAIL = "gatien.debast@gmail.com";
@@ -248,9 +250,19 @@ export class CVView {
                         <input class="cv-language-human-radio" type="radio" id="__ENGLISH" name="language" value="${ENG}" checked></input>
                         <label class="cv-language-human-name" for="__ENGLISH" id="${ENG}"></label>
                         <p class="cv-language-human-desc" id=${CVLANGUAGE_HUMAN_ENGLISH_DESC}></p>
+                        <div class = "cv-language-human-btn-container">
+                          <div class = "cv-language-human-btn">
+                            <img class="cv-language-human-btn-flag" src="${ukImage}" alt="uk" />
+                          </div>
+                        </div>
                         <input class="cv-language-human-radio" type="radio" id="__FRENCH" name="language" value="${FR}"></input>
                         <label class="cv-language-human-name" for="__FRENCH" id="${FR}"></label>
                         <p class="cv-language-human-desc" id=${CVLANGUAGE_HUMAN_FRENCH_DESC}></p>
+                        <div class = "cv-language-human-btn-container">
+                          <div class = "cv-language-human-btn">
+                            <img class="cv-language-human-btn-flag" src="${frImage}" alt="France" />
+                          </div>
+                        </div>
                       </div>
                     </li>
                   </ol>`;
