@@ -187,3 +187,16 @@
 .cv-language-programming-description {
   font-size: 1.2rem;
 }
+
+/*****************/
+/*   Education   */
+/*****************/
+/*class for the container gathering the date, title and location of an education*/
+.cv-education-list-element-date-title-location {
+  /*make sure it is a line*/
+  display: flex;
+  justify-content: space-between;
+}
+.cv-education-list-element-location {
+  font-size: 1.4rem;
+}

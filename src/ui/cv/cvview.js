@@ -42,6 +42,13 @@ const CVLANGUAGE_PROGRAMMING_PYTHON_ID = "cv-language-programming-python";
 const CVLANGUAGE_PROGRAMMING_MIP_ID = "cv-language-programming-mip";
 const CVLANGUAGE_PROGRAMMING_OPAL_ID = "cv-language-programming-opal";
 
+/*educations*/
+const CVEDUCATION_ID = "cv-education-title";
+const CVEDUCTION_ENGINEER_TITLE_ID = "cv-education-title-engineer";
+const CVEDUCTION_ENGINEER_LOCATION_ID = "cv-education-location-engineer";
+const CVEDUCTION_MANAGEMENT_TITLE_ID = "cv-education-title-management";
+const CVEDUCTION_MANAGEMENT_LOCATION_ID = "cv-education-location-management";
+
 /*icons*/
 const HTML_CLOSED_ICON = `<svg xmlns="http://www.w3.org/2000/svg" 
                                fill="none" 
@@ -71,6 +78,7 @@ export class CVView {
     this._makeContactHtmlElement();
     this._makeExperienceParagraphHtmlElement();
     this._makeLanguageParagraphHtmlElement();
+    this._makeEducationHtmlElement();
   }
 
   /**  implement the oberser pattern with the PortalView.*/
@@ -84,7 +92,8 @@ export class CVView {
   getInsertParagraphs() {
     this._translator.translate(this._experienceHtmlElement);
     this._translator.translate(this._languageHtmlElement);
-    return [this._languageHtmlElement, this._experienceHtmlElement];
+    this._translator.translate(this._educationHtmlElement);
+    return [this._languageHtmlElement, this._experienceHtmlElement, this._educationHtmlElement];
   }
 
   // -------
@@ -236,6 +245,8 @@ export class CVView {
     });
   }
 
+  /** make the html element containing the languages.
+   */
   _makeLanguageParagraphHtmlElement() {
     this._translator.registerTranslatable(CVLANGUAGE_ID, {
       ENG: "Languages",
@@ -358,5 +369,51 @@ export class CVView {
         });
       });
     });
+  }
+
+  _makeEducationHtmlElement() {
+    this._translator.registerTranslatable(CVEDUCATION_ID, {
+      ENG: "Educations",
+      FR: "Formations",
+    });
+    this._translator.registerTranslatable(CVEDUCTION_ENGINEER_TITLE_ID, {
+      ENG: "Engineer in Applied Physics",
+      FR: "Ingénieur civil en physique appliquée",
+    });
+    this._translator.registerTranslatable(CVEDUCTION_ENGINEER_LOCATION_ID, {
+      ENG: "Ecole polythechnique de Louvain",
+      FR: "Ecole polythechnique de Louvain",
+    });
+    this._translator.registerTranslatable(CVEDUCTION_MANAGEMENT_TITLE_ID, {
+      ENG: "Master in Management",
+      FR: "Master en gestion",
+    });
+    this._translator.registerTranslatable(CVEDUCTION_MANAGEMENT_LOCATION_ID, {
+      ENG: "Louvain School of Management",
+      FR: "Louvain School of Management",
+    });
+
+    const html = `<h1 class = "cv-paragraph-title" id="${CVEDUCATION_ID}"></h1>
+                  <ol class = "cv-paragraph-list ">
+                    <li class = "cv-paragraph-list-element">
+                      <h2 class = "cv-paragraph-list-element-title cv-education-list-element-date-title-location">
+                        <div class = "cv-education-list-element-date">2006 - 2011</div>
+                        <div class = "cv-education-list-element-title" id="${CVEDUCTION_ENGINEER_TITLE_ID}"></div>
+                        <div class = "cv-education-list-element-location" id="${CVEDUCTION_ENGINEER_LOCATION_ID}"></div>
+                      </h2>
+                    </li>
+                    <li class = "cv-paragraph-list-element">
+                      <h2 class = "cv-paragraph-list-element-title cv-education-list-element-date-title-location">
+                        <div class = "cv-education-list-element-date">2011 - 2012</div>
+                        <div class = "cv-education-list-element-title" id="${CVEDUCTION_MANAGEMENT_TITLE_ID}"></div>
+                        <div class = "cv-education-list-element-location" id="${CVEDUCTION_MANAGEMENT_LOCATION_ID}"></div>
+                      </h2>
+                    </li>
+                  </ol>`;
+    const eduElt = document.createElement("section");
+    eduElt.innerHTML = html;
+    eduElt.classList.add("cv-box");
+    eduElt.classList.add("cv-paragraph");
+    this._educationHtmlElement = eduElt;
   }
 }
