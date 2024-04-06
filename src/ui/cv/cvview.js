@@ -247,7 +247,7 @@ export class CVView {
     });
     this._translator.registerTranslatable(CVLANGUAGE_HUMAN_ENGLISH_DESC, {
       ENG: "Profesional level",
-      FR: "Niveau profesionel",
+      FR: "Niveau professionel",
     });
     this._translator.registerTranslatable(CVLANGUAGE_HUMAN_FRENCH_DESC, {
       ENG: "Mother language",
