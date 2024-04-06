@@ -5,6 +5,8 @@ import { ENG, FR } from "../../model/utility/translatable/translatablestring";
 import ukImage from "../../../uk.png";
 import frImage from "../../../france.png";
 
+const CLASS_HIDDIN = "hidden";
+
 /* contact info */
 const CVCONTACT_EMAIL = "gatien.debast@gmail.com";
 const CVCONTACT_PHONE = "+32479/75.95.49";
@@ -31,8 +33,14 @@ const CVLANGUAGE_ID = "cv-language-title";
 const CVLANGUAGE_HUMAN_ID = "cv-language-list-element-title-human-language";
 const CVLANGUAGE_HUMAN_ENGLISH_DESC = "cv-language-list-element-english-description";
 const CVLANGUAGE_HUMAN_FRENCH_DESC = "cv-language-list-element-french-description";
-
-const CLASS_CV_LANGUAGE_HUMAN_RADIO = "cv-language-human-radio";
+const CLASS_CV_LANGUAGE_SWITCH_BTN = "cv-language-switch-btn";
+const CLASS_CV_LANGUAGE_HUMAN_BTN_FLAG = "cv-language-human-btn-flag";
+const CVLANGUAGE_PROGRAMMING_ID = "cv-language-list-element-title-programming-language";
+const CVLANGUAGE_PROGRAMMING_CPP_ID = "cv-language-programming-cpp";
+const CVLANGUAGE_PROGRAMMING_JSHTMLCSS_ID = "cv-language-programming-jshtmlcss";
+const CVLANGUAGE_PROGRAMMING_PYTHON_ID = "cv-language-programming-python";
+const CVLANGUAGE_PROGRAMMING_MIP_ID = "cv-language-programming-mip";
+const CVLANGUAGE_PROGRAMMING_OPAL_ID = "cv-language-programming-opal";
 
 /*icons*/
 const HTML_CLOSED_ICON = `<svg xmlns="http://www.w3.org/2000/svg" 
@@ -76,7 +84,7 @@ export class CVView {
   getInsertParagraphs() {
     this._translator.translate(this._experienceHtmlElement);
     this._translator.translate(this._languageHtmlElement);
-    return [this._experienceHtmlElement, this._languageHtmlElement];
+    return [this._languageHtmlElement, this._experienceHtmlElement];
   }
 
   // -------
@@ -160,6 +168,10 @@ export class CVView {
       FR: "L'autre principale réalisation alors que j'étais responsable de ce module, fut de mettre en place des tests automatique sur chaque composant disposant d'une interface publique. Les tests automatiques n'avaient jamais été mis en place sur ce module. La productivité de notre équipe, autant que la qualité du produit, fut améliorée étant donné que notre équipe pu se concentrer d'avantage sur les dévelopements que sur les bugs.",
     });
 
+    /*compute the current year */
+    const currentDate = new Date();
+    const currentYear = currentDate.getFullYear();
+
     const html = `<h1 class = "cv-paragraph-title" id="${CVEXPERIENCE_ID}"></h1>
                   <ol class = "cv-paragraph-list">
                     <li class = "cv-paragraph-list-element">
@@ -190,7 +202,7 @@ export class CVView {
                     </li>
                     <li class = "cv-paragraph-list-element">
                       <h2 class = "cv-paragraph-list-element-title cv-experience-list-element-date-title-button">
-                        <div class = "cv-experience-list-element-date">2019 - 2024</div>
+                        <div class = "cv-experience-list-element-date">2019 - ${currentYear}</div>
                         <div class = "cv-experience-list-element-title" 
                              id="${CVEXPERIENCE_SOFTWAREENGINEER_TITLE_ID}">
                         </div>
@@ -241,28 +253,80 @@ export class CVView {
       ENG: "Mother language",
       FR: "Langue maternelle",
     });
+    this._translator.registerTranslatable(CVLANGUAGE_PROGRAMMING_ID, {
+      ENG: "Programming Languages",
+      FR: "Languages de programmation",
+    });
+    this._translator.registerTranslatable(CVLANGUAGE_PROGRAMMING_CPP_ID, {
+      ENG: "Professional usage at OMP since 2019.",
+      FR: "Utilité professionnel chez OMP depuis 2019.",
+    });
+    this._translator.registerTranslatable(CVLANGUAGE_PROGRAMMING_JSHTMLCSS_ID, {
+      ENG: "Personal usage for some projects.",
+      FR: "Utilité personnelle pour des projets.",
+    });
+    this._translator.registerTranslatable(CVLANGUAGE_PROGRAMMING_PYTHON_ID, {
+      ENG: "Professional usage for some small projects.",
+      FR: "Utilité professionnel pour de petits projets.",
+    });
+    this._translator.registerTranslatable(CVLANGUAGE_PROGRAMMING_MIP_ID, {
+      ENG: "Professional usage at OMP since 2015.",
+      FR: "Utilité professionnel chez OMP depuis 2015.",
+    });
+    this._translator.registerTranslatable(CVLANGUAGE_PROGRAMMING_OPAL_ID, {
+      ENG: "Configuration language for OMP softwares.",
+      FR: "Language de configuration pour OMP.",
+    });
 
     const html = `<h1 class = "cv-paragraph-title" id="${CVLANGUAGE_ID}"></h1>
-                  <ol class = "cv-paragraph-list">
-                    <li class = "cv-paragraph-list-element">
+                  <ol class = "cv-paragraph-list cv-language-list">
+                    <li class = "cv-paragraph-list-element cv-language-list-element">
                       <h2 class = "cv-paragraph-list-element-title" id="${CVLANGUAGE_HUMAN_ID}"></h2>
                       <div class = "cv-language-human-grid">
-                        <input class="cv-language-human-radio" type="radio" id="__ENGLISH" name="language" value="${ENG}" checked></input>
-                        <label class="cv-language-human-name" for="__ENGLISH" id="${ENG}"></label>
+
+                        <!-- ENGLISH -->
+                        <div class = "cv-language-human-btn-container">
+                          <div class = "cv-language-human-btn ${CLASS_CV_LANGUAGE_SWITCH_BTN}" id="__ENGLISH" for="__ENGLISH" value="${ENG}">
+                            <img class="${CLASS_CV_LANGUAGE_HUMAN_BTN_FLAG}" src="${ukImage}" alt="uk" />
+                          </div>
+                        </div>
+                        <label class="cv-language-human-name ${CLASS_CV_LANGUAGE_SWITCH_BTN}" for="__ENGLISH" id="${ENG}"></label>
                         <p class="cv-language-human-desc" id=${CVLANGUAGE_HUMAN_ENGLISH_DESC}></p>
+
+                        <!-- FRENCH -->
                         <div class = "cv-language-human-btn-container">
-                          <div class = "cv-language-human-btn">
-                            <img class="cv-language-human-btn-flag" src="${ukImage}" alt="uk" />
+                          <div class = "cv-language-human-btn ${CLASS_CV_LANGUAGE_SWITCH_BTN}" id="__FRENCH" for="__FRENCH" value="${FR}">
+                            <img class="${CLASS_CV_LANGUAGE_HUMAN_BTN_FLAG} ${CLASS_HIDDIN}" src="${frImage}" alt="France" />
                           </div>
                         </div>
-                        <input class="cv-language-human-radio" type="radio" id="__FRENCH" name="language" value="${FR}"></input>
-                        <label class="cv-language-human-name" for="__FRENCH" id="${FR}"></label>
+                        <label class="cv-language-human-name ${CLASS_CV_LANGUAGE_SWITCH_BTN}" for="__FRENCH" id="${FR}"></label>
                         <p class="cv-language-human-desc" id=${CVLANGUAGE_HUMAN_FRENCH_DESC}></p>
-                        <div class = "cv-language-human-btn-container">
-                          <div class = "cv-language-human-btn">
-                            <img class="cv-language-human-btn-flag" src="${frImage}" alt="France" />
-                          </div>
-                        </div>
+                      </div>
+                    </li>
+                    <li class = "cv-paragraph-list-element cv-language-list-element">
+                      <h2 class = "cv-paragraph-list-element-title" id="${CVLANGUAGE_PROGRAMMING_ID}"></h2>
+                      <div class = "cv-language-programming-grid">
+                        
+                        <!-- C++ -->
+                        <label class="cv-language-programming-name">C++</label>
+                        <p class="cv-language-programming-description" id=${CVLANGUAGE_PROGRAMMING_CPP_ID}></p>
+
+                        <!-- Javascript-HTML-CSS -->
+                        <label class="cv-language-programming-name">Javascript-HTML-CSS</label>
+                        <p class="cv-language-programming-description" id=${CVLANGUAGE_PROGRAMMING_JSHTMLCSS_ID}></p>
+
+                        <!-- Python -->
+                        <label class="cv-language-programming-name">Python</label>
+                        <p class="cv-language-programming-description" id=${CVLANGUAGE_PROGRAMMING_PYTHON_ID}></p>
+
+                        <!-- MIP -->
+                        <label class="cv-language-programming-name">Mixed Integer Programming</label>
+                        <p class="cv-language-programming-description" id=${CVLANGUAGE_PROGRAMMING_MIP_ID}></p>
+
+                        <!-- OPAL -->
+                        <label class="cv-language-programming-name">OPAL</label>
+                        <p class="cv-language-programming-description" id=${CVLANGUAGE_PROGRAMMING_OPAL_ID}></p>
+
                       </div>
                     </li>
                   </ol>`;
@@ -273,11 +337,25 @@ export class CVView {
     langElt.classList.add("cv-paragraph");
     this._languageHtmlElement = langElt;
 
+    /* connect the language buttons to translator 
+      each button and label has the cv-language-switch-btn class and they each should point to the round flag with the 'for' attribute.
+      When we click on it, we look for the id in the 'for' attribute and use the 'value' property for setting the language.
+      The flag is then hidden for every round flag button, but the one clicked on.  
+    */
     const self = this;
-    const languageSwitchRadioBtn = this._languageHtmlElement.querySelectorAll(`.${CLASS_CV_LANGUAGE_HUMAN_RADIO}`);
-    languageSwitchRadioBtn.forEach(function (btn) {
+    const languageSwitchRadioBtns = this._languageHtmlElement.querySelectorAll(`.${CLASS_CV_LANGUAGE_SWITCH_BTN}`);
+    languageSwitchRadioBtns.forEach(function (btn) {
       btn.addEventListener("click", function () {
-        self._translator.setLanguage(btn.value);
+        const roundFlagBtn = self._languageHtmlElement.querySelector(`#${btn.attributes.for.nodeValue}`);
+        ASSERT_EXIST(roundFlagBtn);
+        self._translator.setLanguage(roundFlagBtn.attributes.value.nodeValue);
+        const flagElt = roundFlagBtn.children[0];
+        ASSERT_EXIST(flagElt);
+        const flagElements = self._languageHtmlElement.querySelectorAll(`.${CLASS_CV_LANGUAGE_HUMAN_BTN_FLAG}`);
+        flagElements.forEach(function (flag) {
+          if (flag === flagElt) flag.classList.remove(CLASS_HIDDIN);
+          else flag.classList.add(CLASS_HIDDIN);
+        });
       });
     });
   }

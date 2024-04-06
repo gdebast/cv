@@ -121,27 +121,42 @@
 /*****************/
 /*   Languages   */
 /*****************/
+/*class for the container of the two language types*/
+.cv-language-list {
+  flex-direction: row; /*this property must be after the class 'cv-paragraph-list' to overrule its same property*/
+}
+/*class for the element of the class above*/
+.cv-language-list-element {
+  width: 50%; /*make sure that two languages take half each of the language box*/
+}
+/*   Human Languages   */
+/*---------------------*/
 /*control the grid of the human languages*/
 .cv-language-human-grid {
   display: grid;
-  grid-template-columns: 0.2fr 0.5fr 0.5fr 3fr;
+  grid-template-columns: 0.5fr 0.9fr 3fr;
   align-items: center;
-  row-gap: 1rem;
+  row-gap: 1.5rem;
 }
 /*class for the language name*/
 .cv-language-human-name {
   font-size: 1.2rem;
   font-weight: 450;
-  cursor: pointer;
 }
 /*class for the language description*/
 .cv-language-human-desc {
   font-size: 1.2rem;
 }
 
+/*button to switch between langages*/
+.cv-language-switch-btn {
+  cursor: pointer;
+}
 .cv-language-human-btn {
   display: inline-block;
   height: 2.2rem;
+  width: 2.2rem;
+  background-color: aliceblue;
   border-radius: 1000rem;
   border-style: solid;
   border-width: 0.2rem;
@@ -152,4 +167,23 @@
   border-color: aliceblue;
   border-style: solid;
   border-width: 0.3rem;
+}
+
+/*   Programming Languages   */
+/*---------------------------*/
+/*grid containing the programming language name and description*/
+.cv-language-programming-grid {
+  display: grid;
+  grid-template-columns: 2fr 3fr;
+  align-items: center;
+  gap: 0.7rem;
+}
+/*name of the programming languages*/
+.cv-language-programming-name {
+  font-size: 1.2rem;
+  font-weight: 450;
+}
+/*description of the programming languages*/
+.cv-language-programming-description {
+  font-size: 1.2rem;
 }

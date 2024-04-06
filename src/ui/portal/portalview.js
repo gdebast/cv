@@ -85,7 +85,7 @@ export class PortalView {
   _translatePortal() {
     this._translator.registerTranslatable(JOB_DESCRIPTION_ID, {
       ENG: "Passionate Software Engineer",
-      FR: "Engénieur Software Passionné",
+      FR: "Ingénieur Software Passionné",
     });
     this._translator.registerTranslatable(ABOUTME_BUTTON_TEXT_ID, {
       ENG: "About me",
@@ -97,7 +97,7 @@ export class PortalView {
     });
     this._translator.registerTranslatable(GRAPHPLAYER_BUTTON_TEXT_ID, {
       ENG: "... the graph Lover",
-      FR: "... le passionné des graphes",
+      FR: "... passionné des graphes",
     });
     this._translator.translate(APP_GRID);
   }
@@ -158,7 +158,7 @@ export class PortalView {
       if (self._insertProvider != null) {
         recoverInsertHeader();
         await wait(0.001);
-        self._insertHeaderHTMLElement.classList.remove(CLASS_INSERT_HEADER_GO); /*this needs to be after a wait function call */
+        self._insertHeaderHTMLElement.classList.remove(CLASS_INSERT_HEADER_GO); /*this needs to be after the wait function call */
         // make the paragraph appearing
         const insertParagraphs = self._insertProvider.getInsertParagraphs();
         let startGridRow = 3;
