@@ -67,7 +67,6 @@ export class DPLMovieAllocableRenderer {
     const allocableToBucketsMap = new Map();
     // it is import to sort the allocable base on their date such that the drawing is deterministic
     const allocableObjects = this._sortAllocableBaseOnDates(dplMovieRuntime.getTrackedObjects(this._objectClassId));
-    console.log(this._objectClassId, allocableObjects);
     for (const allocableObject of allocableObjects) {
       const allocableProductLocationId = this._getProductLocationId(allocableObject);
       if (allocableProductLocationId !== productLocationTrackedObject.Id) continue;
@@ -188,7 +187,6 @@ export class DPLMovieAllocableRenderer {
         bucketPartPosition.add(key);
       }
     }
-    console.log(this._objectClassId, this._allocableRects);
     return totalRect;
   }
 

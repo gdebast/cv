@@ -39,7 +39,6 @@ export class DPLMovieCanvasView {
 
   // implement observer pattern with DPLMoviePlayerView (forward, backward, reset)
   notifyOnPlayerPressed() {
-    console.log("========== event");
     this._eraseCanvas();
     this._displayOnCanvas();
   }

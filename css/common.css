@@ -10,6 +10,9 @@ html {
   /* Percentage of user's browser font-size setting */
   font-size: 62.5%;
   height: 100%;
+
+  /*Workaround to make sure that the app are filled at the bottom*/
+  background-color: #e9f3fd;
 }
 
 body {
