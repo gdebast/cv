@@ -1,6 +1,11 @@
 /*************************/
 /*      main view        */
 /*************************/
+.dplmovie {
+  height: 85%;
+  /*because the app is taking 85% of the screen and the rest is for the menu above.
+    Technically, it should be refactored with flex box.*/
+}
 
 .dplmovie-runtime-canvas {
   display: grid;

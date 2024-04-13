@@ -8,6 +8,10 @@ Generic css class to view pool elements in a list.
   display: flex;
   flex-direction: column;
   gap: 1rem;
+
+  /*scroll bar*/
+  overflow-y: scroll;
+  scrollbar-width: thin;
 }
 
 /*elements in the view*/
