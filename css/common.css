@@ -9,7 +9,6 @@ html {
   /* 10px / 16px = 0.625 = 62.5% */
   /* Percentage of user's browser font-size setting */
   font-size: 62.5%;
-  height: 100%;
 
   /*Workaround to make sure that the app are filled at the bottom*/
   background-color: #e9f3fd;
@@ -20,7 +19,6 @@ body {
   line-height: 1;
   font-weight: 400;
   color: #0a2a45;
-  height: 100%;
 }
 
 /*

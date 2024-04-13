@@ -1,3 +1,13 @@
+/*classes made for giving the body and html a absolute or relative size.
+  These classes are used during the transition between the portal buttons and the cv.
+*/
+.relative-size {
+  height: 100%;
+}
+.absolute-size {
+  height: 200rem;
+}
+
 /********************************/
 /*BIG BUTTONS to get to the apps*/
 /********************************/

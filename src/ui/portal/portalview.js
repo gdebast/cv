@@ -4,6 +4,9 @@ import { PortalAppLinker } from "./src/portalapplinker";
 const CLASS_APP_GRID = "app-grid";
 const CLASS_APPCONTAINER = "app-container";
 const CLASS_ABOUTME = "about-section";
+const CLASS_RELATIVESIZE = "relative-size";
+const CLASS_ABSOLUTESIZE = "absolute-size";
+const TAG_MAINELEMENTS = ["html", "body"];
 
 /*id of the text in the portal*/
 const JOB_DESCRIPTION_ID = "description-jobtitle";
@@ -146,6 +149,7 @@ export class PortalView {
     };
 
     const makeInsertAppear = async function () {
+      self._setAbsoluteSizingClassesForMainElements();
       // the buttons are disapearing
       const totalNumberOfButtons = ALL_APP_BUTTONS.length;
       for (let index = totalNumberOfButtons - 1; index >= 0; index--) {
@@ -182,9 +186,11 @@ export class PortalView {
       }
       await wait(0.1);
       for (const btn of ALL_APP_BUTTONS) self._removeAnyTransitionCSSClasses(btn);
+      self._setDefaultSizingClassesForMainElements();
     };
 
     const makeInsertDisappear = async function () {
+      self._setAbsoluteSizingClassesForMainElements();
       ASSERT_EXIST(self._insertProvider);
 
       /* remove the insert paragraphs */
@@ -214,6 +220,7 @@ export class PortalView {
       }
       await wait(0.001);
       for (const btn of ALL_APP_BUTTONS) self._removeAnyTransitionCSSClasses(btn);
+      self._setRelativeSizingClassesForMainElements();
     };
 
     const AboutMeButton = document.querySelector(`.${CLASS_ABOUTME}`);
@@ -225,10 +232,50 @@ export class PortalView {
   /** remove any classes that setup the transition for an animation.
    * @param {HTMLElement} element element on which removing the classes.
    */
-
   _removeAnyTransitionCSSClasses(element) {
     ALL_TRANSITION_CLASS.forEach((className) => {
       element.classList.remove(className);
+    });
+  }
+
+  /** add the relative sizing for the main elements
+   */
+  _setRelativeSizingClassesForMainElements() {
+    TAG_MAINELEMENTS.forEach(function (elementTag) {
+      const elt = document.querySelector(elementTag);
+      ASSERT_EXIST(elt);
+      if (elt.classList.contains(CLASS_ABSOLUTESIZE)) {
+        elt.classList.remove(CLASS_ABSOLUTESIZE);
+      }
+      elt.classList.add(CLASS_RELATIVESIZE);
+    });
+  }
+
+  /** add the absolute sizing for the main elements
+   */
+  _setAbsoluteSizingClassesForMainElements() {
+    TAG_MAINELEMENTS.forEach(function (elementTag) {
+      const elt = document.querySelector(elementTag);
+      ASSERT_EXIST(elt);
+      if (elt.classList.contains(CLASS_RELATIVESIZE)) {
+        elt.classList.remove(CLASS_RELATIVESIZE);
+      }
+      elt.classList.add(CLASS_ABSOLUTESIZE);
+    });
+  }
+
+  /** add the default sizing for the main elements
+   */
+  _setDefaultSizingClassesForMainElements() {
+    TAG_MAINELEMENTS.forEach(function (elementTag) {
+      const elt = document.querySelector(elementTag);
+      ASSERT_EXIST(elt);
+      if (elt.classList.contains(CLASS_RELATIVESIZE)) {
+        elt.classList.remove(CLASS_RELATIVESIZE);
+      }
+      if (elt.classList.contains(CLASS_ABSOLUTESIZE)) {
+        elt.classList.remove(CLASS_ABSOLUTESIZE);
+      }
     });
   }
 }
