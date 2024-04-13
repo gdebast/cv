@@ -51,6 +51,8 @@
   background-color: #d3e8fa;
 
   overflow: hidden; /*this make sure that the button can translate outside the frame*/
+
+  height: 100%; /*with the height of all parents (body and html), this make sure that the portal takes the entire screen*/
 }
 
 .app-grid {
