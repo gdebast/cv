@@ -37,6 +37,7 @@ const CLASS_CV_LANGUAGE_SWITCH_BTN = "cv-language-switch-btn";
 const CLASS_CV_LANGUAGE_HUMAN_BTN_FLAG = "cv-language-human-btn-flag";
 const CVLANGUAGE_PROGRAMMING_ID = "cv-language-list-element-title-programming-language";
 const CVLANGUAGE_PROGRAMMING_CPP_ID = "cv-language-programming-cpp";
+const CVLANGUAGE_PROGRAMMING_CSHARP_ID = "cv-language-programming-csharp";
 const CVLANGUAGE_PROGRAMMING_JSHTMLCSS_ID = "cv-language-programming-jshtmlcss";
 const CVLANGUAGE_PROGRAMMING_PYTHON_ID = "cv-language-programming-python";
 const CVLANGUAGE_PROGRAMMING_MIP_ID = "cv-language-programming-mip";
@@ -272,6 +273,10 @@ export class CVView {
       ENG: "Professional usage at OMP since 2019.",
       FR: "Utilité professionnel chez OMP depuis 2019.",
     });
+    this._translator.registerTranslatable(CVLANGUAGE_PROGRAMMING_CSHARP_ID, {
+      ENG: "Professional usage at OMP since 2024.",
+      FR: "Utilité professionnel chez OMP depuis 2024.",
+    });
     this._translator.registerTranslatable(CVLANGUAGE_PROGRAMMING_JSHTMLCSS_ID, {
       ENG: "Personal usage for some projects.",
       FR: "Utilité personnelle pour des projets.",
@@ -321,6 +326,10 @@ export class CVView {
                         <!-- C++ -->
                         <label class="cv-language-programming-name">C++</label>
                         <p class="cv-language-programming-description" id=${CVLANGUAGE_PROGRAMMING_CPP_ID}></p>
+
+                        <!-- C# -->
+                        <label class="cv-language-programming-name">C#</label>
+                        <p class="cv-language-programming-description" id=${CVLANGUAGE_PROGRAMMING_CSHARP_ID}></p>
 
                         <!-- Javascript-HTML-CSS -->
                         <label class="cv-language-programming-name">Javascript-HTML-CSS</label>

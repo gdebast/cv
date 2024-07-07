@@ -91,16 +91,16 @@ export class PortalView {
       FR: "Ingénieur Software Passionné",
     });
     this._translator.registerTranslatable(ABOUTME_BUTTON_TEXT_ID, {
-      ENG: "About me",
-      FR: "A propos de moi",
+      ENG: "About the author",
+      FR: "A propos de l'autheur",
     });
     this._translator.registerTranslatable(DPLMOVIE_BUTTON_TEXT_ID, {
-      ENG: "the XAI Expert ...",
-      FR: "l'expert XAI ...",
+      ENG: "Discover the DPL Movie ...",
+      FR: "Découvrir le DPL Movie ...",
     });
     this._translator.registerTranslatable(GRAPHPLAYER_BUTTON_TEXT_ID, {
-      ENG: "... the graph Lover",
-      FR: "... passionné des graphes",
+      ENG: "... Play with graphs",
+      FR: "... Jouer avec des graphes",
     });
     this._translator.translate(APP_GRID);
   }

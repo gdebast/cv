@@ -133,6 +133,7 @@
 /*---------------------*/
 /*control the grid of the human languages*/
 .cv-language-human-grid {
+  padding-top: 1.5rem; /*ADAPT THIS WHEN ADDING PROGRAMMING LANGUAGES*/
   display: grid;
   grid-template-columns: 0.5fr 0.9fr 3fr;
   align-items: center;
