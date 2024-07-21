@@ -4,8 +4,12 @@ import { ASSERT_EXIST } from "../../model/utility/assert/assert";
 import { ENG, FR } from "../../model/utility/translatable/translatablestring";
 import ukImage from "../../../uk.png";
 import frImage from "../../../france.png";
+import gdbImage from "../../../gdb.jpg";
 
 const CLASS_HIDDIN = "hidden";
+
+/*title */
+const CVTITLE_ID = "cv-title";
 
 /* contact info */
 const CVCONTACT_EMAIL = "gatien.debast@gmail.com";
@@ -74,15 +78,27 @@ export class CVView {
     ASSERT_EXIST(translator);
     this._portalView = portalView;
     this._translator = translator;
-    this._portalView.registerInsertProvider(this);
 
+    this._makePhotoHtmlElement();
+    this._makeTitleHtmlElement();
     this._makeContactHtmlElement();
     this._makeExperienceParagraphHtmlElement();
     this._makeLanguageParagraphHtmlElement();
     this._makeEducationHtmlElement();
+
+    /*registering must be after making the html element. */
+    this._portalView.registerInsertProvider(this);
   }
 
   /**  implement the oberser pattern with the PortalView.*/
+  getInsertPhoto() {
+    this._translator.translate(this._photoHtmlElement);
+    return this._photoHtmlElement;
+  }
+  getInsertTitle() {
+    this._translator.translate(this._titleHtmlElement);
+    return this._titleHtmlElement;
+  }
   getInsertHeader() {
     this._translator.translate(this._contactHtmlElement);
     return this._contactHtmlElement;
@@ -100,6 +116,29 @@ export class CVView {
   // -------
   // PRIVATE
   // -------
+
+  /** make the html containing the photo of the cv.
+   */
+  _makePhotoHtmlElement() {
+    const html = `<img class="cv-photo-gdb" src=${gdbImage} alt="Gatien De Bast" />`;
+    const photoElt = document.createElement("section");
+    photoElt.innerHTML = html;
+    photoElt.classList.add("cv-photo");
+    this._photoHtmlElement = photoElt;
+  }
+
+  _makeTitleHtmlElement() {
+    this._translator.registerTranslatable(CVTITLE_ID, {
+      ENG: "Passionate Software Engineer",
+      FR: "Ingénieur Software Passionné",
+    });
+    const html = `<div class="cv-title-name">Gatien De Bast</div>
+                  <div class="cv-title-description" id="${CVTITLE_ID}"></div>`;
+    const titleElt = document.createElement("section");
+    titleElt.innerHTML = html;
+    titleElt.classList.add("cv-title");
+    this._titleHtmlElement = titleElt;
+  }
 
   /** make the html element containing the contact information.
    * The instance of this class owns it.

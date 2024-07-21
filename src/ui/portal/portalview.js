@@ -1,4 +1,4 @@
-import { ASSERT, ASSERT_EXIST } from "../../model/utility/assert/assert";
+import { ASSERT, ASSERT_EXIST, ASSERT_ISBOOLEAN, ASSERT_TYPE } from "../../model/utility/assert/assert";
 import { PortalAppLinker } from "./src/portalapplinker";
 
 const CLASS_APP_GRID = "app-grid";
@@ -30,6 +30,8 @@ const CLASS_INSERT_HEADER_GO_TRANSITION = "insert-header-go-transition";
 const CLASS_INSERT_PARAGRAPH_GO_TRANSITION = "insert-paragraph-go-transition";
 const CLASS_INSERT_PARAGRAPH_GO_LEFT = "insert-paragraph-go-left";
 const CLASS_INSERT_PARAGRAPH_GO_RIGHT = "insert-paragraph-go-rigth";
+const CLASS_INSERT_PHOTO = "insert-photo";
+const CLASS_INSERT_TITLE = "insert-title";
 
 const ALL_APP_BUTTONS = document.querySelectorAll(`.${CLASS_APPCONTAINER}`);
 const APP_GRID = document.querySelector(`.${CLASS_APP_GRID}`);
@@ -43,10 +45,12 @@ const ALL_TRANSITION_CLASS = [
 ];
 
 export class PortalView {
-  constructor(translator) {
+  constructor(translator, localConfigGetter) {
     ASSERT_EXIST(translator);
+    ASSERT_EXIST(localConfigGetter);
     this._portalAppLinker = new PortalAppLinker();
     this._translator = translator;
+    this._localConfigGetter = localConfigGetter;
     this._setupHoveredState();
     this._setupGoState();
     this._translatePortal();
@@ -56,11 +60,12 @@ export class PortalView {
 
   /** register an object able to provide the insert.
    *  An insert is the set of html elements replacing the app buttons when clicking on the about-me button.
-   *  the insert-provider must provide the method getInsertHeader(), getInsertHeaderBackButtonId() and getInsertParagraphs()
+   *  the insert-provider must provide the method getInsertPhoto(), getInsertTitle(), getInsertHeader(), getInsertHeaderBackButtonId() and getInsertParagraphs()
    */
   registerInsertProvider(insertProvider) {
     ASSERT_EXIST(insertProvider);
     this._insertProvider = insertProvider;
+    this._setupPhotoAndTitleInsert(true);
   }
 
   // -------
@@ -86,10 +91,6 @@ export class PortalView {
   }
 
   _translatePortal() {
-    this._translator.registerTranslatable(JOB_DESCRIPTION_ID, {
-      ENG: "Passionate Software Engineer",
-      FR: "Ingénieur Software Passionné",
-    });
     this._translator.registerTranslatable(ABOUTME_BUTTON_TEXT_ID, {
       ENG: "About the author",
       FR: "A propos de l'autheur",
@@ -160,9 +161,14 @@ export class PortalView {
 
       // the insert is appearing
       if (self._insertProvider != null) {
+        // the photo and title are appearing
+        //TODO
+
+        // header is appearing
         recoverInsertHeader();
         await wait(0.001);
         self._insertHeaderHTMLElement.classList.remove(CLASS_INSERT_HEADER_GO); /*this needs to be after the wait function call */
+
         // make the paragraph appearing
         const insertParagraphs = self._insertProvider.getInsertParagraphs();
         let startGridRow = 3;
@@ -227,6 +233,24 @@ export class PortalView {
     AboutMeButton.addEventListener("click", function () {
       makeInsertAppear();
     });
+  }
+
+  _setupPhotoAndTitleInsert(isSatrtup) {
+    ASSERT_EXIST(this._insertProvider);
+    ASSERT_ISBOOLEAN(isSatrtup);
+
+    // insert them at start up
+    if (isSatrtup) {
+      // get the inserts
+      this._insertPhotoHtmlElement = this._insertProvider.getInsertPhoto();
+      this._insertTitleHtmlElement = this._insertProvider.getInsertTitle();
+      console.log(this._insertPhotoHtmlElement);
+      // put them in the grid
+      this._insertPhotoHtmlElement.classList.add(CLASS_INSERT_PHOTO);
+      this._insertTitleHtmlElement.classList.add(CLASS_INSERT_TITLE);
+      APP_GRID.append(this._insertPhotoHtmlElement);
+      APP_GRID.append(this._insertTitleHtmlElement);
+    }
   }
 
   /** remove any classes that setup the transition for an animation.

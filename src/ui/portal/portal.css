@@ -79,45 +79,6 @@
 }
 
 /***************/
-/*PHOTO SECTION*/
-/***************/
-.photo-section {
-  overflow: hidden;
-  background-color: #a7d1f5;
-  border-radius: 2.4rem;
-  grid-column: 1;
-  grid-row: 1/3;
-}
-.gdb-photo {
-  width: 100%;
-}
-
-.description-section {
-  /*grid properties*/
-  grid-column: 2;
-  grid-row: 1;
-
-  /*shape*/
-  border-radius: 2.4rem;
-  background-color: #a7d1f5;
-  padding: 6.3rem 6.3rem;
-
-  padding: 3.2rem 6.4rem;
-  display: flex;
-  flex-direction: column;
-  gap: 1.8rem;
-}
-.description-name {
-  font-size: 3.6rem;
-  font-weight: 600;
-}
-.description-jobtitle {
-  font-size: 3rem;
-  font-weight: 500;
-  color: #114673;
-}
-
-/***************/
 /* APP BUTTONS*/
 /***************/
 
@@ -147,9 +108,39 @@
 /***************/
 /*The insert is the set of elements which inserts themselves in-place of the big buttons.
   Specifically:
+    - the "insert-photo" is the photo of the cv
+    - the "insert-title" is the title of the cv
     - the "insert-header" is the contact element of the CV
     - the "insert-paragraph" are the Experiences, the Educations and Langages paragraph of the cv
 */
+
+/*insert-photo*/
+/*------------*/
+.insert-photo {
+  grid-column: 1;
+  grid-row: 1/3;
+}
+/*used to make the transition of the photo. It is coming from above*/
+.insert-photo-go {
+  transform: translateY(2000px);
+}
+.insert-photo-go-transition {
+  transition: transform 1s;
+}
+
+/*insert-title*/
+/*------------*/
+.insert-title {
+  grid-column: 2;
+  grid-row: 1;
+}
+/*used to make the transition of the title*/
+.insert-title-go {
+  transform: translateX(2000px);
+}
+.insert-title-go-transition {
+  transition: transform 1s;
+}
 
 /*insert-header*/
 /*-------------*/
@@ -165,6 +156,8 @@
 .insert-header-go-transition {
   transition: transform 1s;
 }
+/*insert-paragraph*/
+/*----------------*/
 /*used to make the transition of the paragraphs*/
 .insert-paragraph-go-left {
   transform: translateX(-2000px);

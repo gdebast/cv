@@ -11,9 +11,11 @@ import { DPLMovieCanvasView } from "./ui/dplmovie/canvas/dplmoviecanvasview";
 import { PortalView } from "./ui/portal/portalview";
 import { CVView } from "./ui/cv/cvview";
 import { ViewTranslator } from "./ui/translator/viewtranslator";
+import { LocalConfigGetter } from "./ui/localconfig/localconfiggetter";
 
 const translator = new ViewTranslator();
-const portal = new PortalView(translator);
+const localConfig = new LocalConfigGetter();
+const portal = new PortalView(translator, localConfig);
 
 // DPL movie
 const dplMovieRuntimePool = new DPLMovieRuntimePool();

@@ -52,6 +52,45 @@
 }
 
 /**************/
+/*   PHOTO    */
+/**************/
+.cv-photo {
+  overflow: hidden;
+  background-color: #a7d1f5;
+  border-radius: 2.4rem;
+}
+.cv-photo-gdb {
+  width: 100%;
+}
+
+/**************/
+/*   TITLE    */
+/**************/
+
+.cv-title {
+  /*shape*/
+  border-radius: 2.4rem;
+  background-color: #a7d1f5;
+  padding: 6.3rem 6.3rem;
+
+  /*shaping the name and description*/
+  padding: 3.2rem 6.4rem;
+  display: flex;
+  flex-direction: column;
+  gap: 1.8rem;
+  justify-content: center;
+}
+.cv-title-name {
+  font-size: 3.6rem;
+  font-weight: 600;
+}
+.cv-title-description {
+  font-size: 3rem;
+  font-weight: 500;
+  color: #114673;
+}
+
+/**************/
 /*   CONTACT  */
 /**************/
 .cv-address-backToMenu {
