@@ -122,7 +122,7 @@
 }
 /*used to make the transition of the photo. It is coming from above*/
 .insert-photo-go {
-  transform: translateY(2000px);
+  transform: translateY(-2000px);
 }
 .insert-photo-go-transition {
   transition: transform 1s;
@@ -136,7 +136,7 @@
 }
 /*used to make the transition of the title*/
 .insert-title-go {
-  transform: translateX(2000px);
+  transform: translateY(-2000px);
 }
 .insert-title-go-transition {
   transition: transform 1s;

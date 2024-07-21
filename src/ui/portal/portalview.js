@@ -31,7 +31,11 @@ const CLASS_INSERT_PARAGRAPH_GO_TRANSITION = "insert-paragraph-go-transition";
 const CLASS_INSERT_PARAGRAPH_GO_LEFT = "insert-paragraph-go-left";
 const CLASS_INSERT_PARAGRAPH_GO_RIGHT = "insert-paragraph-go-rigth";
 const CLASS_INSERT_PHOTO = "insert-photo";
+const CLASS_INSERT_PHOTO_GO_TRANSITION = "insert-photo-go-transition";
+const CLASS_INSERT_PHOTO_GO = "insert-photo-go";
 const CLASS_INSERT_TITLE = "insert-title";
+const CLASS_INSERT_TITLE_GO = "insert-title-go";
+const CLASS_INSERT_TITLE_GO_TRANSITION = "insert-title-go-transition";
 
 const ALL_APP_BUTTONS = document.querySelectorAll(`.${CLASS_APPCONTAINER}`);
 const APP_GRID = document.querySelector(`.${CLASS_APP_GRID}`);
@@ -42,6 +46,8 @@ const ALL_TRANSITION_CLASS = [
   CLASS_INSERT_HEADER_GO_TRANSITION,
   CLASS_APPCONTAINER_COMEBACK_TRANSITION,
   CLASS_INSERT_PARAGRAPH_GO_TRANSITION,
+  CLASS_INSERT_TITLE_GO_TRANSITION,
+  CLASS_INSERT_PHOTO_GO_TRANSITION,
 ];
 
 export class PortalView {
@@ -65,7 +71,7 @@ export class PortalView {
   registerInsertProvider(insertProvider) {
     ASSERT_EXIST(insertProvider);
     this._insertProvider = insertProvider;
-    this._setupPhotoAndTitleInsert(true);
+    this._setupPhotoAndTitleInsert();
   }
 
   // -------
@@ -149,6 +155,20 @@ export class PortalView {
       self._insertHeaderHTMLElement.classList.add(CLASS_INSERT_HEADER_GO);
     };
 
+    // recover or hide the phto and the insert if needed.
+    const recoverInsertPhotoAndTitleIfNeeded = function () {
+      if (self._localConfigGetter.hidePhotoAndMainDescriptionAtStart == false) return;
+      self._insertPhotoHtmlElement.classList.add(CLASS_INSERT_PHOTO_GO_TRANSITION);
+      self._insertTitleHtmlElement.classList.add(CLASS_INSERT_TITLE_GO_TRANSITION);
+      self._insertPhotoHtmlElement.classList.remove(CLASS_INSERT_PHOTO_GO);
+      self._insertTitleHtmlElement.classList.remove(CLASS_INSERT_TITLE_GO);
+    };
+    const removeInsertPhotoAndTitleIfNeeded = function () {
+      if (self._localConfigGetter.hidePhotoAndMainDescriptionAtStart == false) return;
+      self._insertPhotoHtmlElement.classList.add(CLASS_INSERT_PHOTO_GO);
+      self._insertTitleHtmlElement.classList.add(CLASS_INSERT_TITLE_GO);
+    };
+
     const makeInsertAppear = async function () {
       self._setAbsoluteSizingClassesForMainElements();
       // the buttons are disapearing
@@ -162,7 +182,8 @@ export class PortalView {
       // the insert is appearing
       if (self._insertProvider != null) {
         // the photo and title are appearing
-        //TODO
+        recoverInsertPhotoAndTitleIfNeeded();
+        await wait(0.001);
 
         // header is appearing
         recoverInsertHeader();
@@ -217,6 +238,10 @@ export class PortalView {
       removeInsertHeader();
       await wait(0.15);
 
+      /*remove the photo and the title */
+      removeInsertPhotoAndTitleIfNeeded();
+      await wait(0.15);
+
       /*recover the buttons */
       const totalNumberOfButtons = ALL_APP_BUTTONS.length;
       for (let index = 0; index < totalNumberOfButtons; index++) {
@@ -235,21 +260,26 @@ export class PortalView {
     });
   }
 
-  _setupPhotoAndTitleInsert(isSatrtup) {
-    ASSERT_EXIST(this._insertProvider);
-    ASSERT_ISBOOLEAN(isSatrtup);
+  /**
+   * add the photo and the title at startup.
+   */
+  _setupPhotoAndTitleInsert() {
+    if (this._insertProvider == null) return;
 
-    // insert them at start up
-    if (isSatrtup) {
-      // get the inserts
-      this._insertPhotoHtmlElement = this._insertProvider.getInsertPhoto();
-      this._insertTitleHtmlElement = this._insertProvider.getInsertTitle();
-      console.log(this._insertPhotoHtmlElement);
-      // put them in the grid
-      this._insertPhotoHtmlElement.classList.add(CLASS_INSERT_PHOTO);
-      this._insertTitleHtmlElement.classList.add(CLASS_INSERT_TITLE);
-      APP_GRID.append(this._insertPhotoHtmlElement);
-      APP_GRID.append(this._insertTitleHtmlElement);
+    // get the inserts
+    this._insertPhotoHtmlElement = this._insertProvider.getInsertPhoto();
+    this._insertTitleHtmlElement = this._insertProvider.getInsertTitle();
+    console.log(this._insertPhotoHtmlElement);
+    // put them in the grid
+    this._insertPhotoHtmlElement.classList.add(CLASS_INSERT_PHOTO);
+    this._insertTitleHtmlElement.classList.add(CLASS_INSERT_TITLE);
+    APP_GRID.append(this._insertPhotoHtmlElement);
+    APP_GRID.append(this._insertTitleHtmlElement);
+
+    // make it go if the needed
+    if (this._localConfigGetter.hidePhotoAndMainDescriptionAtStart) {
+      this._insertPhotoHtmlElement.classList.add(CLASS_INSERT_PHOTO_GO);
+      this._insertTitleHtmlElement.classList.add(CLASS_INSERT_TITLE_GO);
     }
   }
 
